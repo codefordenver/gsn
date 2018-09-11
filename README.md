@@ -10,6 +10,17 @@ This project aims to build a platform for gathering and parsing data for any ris
 - Facilitate the process of updating records for social workers who are having to contend with records from a variety of sources.
 - Enable data to be uploaded from a variety of school networks into a remote database that can be accessed via a website 
 
+# Current Assumptions:
+- Until further notice, any possible app will be hosted on Heroku. 
+
+# Dangling Questions:
+- Assuming we use SQL, where do we go from there? PostgreSQL? MySQL?
+- What language jells best with the prospective group members? Node.js appears to be the current frontrunner.
+- Will we use a framework? React? 
+
+# Going Forward:
+- Maintaining any initial momentum will likely hinge on good communication between team members and the partners at Generation Schools Network. 
+
 
 
 [![Stories Ready to Work On](https://badge.waffle.io/codefordenver/gsn.svg?label=ready&title=Cards%20Ready%20To%20Work%20On)](https://waffle.io/codefordenver/gsn)
