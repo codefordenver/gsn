@@ -6,9 +6,9 @@ Statement of Purpose:
 This project aims to build a platform for gathering and parsing data for any risk youth that are participating in the EARRS program within the Generation Schools Network. 
 
 # Goals:
-..* Gather and parse csv data for the purpose of tracking metrics that relate to a students success within the school system, i.e. record and track attendence rates and grade point average. 
-..* Facilitate the process of updating records for social workers who are having to contend with records from a variety of sources.
-..* Enable data to be uploaded from a variety of school networks into a remote database that can be accessed via a website 
+- Gather and parse csv data for the purpose of tracking metrics that relate to a students success within the school system, i.e. record and track attendence rates and grade point average. 
+- Facilitate the process of updating records for social workers who are having to contend with records from a variety of sources.
+- Enable data to be uploaded from a variety of school networks into a remote database that can be accessed via a website 
 
 
 
