@@ -2,15 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 
-class HelloWorld extends Component {
+const Index = () => {
+  return <div>This is the future Landing page for GSN!</div>;
+};
 
-  render() {
-    return (
-      <div> Welcome to the GSN website </div>
-    );
-  }
-}
 
 const wrapper = document.getElementById("app");
 
-wrapper ? ReactDOM.render(<HelloWorld />, wrapper) : null;
+wrapper ? ReactDOM.render(<Index />, wrapper) : null;

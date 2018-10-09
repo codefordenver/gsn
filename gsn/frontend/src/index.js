@@ -1,1 +1,1 @@
-import HelloWorld from "./components/App";
+import Index from "./components/App";
