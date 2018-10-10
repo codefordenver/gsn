@@ -1,1 +1,1 @@
-web: gunicorn wsgi.py 
+web: gunicorn --pythonpath gsn gsn.wsgi 
