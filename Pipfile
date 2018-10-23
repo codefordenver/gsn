@@ -9,6 +9,10 @@ djangorestframework = "*"
 whitenoise = "*"
 gunicorn = "*"
 django-heroku = "*"
+"psycopg2" = "*"
+graphviz = "*"
+djangorestframework-jwt = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 coverage = "*"

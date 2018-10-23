@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import UserForms from './UserForms';
 
 
 const Index = () => {
@@ -9,4 +10,4 @@ const Index = () => {
 
 const wrapper = document.getElementById("app");
 
-wrapper ? ReactDOM.render(<Index />, wrapper) : null;
+wrapper ? ReactDOM.render(<UserForms />, wrapper) : null;

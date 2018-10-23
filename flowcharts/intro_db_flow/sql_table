@@ -1,0 +1,57 @@
+// SQL Schema
+digraph {
+	A [label=<<TABLE>
+		<TR><TD><B>Student Info</B></TD></TR>
+		<TR><TD>person_id (pk)</TD></TR>
+		<TR><TD><I>state_id</I></TD></TR>
+		<TR><TD>student_number</TD></TR>
+		<TR><TD>last_name</TD></TR>
+		<TR><TD>first_name</TD></TR>
+		<TR><TD>middle_name</TD></TR>
+		<TR><TD>gender</TD></TR>
+		<TR><TD>birthdate</TD></TR>
+		<TR><TD>grade</TD></TR>
+		<TR><TD>school_id</TD></TR>
+		<TR><TD>district_id</TD></TR>
+	</TABLE>> shape=plaintext]
+	B [label=<<TABLE>
+		<TR><TD><B>Behavior</B></TD></TR>
+		<TR><TD><I>person_id (pk)</I></TD></TR>
+		<TR><TD>context</TD></TR>
+		<TR><TD>context_description</TD></TR>
+		<TR><TD>incident_date</TD></TR>
+		<TR><TD>incident_id</TD></TR>
+		<TR><TD>location</TD></TR>
+		<TR><TD>location_description</TD></TR>
+		<TR><TD>status</TD></TR>
+		<TR><TD>timestamp</TD></TR>
+		<TR><TD>submitted_by_person_id</TD></TR>
+</TABLE>> shape=plaintext]
+	C [label=<<TABLE>
+		<TR><TD><B>Attendance</B></TD></TR>
+		<TR><TD><I>person_id (pk)</I></TD></TR>
+		<TR><TD>term1_period_absences</TD></TR>
+		<TR><TD>term1_absences_excused</TD></TR>
+		<TR><TD>term1_absences_unexcused</TD></TR>
+		<TR><TD>term1_tardies</TD></TR>
+</TABLE>> shape=plaintext]
+	D [label=<<TABLE>
+			<TR><TD><B>GPA</B></TD></TR>
+			<TR><TD><I>person_id (pk)</I></TD></TR>
+			<TR><TD>calender_id</TD></TR>
+			<TR><TD>term1_gpa</TD></TR>
+</TABLE>> shape=plaintext]
+	E [label=<<TABLE>
+			<TR><TD><B>grading</B></TD></TR>
+			<TR><TD><I>person_id (pk)</I></TD></TR>
+			<TR><TD>section_id</TD></TR>
+			<TR><TD>course_id</TD></TR>
+			<TR><TD>course_number</TD></TR>
+			<TR><TD>course_name</TD></TR>
+			<TR><TD>section_number</TD></TR>
+</TABLE>> shape=plaintext]
+	A -> B
+	A -> C
+	A -> D
+	A -> E
+}

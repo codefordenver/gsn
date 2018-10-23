@@ -20,8 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5i#6am1lt$i*gbp_c9@s_$9lr$6%nuk4@)5=!+2f^koch6^s5h'
-
+SECRET_KEY = 'gsn.gsnsecrets.gsn_django_secretkey'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -37,13 +36,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'frontend',
-    'rest_framework'
+    'frontend.apps.FrontendConfig',
+    'rest_framework',
+    'user_app.apps.UserAppConfig'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -51,6 +52,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
+    ),
+}
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000',
+)
 
 ROOT_URLCONF = 'gsn.urls'
 
@@ -78,12 +93,18 @@ WSGI_APPLICATION = 'gsn.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'gsndb',
+        'USER': 'hunter',
+        'PASSWORD': 'gsn.gsnsecrets.db_password',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
-
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'gsn.utils.my_jwt_response_handler'
+}
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
