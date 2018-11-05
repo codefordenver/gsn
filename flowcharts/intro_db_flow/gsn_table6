@@ -1,0 +1,77 @@
+// gsn SQL schema
+digraph {
+	E [label=<<TABLE>
+			<TR><TD><B>District</B></TD></TR>
+			<TR><TD><I>district_id (pk)</I></TD></TR>
+			<TR><TD>code</TD></TR>
+			<TR><TD>state</TD></TR>
+			<TR><TD>city</TD></TR>
+			<TR><TD>number</TD></TR>
+	</TABLE>> shape=plaintext]
+	F [label=<<TABLE>
+			<TR><TD><B>School</B></TD></TR>
+			<TR><TD><I>school_id (pk)</I></TD></TR>
+			<TR><TD><I>district_id (fk)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+	</TABLE>> shape=plaintext]
+	D [label=<<TABLE>
+			<TR><TD><B>Student</B></TD></TR>
+			<TR><TD><I>student_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (m2m)</I></TD></TR>
+			<TR><TD>first_name</TD></TR>
+			<TR><TD>last_name</TD></TR>
+			<TR><TD>middle_name</TD></TR>
+			<TR><TD>gender</TD></TR>
+			<TR><TD>birthdate</TD></TR>
+			<TR><TD>grade</TD></TR>
+			<TR><TD>state_id</TD></TR>
+	</TABLE>> shape=plaintext]
+	H [label=<<TABLE>
+			<TR><TD><B>Student Snap</B></TD></TR>
+			<TR><TD><I>student_snap_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (fk)</I></TD></TR>
+			<TR><TD><I>student_id (fk)</I></TD></TR>
+			<TR><TD>student_year</TD></TR>
+			<TR><TD>student_term</TD></TR>
+
+</TABLE>> shape=plaintext]
+	G [label=<<TABLE>
+			<TR><TD><B>Course</B></TD></TR>
+			<TR><TD><I>course_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (fk)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+			<TR><TD>subject</TD></TR>
+	</TABLE>> shape=plaintext]
+	A [label=<<TABLE>
+		<TR><TD><B>Behavior</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD>incident_date_time</TD></TR>
+		<TR><TD>context</TD></TR>
+		<TR><TD>result</TD></TR>
+	</TABLE>> shape=plaintext]
+	B [label=<<TABLE>
+		<TR><TD><B>Attendance</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD>entry_date_time</TD></TR>
+		<TR><TD>total_unexabs</TD></TR>
+		<TR><TD>total_exabs</TD></TR>
+		<TR><TD>total_tardies</TD></TR>
+	</TABLE>> shape=plaintext]
+	C [label=<<TABLE>
+		<TR><TD><B>Grade</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD><I>course_id (fk)</I></TD></TR>
+		<TR><TD>entry_date_time</TD></TR>
+		<TR><TD>grade</TD></TR>
+		<TR><TD>final_boolean</TR></TD>
+	</TABLE>> shape=plaintext]
+	H -> B
+	H -> C
+	H -> A
+	D -> H
+	E -> F
+	F -> H
+	F -> G
+	F -> D
+	G -> C
+}

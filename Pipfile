@@ -13,6 +13,7 @@ django-heroku = "*"
 graphviz = "*"
 djangorestframework-jwt = "*"
 django-cors-headers = "*"
+httpie = "*"
 
 [dev-packages]
 coverage = "*"

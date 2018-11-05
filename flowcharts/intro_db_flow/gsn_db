@@ -1,0 +1,75 @@
+from graphviz import Digraph
+
+flow = Digraph(comment="gsn SQL schema")
+
+flow.node('E', shape='plaintext', label='''<<TABLE>
+			<TR><TD><B>District</B></TD></TR>
+			<TR><TD><I>district_id (pk)</I></TD></TR>
+			<TR><TD>code</TD></TR>
+			<TR><TD>state</TD></TR>
+			<TR><TD>city</TD></TR>
+			<TR><TD>number</TD></TR>
+	</TABLE>>''')
+flow.node('F', shape='plaintext', label='''<<TABLE>
+			<TR><TD><B>School</B></TD></TR>
+			<TR><TD><I>school_id (pk)</I></TD></TR>
+			<TR><TD><I>district_id (fk)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+	</TABLE>>''')
+flow.node('D', shape='plaintext', label='''<<TABLE>
+			<TR><TD><B>Student</B></TD></TR>
+			<TR><TD><I>student_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (m2m)</I></TD></TR>
+			<TR><TD>first_name</TD></TR>
+			<TR><TD>last_name</TD></TR>
+			<TR><TD>middle_name</TD></TR>
+			<TR><TD>gender</TD></TR>
+			<TR><TD>birthdate</TD></TR>
+			<TR><TD>state_id</TD></TR>
+	</TABLE>>''')
+flow.node('H', shape='plaintext', label='''<<TABLE>
+			<TR><TD><B>Student Snap</B></TD></TR>
+			<TR><TD><I>student_snap_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (fk)</I></TD></TR>
+			<TR><TD><I>student_id (fk)</I></TD></TR>
+			<TR><TD>student_year</TD></TR>
+			<TR><TD>student_term</TD></TR>
+
+</TABLE>>''')
+flow.node('G', shape='plaintext', label='''<<TABLE>
+			<TR><TD><B>Course</B></TD></TR>
+			<TR><TD><I>course_id (pk)</I></TD></TR>
+			<TR><TD><I>school_id (fk)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+			<TR><TD>subject</TD></TR>
+	</TABLE>>''')
+flow.node('A', shape='plaintext', label='''<<TABLE>
+		<TR><TD><B>Behavior</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD>incident_date_time</TD></TR>
+		<TR><TD>context</TD></TR>
+		<TR><TD>result</TD></TR>
+	</TABLE>>''')
+flow.node('B', shape='plaintext', label='''<<TABLE>
+		<TR><TD><B>Attendance</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD>entry_date_time</TD></TR>
+		<TR><TD>total_unexabs</TD></TR>
+		<TR><TD>total_exabs</TD></TR>
+		<TR><TD>total_tardies</TD></TR>
+	</TABLE>>''')
+flow.node('C', shape='plaintext', label='''<<TABLE>
+		<TR><TD><B>Grade</B></TD></TR>
+		<TR><TD><I>student_snap_id (fk)</I></TD></TR>
+		<TR><TD><I>course_id (fk)</I></TD></TR>
+		<TR><TD>entry_date_time</TD></TR>
+		<TR><TD>grade_metric</TD></TR>
+		<TR><TD>grade_scale</TD></TR>
+		<TR><TD>grade_is_final</TD></TR>
+	</TABLE>>''')
+
+
+flow.edges(['HB', 'HC', 'HA', 'DH', 'EF', 'FH', 'FG', 'FD', 'GC'])
+flow.format = 'svg'
+
+flow.render('./gsn_final_table', view=True)

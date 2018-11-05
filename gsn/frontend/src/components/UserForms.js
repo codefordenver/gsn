@@ -92,6 +92,11 @@ class UserForms extends Component {
         form = null;
     }
 
+    let controller;
+    if (this.state_logged_in) {
+      controller = <Controller />;
+    }
+
     return (
       <div className="UserForms">
         <Nav
@@ -105,6 +110,7 @@ class UserForms extends Component {
             ? `Hello, ${this.state.username}`
             : 'Please Log In'}
         </h3>
+
       </div>
     );
   }
