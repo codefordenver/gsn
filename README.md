@@ -96,7 +96,7 @@ brew install postgres
 ```
 
 #### Clone the repository from Github:
-We're nearly there. Install Git using Homebrew if you don't have it already. 
+Install Git using Homebrew if you don't have it already. 
 ```bash
 brew install git
 ```
@@ -106,6 +106,7 @@ Go to a directory of your choosing, maybe one entitled 'projects'. Once there, c
 ```bash 
 git clone git@github.com:codefordenver/gsn.git
 ```
+
 Now you should have the GSN website's project directory in a folder entitled 'gsn'. Now type `cd gsn` to enter the gsn project folder and type the following command to install all of the python dependencies with pipenv.
 ``` shell
 pipenv install
@@ -116,7 +117,42 @@ If everything installs without a hitch, you should be able to start your virtual
 pipenv shell
 ```
 
-At this point, you may be able to run the website on your local server by going into another gsn subfolder `cd gsn`, and running the following commands:
+#### Ensure that the settings.py folder agrees with your postgres instance:
+We're near the end of the tunnel. The final step we need to take before we get our local server up and running involves wiring up a Postgres instance that can work properly alongside our django project. If you open up the ```settings.py``` file inside of the gsn app (confusingly nested within two other ```gsn``` project folders) you can scroll down and see the database configuration for our Django project:
+
+``` shell
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'gsndb',
+        'USER': 'gsn',
+        'PASSWORD': 'gsn.gsnsecrets.db_password',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+```
+
+A quick read of this configuration suggests that our django project expects to connect to a Postgres database instance named ```gsndb``` that is owned by a user ```gsn```. But, you also might notice that there is a password stored in a python file entitled ```gsnsecrets```. This is a precaution to ensure that whatever password is used to access the database cannot be swiped by some malefactor intent on misusing student data to meet his/her/their own nefarious ends! With all this in mind, let's set up our database to agree with the configuration presented above.
+
+1. Enter the Postgres shell by typeing ```psql``` in your BASH shell and create a user named gsn and give that user a password of your own choosing.
+``` shell
+CREATE USER gsn WITH PASSWORD 'yourpassword';
+```
+2. Now go ahead and create a database named ```gsndb``` that is owned by our newly created user:
+``` shell
+CREATE DATABASE gsndb WITH OWNER gsn;
+```
+3. Finally, exit the Postgres shell and create a file named ```gsnsecrets.py``` in the same directory as the settings.py file. Inside the file, instantiate a variable called ```db_password``` and assign it a string value corresponding to the password you chose for the gsn user.
+``` shell
+db_password = 'yourpassword';
+```
+And that should do it. As per the password field in the database configuration of our settings.py, Django will search for the ```gsnsecrets.py``` file that you just created and use the value stored in ```db_password``` to access the ```gsndb``` Postgres database instance. 
+
+###### If you were carefully reading through the settings.py file, you may have noticed that there is another field entitled ```SECRET_KEY``` that accepts a value from our gsnsecrets.py file. You will need this for authentication purposes soon enough. For the moment things will work up to a point without it.  
+
+#### Run the server, see if things are working as they should.
+At this point, you should be able to view the website on your local server by going into the gsn Django project folder and running the following commands:
 ``` shell
 npm run dev
 python manage.py runserver
@@ -127,19 +163,7 @@ Django version 2.1.3, using settings 'gsn.settings'
 Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.
 ```
-If you see that, everything is working! You can visit the url address for your local server and you'll see a very bare bones incarnation of the gsn website. If, on the other hand, you get an error, it is likely due to a problem with postgres and some configurations in the settings.py folder. Updates to the installation instructions, along with an Ubuntu guide, will be forthcoming. But I'm gonna hop off for now and watch the midterm results roll in. Hopefully everyone voted, it's your civic duty!
-
-
-
-
-
-
-
-
-
-
-
-
+If you see that, everything is working! You can visit the url address for the development server and you'll see a very bare bones incarnation of the gsn website. Much of the interactivity will be limited until you're given the SECRET_KEY that Django employs for authenticating users, but you should at least see a landing page. If, on the other hand, you get an error, then there was likely some hitch along the way that resulted from improper configuration or improper instruction (the latter being my fault). Don't worry, setting things up can be onerous. Attempt to solve the problem on your own by following the errors wherever they might lead you. If you find yourself running up against a brick wall, don't be afraid to reach out to a fellow team member! As the saying goes, Rome wasn't built in a day.
 
 
 
