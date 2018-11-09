@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'gsn.gsnsecrets.gsn_django_secretkey'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -96,7 +96,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'gsndb',
-        'USER': 'hunter',
+        'USER': 'gsn',
         'PASSWORD': 'gsn.gsnsecrets.db_password',
         'HOST': 'localhost',
         'PORT': '',
