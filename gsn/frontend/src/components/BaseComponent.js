@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import Nav from './Nav';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
+import DatabaseInteractor from './DatabaseInteractor';
 
 
-class UserForms extends Component {
+class BaseComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -92,13 +93,9 @@ class UserForms extends Component {
         form = null;
     }
 
-    let controller;
-    if (this.state_logged_in) {
-      controller = <Controller />;
-    }
 
     return (
-      <div className="UserForms">
+      <div className="BaseComponent">
         <Nav
           logged_in={this.state.logged_in}
           display_form={this.display_form}
@@ -107,13 +104,13 @@ class UserForms extends Component {
         {form}
         <h3>
           {this.state.logged_in
-            ? `Hello, ${this.state.username}`
+            ? null
             : 'Please Log In'}
         </h3>
-
-      </div>
+        {this.state.logged_in ? <DatabaseInteractor /> : null}
+       </div>
     );
   }
 }
 
-export default UserForms;
+export default BaseComponent;
