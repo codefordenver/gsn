@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Nav from './Nav';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
-import Test from './Test';
+import DatabaseInteractor from './DatabaseInteractor';
 
 
 class BaseComponent extends Component {
@@ -107,7 +107,7 @@ class BaseComponent extends Component {
             ? null
             : 'Please Log In'}
         </h3>
-        {this.state.logged_in ? <Test /> : null}
+        {this.state.logged_in ? <DatabaseInteractor /> : null}
        </div>
     );
   }
