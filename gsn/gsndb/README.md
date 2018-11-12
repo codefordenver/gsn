@@ -2,13 +2,17 @@
 
 ### Question: So what are these elegant generic views that are all the rage?
 
+``` shell
 class DistrictList(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
+```
 
+``` shell
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
+```
 
 ## Answer: They are a concise way to handle a variety of common HTTP requests!
 The definitions below correspond to the generic views for the District class in that were just listed above. Notice how many more lines of code there are! Beyond consolidating code and allowing for a few lines to express GET, POST, and PUT protocols, generic views are also tailor made to allow users to directly interact with a table in the gsndb database instance via the Django REST API endpoints, all from the comfort of their own browser. Hot dog!
