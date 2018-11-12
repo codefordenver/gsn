@@ -11,50 +11,13 @@ from rest_framework import generics
 
 """The district views will be functional and verbose with the intent of clarifying their purpose. Every view hereafter will be generic in nature"""
 
-@csrf_exempt
-def district_list(request):
-    """
-    List all districts, or create a new district.
-    """
+class DistrictList(generics.ListCreateAPIView):
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
 
-    if request.method == 'GET':
-        districts = District.objects.all()
-        serializer = DistrictSerializer(districts, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = DistrictSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.error, status=400)
-
-@csrf_exempt
-def district_detail(request, pk):
-    """
-    Retrieve, update or delete a district.
-    """
-    try:
-        district = District.objects.get(pk=pk)
-    except District.DoesNotExist:
-        return HttpResponse(status=404)
-
-    if request.method == 'GET':
-        serializer = DistrictSerializer(district)
-        return JsonResponse(serializer.data)
-
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = DistrictSerializer(district, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
-
-    elif request.method == 'DELETE':
-        district.delete()
-        return HttpResponse(status=204)
+class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
 
 """As stated, all of the following views will utilize generic view classes provided by the Django Rest framework."""
 

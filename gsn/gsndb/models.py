@@ -6,8 +6,7 @@ from django.db import models
 class District(models.Model):
    district_state = models.CharField(max_length=2)
    district_city = models.CharField(max_length=50)
-   district_number = models.SmallIntegerField()
-   district_code = models.CharField(max_length=5)
+   district_code = models.CharField(max_length=10)
 
 class School(models.Model):
     school_name = models.TextField(max_length=150)

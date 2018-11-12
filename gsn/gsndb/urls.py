@@ -2,8 +2,8 @@ from django.urls import path
 from gsndb import views
 
 urlpatterns = [
-  path('district/', views.district_list),
-  path('district/<int:pk>/', views.district_detail),
+  path('district/', views.DistrictList.as_view()),
+  path('district/<int:pk>/', views.DistrictDetail.as_view()),
   path('school/', views.SchoolList.as_view()),
   path('school/<int:pk>/', views.SchoolDetail.as_view()),
   path('student/', views.StudentList.as_view()),

@@ -7,8 +7,7 @@ class DistrictSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     district_state = serializers.CharField(max_length = 2)
     district_city = serializers.CharField(max_length=50)
-    district_number = serializers.IntegerField()
-    district_code = serializers.CharField(max_length=5)
+    district_code = serializers.CharField(max_length=10)
 
     def create(self, validated_data):
       """
@@ -22,7 +21,6 @@ class DistrictSerializer(serializers.Serializer):
         """
         instance.district_state = validated_data.get('district_state', instance.district_state)
         instance.district_city = validated_data.get('district_city', instance.district_city)
-        instance.district_number = validated_data.get('district_number', instance.district_number)
         instance.district_code = validated_data.get('district_code', instance.district_code)
         instance.save()
         return instance
