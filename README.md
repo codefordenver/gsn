@@ -2,6 +2,21 @@
 ##
 The aim of this project is to provide a maintainable and navigable database that should aid social workers in providing assistance to at-risk youth. 
 
+## Goals & Features:
+GSN should enable social workers to monitor student metrics as they change. Ideally, we will achieve this by piping data directly from [Infinite Campus](https://www.infinitecampus.com/). In the unlikely event that we are unable to pull student data from Infinite Campus, we will need to conceive a _very_** user friendly system in which CSV files are uploaded to be parsed by our API.
+
+In terms of usability, social workers should have access to their own profiles that will be set up upon registration, which can then be used to personalize their own simple dashboard of specific students, schools, districts, etc. 
+
+Finally, the fun part for the frontend will lie in the data visualization. When we get there, we'll likely use D3 in the absence of a better suggestion. 
+
+For the time being, here is a simple flowchart that should indicate the technologies at play. The REST API will interact with the database using the Django ORM (Python stuff), whereas React will interact with Django REST through JSON objects passed through HTTP requests. 
+
+---
+
+![alt text](https://i.imgur.com/KICVtCf.png)
+
+---
+
 ## A Brief (non-technical) Technical Overview:
 Any moderately complex website can be broken down into two main components:
 1. A side that interacts with users, often called the frontend.
@@ -15,9 +30,12 @@ GSN will be moderately complex, so both the frontend and backend should use robu
 
 * For our database, we will be using [PostgreSQL](https://www.postgresql.org/ "Official PostgreSQL Website"), a Relational Database that is well liked for its extensibility.
 
+* For both the REST API and our database, we will use [Docker](https://www.docker.com/why-docker "Official Docker Website") containers, as they should make it easier for new developers to jump on the project. 
+
 Every step of the way, we are making use of open source technologies, meaning they are freely available to the general public. 
 
 ## Developer Guide:
+###### This guide should hopefully be far simpler once things are properly containerized.
 If you are interested in contributing to GSN, that's fantastic! As the project grows, there will be many opportunities for developers to jump on board and contribute their thoughts and skills, regardless of expertise or background. But before you can do anything, you'll need to set things up on your computer! 
 ##### A note: This quickstart is written for Unix environments (Linux/Mac OS). It can be modified to accomodate Windows users as the need arises. 
 
