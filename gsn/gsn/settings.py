@@ -95,11 +95,11 @@ WSGI_APPLICATION = 'gsn.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'gsndb',
-        'USER': 'gsn',
-        'PASSWORD': 'gsn.gsnsecrets.db_password',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.environ.get('DB_NAME','gsndb'),
+        'USER': os.environ.get('DB_USER','gsn'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'gsn.gsnsecrets.db_password'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '')
     }
 }
 
