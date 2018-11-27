@@ -3,7 +3,7 @@
 The aim of this project is to provide a maintainable and navigable database that should aid social workers in providing assistance to at-risk youth. 
 
 ## Goals & Features:
-GSN should enable social workers to monitor student metrics as they change. Ideally, we will achieve this by piping data directly from [Infinite Campus](https://www.infinitecampus.com/). In the unlikely event that we are unable to pull student data from Infinite Campus, we will need to conceive a _very_** user friendly system in which CSV files are uploaded to be parsed by our API.
+GSN should enable social workers to monitor student metrics as they change. Ideally, we will achieve this by piping data directly from [Infinite Campus](https://www.infinitecampus.com/). In the unlikely event that we are unable to pull student data from Infinite Campus, we will need to conceive a **_very_** user friendly system in which CSV files are uploaded to be parsed by our API.
 
 In terms of usability, social workers should have access to their own profiles that will be set up upon registration, which can then be used to personalize their own simple dashboard of specific students, schools, districts, etc. 
 
