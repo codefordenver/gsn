@@ -12,7 +12,6 @@ graphviz = "*"
 djangorestframework-jwt = "*"
 httpie = "*"
 django-cors-headers = "*"
-pyyaml = "*"
 
 [dev-packages]
 coverage = "*"
