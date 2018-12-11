@@ -1,0 +1,24 @@
+from graphviz import Digraph
+
+h = Digraph('html_table')
+
+h.node('A', shape='plaintext', label ='''<<TABLE>
+			<TR>
+				<TD>Hello</TD>
+				<TD>World</TD>
+			</TR>
+		</TABLE>>
+''')
+
+
+h.node('B', shape='plaintext', label='''<<TABLE>
+			<TR>
+				<TD>Goodbye</TD>
+				<TD>Freind...</TD>
+			</TR>
+		</TABLE>>
+''')
+
+h.edges(['AB'])
+
+h.render('./example.gv', view=True)
