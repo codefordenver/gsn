@@ -18,7 +18,6 @@ class App extends Component {
   componentDidMount() {
     if (this.state.logged_in) {
       getUserState()
-        .then(res => res.json())
         .then(json => {
           console.log('getUserState', json);
           this.setState({ username: json.username });
@@ -30,7 +29,6 @@ class App extends Component {
     e.preventDefault();
 
     loginUser(data)
-    .then(res => res.json())
     .then(json => {
       localStorage.setItem('token', json.token);
       this.setState({
@@ -44,7 +42,6 @@ class App extends Component {
   handle_signup = (e, data) => {
     e.preventDefault();
     signupUser(data)
-      .then(res => res.json())
       .then(json => {
         localStorage.setItem('token', json.token);
         this.setState({

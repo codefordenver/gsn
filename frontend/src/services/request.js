@@ -7,6 +7,7 @@ export function request({
   body
 }) {
   if (url) {
-    return fetch(`${API_ROOT}${url}`,{method, headers, body});
+    return fetch(`${API_ROOT}${url}`,{method, headers, body})
+    .then(res => res.json());
   }
 }
