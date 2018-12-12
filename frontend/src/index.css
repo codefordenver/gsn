@@ -12,3 +12,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.navitem {
+  color: black;
+  cursor: pointer;
+}
+
+.navitem:hover {
+  color: white;
+  background-color: black;
+}
