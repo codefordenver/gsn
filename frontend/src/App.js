@@ -3,6 +3,7 @@ import Nav from './Nav';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import DatabaseInteractor from './DatabaseInteractor';
+import {getUserState, loginUser, signupUser} from './services/authServices';
 
 class App extends Component {
   constructor(props) {
@@ -16,13 +17,10 @@ class App extends Component {
 
   componentDidMount() {
     if (this.state.logged_in) {
-      fetch('http://127.0.0.1:8000/user_app/current_user/', {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('token')}`
-        }
-      })
+      getUserState()
         .then(res => res.json())
         .then(json => {
+          console.log('getUserState', json);
           this.setState({ username: json.username });
         });
     }
@@ -30,13 +28,8 @@ class App extends Component {
 
   handle_login = (e, data) => {
     e.preventDefault();
-    fetch('http://127.0.0.1:8000/token-auth/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
+
+    loginUser(data)
     .then(res => res.json())
     .then(json => {
       localStorage.setItem('token', json.token);
@@ -50,13 +43,7 @@ class App extends Component {
 
   handle_signup = (e, data) => {
     e.preventDefault();
-    fetch('http://127.0.0.1:8000/user_app/users/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
+    signupUser(data)
       .then(res => res.json())
       .then(json => {
         localStorage.setItem('token', json.token);
@@ -102,6 +89,7 @@ class App extends Component {
         />
         {form}
         <h3>
+          <p>Username: {this.state.username}</p>
           {this.state.logged_in
             ? null
             : 'Please Log In'}
