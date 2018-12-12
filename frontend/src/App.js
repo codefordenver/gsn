@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Nav from './Nav';
-import LoginForm from './LoginForm';
-import SignupForm from './SignupForm';
-import DatabaseInteractor from './DatabaseInteractor';
+import Nav from './components/Nav';
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
+import DatabaseInteractor from './components/DatabaseInteractor';
 import {getUserState, loginUser, signupUser} from './services/authServices';
 
 class App extends Component {
