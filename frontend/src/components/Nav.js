@@ -5,14 +5,14 @@ function Nav(props) {
 
   const logged_out_nav = (
     <ul>
-      <li onClick={() => props.display_form('login')}>login</li>
-      <li onClick={() => props.display_form('signup')}>signup</li>
+      <li onClick={() => props.display_form('login')}><span className="navitem">login</span></li>
+      <li onClick={() => props.display_form('signup')}><span className="navitem">signup</span></li>
     </ul>
   );
 
   const logged_in_nav = (
     <ul>
-      <li onClick={props.handle_logout}>logout</li>
+      <li onClick={props.handle_logout}><span className="navitem">logout</span></li>
     </ul>
   );
 
