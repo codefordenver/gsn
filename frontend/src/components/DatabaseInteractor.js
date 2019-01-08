@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import {getDistricts} from '../services/districtServices.js'
 
 class DatabaseInteractor extends Component {
   constructor(props) {
@@ -14,8 +14,7 @@ class DatabaseInteractor extends Component {
 
   handleClick(e) {
     e.preventDefault();
-    fetch('http://127.0.0.1:8000/gsndb/district/')
-    .then(res => res.json())
+    getDistricts()
     .then(json => {
       this.setState({json: json})
       this.setState({dataIsLoaded: true})
