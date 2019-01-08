@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux'
-import * as userActions from '../globalState/user/UserActions';
+import * as userActions from 'globalState/user/UserActions';
 
 function Nav({isLoggedIn, logOut, display_form}) {
 
