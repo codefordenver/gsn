@@ -4,23 +4,26 @@ import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import District from './components/District';
 import {getUserState, loginUser, signupUser} from './services/authServices';
+import {connect} from 'react-redux'
+import * as userActions from './globalState/user/UserActions';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
     displayed_form: '',
-    logged_in: localStorage.getItem('token') ? true : false,
-    username: ''
+    hasToken: localStorage.getItem('token') ? true : false,
     };
   }
 
   componentDidMount() {
-    if (this.state.logged_in) {
+    if (this.state.hasToken) {
       getUserState()
         .then(json => {
           console.log('getUserState', json);
-          this.setState({ username: json.username });
+          const {setUsername, setIsLoggedIn} = this.props;
+          setUsername(json.username);
+          setIsLoggedIn(true);
         });
     }
   }
@@ -31,6 +34,14 @@ class App extends Component {
     loginUser(data)
     .then(json => {
       localStorage.setItem('token', json.token);
+
+      const {authSuccess} = this.props;
+      authSuccess(
+        {
+          token: json.token,
+          username: json.user.username})
+
+
       this.setState({
         logged_in: true,
         displayed_form: '',
@@ -52,11 +63,6 @@ class App extends Component {
       });
   };
 
-  handle_logout = () => {
-    localStorage.removeItem('token');
-    this.setState({ logged_in: false, username: ''});
-  };
-
   display_form = form => {
     this.setState({
       displayed_form: form
@@ -64,6 +70,8 @@ class App extends Component {
   };
 
   render() {
+    const { username, isLoggedIn } = this.props;
+    console.log({ username, isLoggedIn });
     let form;
     switch (this.state.displayed_form) {
       case 'login':
@@ -80,21 +88,32 @@ class App extends Component {
     return (
       <div className="BaseComponent">
         <Nav
-          logged_in={this.state.logged_in}
           display_form={this.display_form}
-          handle_logout={this.handle_logout}
         />
         {form}
         <h3>
-          <p>Username: {this.state.username}</p>
-          {this.state.logged_in
+          <p>Username: {username}</p>
+          {isLoggedIn
             ? null
             : 'Please Log In'}
         </h3>
-        {this.state.logged_in ? <District /> : null}
+        {isLoggedIn ? <District /> : null}
        </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  const {user} = state;
+  console.log('user state', user.toJS());
+  return {
+    username: user.get('username'),
+    isLoggedIn: user.get('isLoggedIn'),
+  }
+}
+
+export default connect(mapStateToProps,{
+  authSuccess: userActions.authSuccess,
+  setUsername: userActions.setUsername,
+  setIsLoggedIn: userActions.setIsLoggedIn,
+})(App);
