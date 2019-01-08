@@ -1,5 +1,6 @@
-export const SET_AUTH_TOKEN = 'user/SET_AUTH_TOKEN';
-export const CLEAR_AUTH = 'user/CLEAR_AUTH';
-export const AUTH_REQUEST = 'user/AUTH_REQUEST';
-export const AUTH_SUCCESS = 'user/AUTH_SUCCESS';
-export const AUTH_ERROR = 'user/AUTH_ERROR';
+export const SET_TOKEN = 'user/SET_TOKEN';
+export const SET_USERNAME = 'user/SET_USERNAME';
+export const SET_LOADING = 'user/SET_LOADING';
+export const SET_IS_LOGGED_IN = 'user/SET_IS_LOGGED_IN';
+export const SET_ERROR = 'user/SET_ERROR';
+export const CLEAR_ERROR = 'user/CLEAR_ERROR';
