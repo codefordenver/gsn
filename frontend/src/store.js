@@ -1,6 +1,6 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import thunk from "redux-thunk";
-import user from "./globalState/user/UserReducer";
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import thunk from 'redux-thunk';
+import user from './globalState/user/UserReducer';
 
 const store = createStore(
   combineReducers({
