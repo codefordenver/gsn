@@ -8,7 +8,7 @@ import {
 
 export const setAuthToken = authToken => ({
   type: SET_AUTH_TOKEN,
-  authToken
+  payload: authToken
 });
 
 export const clearAuth = () => ({
@@ -19,12 +19,12 @@ export const authRequest = () => ({
   type: AUTH_REQUEST
 });
 
-export const authSuccess = currentUser => ({
+export const authSuccess = ({username, token}) => ({
   type: AUTH_SUCCESS,
-  currentUser
+  payload: {username, token}
 });
 
 export const authError = error => ({
   type: AUTH_ERROR,
-  error
+  payload: error
 });
