@@ -5,7 +5,6 @@ import * as userActions from '../globalState/user/UserActions';
 
 function Nav({isLoggedIn, logOut, display_form}) {
 
-
   const logged_out_nav = (
     <ul>
       <li onClick={() => display_form('login')}><span className="navitem">login</span></li>

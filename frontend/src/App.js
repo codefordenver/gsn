@@ -36,16 +36,13 @@ class App extends Component {
       localStorage.setItem('token', json.token);
 
       const {authSuccess} = this.props;
-      authSuccess(
-        {
+      authSuccess({
           token: json.token,
-          username: json.user.username})
-
+          username: json.user.username
+      });
 
       this.setState({
-        logged_in: true,
         displayed_form: '',
-        username: json.user.username
       });
     });
   };
@@ -71,7 +68,7 @@ class App extends Component {
 
   render() {
     const { username, isLoggedIn } = this.props;
-    console.log({ username, isLoggedIn });
+
     let form;
     switch (this.state.displayed_form) {
       case 'login':
@@ -83,7 +80,6 @@ class App extends Component {
       default:
         form = null;
     }
-
 
     return (
       <div className="BaseComponent">
@@ -105,7 +101,7 @@ class App extends Component {
 
 const mapStateToProps = state => {
   const {user} = state;
-  console.log('user state', user.toJS());
+
   return {
     username: user.get('username'),
     isLoggedIn: user.get('isLoggedIn'),
