@@ -1,27 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux'
+import * as userActions from '../globalState/user/UserActions';
 
-function Nav(props) {
+function Nav({isLoggedIn, logOut, display_form}) {
 
   const logged_out_nav = (
     <ul>
-      <li onClick={() => props.display_form('login')}><span className="navitem">login</span></li>
-      <li onClick={() => props.display_form('signup')}><span className="navitem">signup</span></li>
+      <li onClick={() => display_form('login')}><span className="navitem">login</span></li>
+      <li onClick={() => display_form('signup')}><span className="navitem">signup</span></li>
     </ul>
   );
 
   const logged_in_nav = (
     <ul>
-      <li onClick={props.handle_logout}><span className="navitem">logout</span></li>
+      <li onClick={logOut}><span className="navitem">logout</span></li>
     </ul>
   );
 
-  return <div>{props.logged_in ? logged_in_nav : logged_out_nav}</div>;
+  return <div>{isLoggedIn ? logged_in_nav : logged_out_nav}</div>;
 }
 
-export default Nav;
+const mapStateToProps = state => {
+  const {user} = state;
+  return {
+    isLoggedIn: user.get('isLoggedIn'),
+  }
+}
+
+export default connect(mapStateToProps, {logOut: userActions.logOut})(Nav);
 
 Nav.proptypes = {
-  logged_in: PropTypes.bool.isRequired,
   display_form: PropTypes.func.isRequired,
 }
