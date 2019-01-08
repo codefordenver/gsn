@@ -7,7 +7,7 @@ import {
   CLEAR_ERROR,
 } from './UserConstants';
 
-import {createAction} from '../../utils/ActionUtils';
+import {createAction} from 'utils/ActionUtils';
 
 export const setToken = createAction(SET_TOKEN);
 export const setUsername = createAction(SET_USERNAME);

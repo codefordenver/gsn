@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {getDistricts} from '../services/districtServices.js'
+import {getDistricts} from 'services/districtServices.js'
 
 class District extends Component {
   constructor(props) {

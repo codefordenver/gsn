@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import Nav from './components/Nav';
-import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignupForm';
-import District from './components/District';
-import {getUserState, loginUser, signupUser} from './services/authServices';
+import Nav from 'components/Nav';
+import LoginForm from 'components/LoginForm';
+import SignupForm from 'components/SignupForm';
+import District from 'components/District';
+import {getUserState, loginUser, signupUser} from 'services/authServices';
 import {connect} from 'react-redux'
-import * as userActions from './globalState/user/UserActions';
+import * as userActions from 'globalState/user/UserActions';
 
 class App extends Component {
   constructor(props) {
