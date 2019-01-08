@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {getDistricts} from '../services/districtServices.js'
 
-class DatabaseInteractor extends Component {
+class District extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,17 +16,15 @@ class DatabaseInteractor extends Component {
     e.preventDefault();
     getDistricts()
     .then(json => {
-      this.setState({json: json})
+      this.setState({json})
       this.setState({dataIsLoaded: true})
     });
   }
 
-
-
-
   render(){
     return (
-      <div className="DatabaseInteractor">
+      <div className="District">
+        <h1>District</h1>
         <button onClick={this.handleClick}>
            Get District Data
         </button>
@@ -40,4 +38,4 @@ class DatabaseInteractor extends Component {
   }
 }
 
-export default DatabaseInteractor;
+export default District;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Nav from './components/Nav';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
-import DatabaseInteractor from './components/DatabaseInteractor';
+import District from './components/District';
 import {getUserState, loginUser, signupUser} from './services/authServices';
 
 class App extends Component {
@@ -91,7 +91,7 @@ class App extends Component {
             ? null
             : 'Please Log In'}
         </h3>
-        {this.state.logged_in ? <DatabaseInteractor /> : null}
+        {this.state.logged_in ? <District /> : null}
        </div>
     );
   }
