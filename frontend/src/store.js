@@ -4,7 +4,7 @@ import user from './globalState/user/UserReducer';
 
 const store = createStore(
   combineReducers({
-    user: user
+    user
   }),
   applyMiddleware(thunk)
 );
