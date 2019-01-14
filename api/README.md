@@ -6,7 +6,7 @@ GSN-API instructions:
 * install Homebrew (here I'm assuming that you're using a Macintosh)
 * using Homebrew, install git
 
-Now, go to a directory of your choosing and clone git repo from 'HTempleman/gsn-api' (Soon to be GSN/gsn-api hopefully!)
+Now, go to a directory of your choosing and clone git repo from 'gsn/api'
 
 type the following command in the root directory (with the Dockerfile)
 
