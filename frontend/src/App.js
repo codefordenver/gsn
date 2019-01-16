@@ -6,6 +6,7 @@ import District from 'components/District';
 import {getUserState, loginUser, signupUser} from 'services/authServices';
 import {connect} from 'react-redux'
 import * as userActions from 'globalState/user/UserActions';
+import { Switch, Route } from 'react-router-dom'
 
 class App extends Component {
   constructor(props) {
@@ -88,6 +89,14 @@ class App extends Component {
         />
         {form}
         <h3>
+          <Switch>
+            <Route exact path='/' render={()=><p>rooot</p>} />
+            <Route path='/testpath/:testparam' render={(props)=>{
+              console.log({props});
+              const {testparam} = props.match.params;
+              return <p>testpath worked: {testparam}</p>;
+            }} />
+          </Switch>
           <p>Username: {username}</p>
           {isLoggedIn
             ? null
