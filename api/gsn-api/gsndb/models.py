@@ -193,3 +193,8 @@ class Grade(models.Model):
             default=FOUR_POINT_SCALE,
     )
     grade_is_final = models.BooleanField(default=True)
+
+class Referral(models.Model):
+    reference_name = models.CharField(
+    max_length = 150
+    )
