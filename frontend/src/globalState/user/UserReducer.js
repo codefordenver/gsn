@@ -12,7 +12,7 @@ const initialState = fromJS({
   token: null,
   isLoggedIn: false,
   username: null,
-  loading: false,
+  loading: true,
   error: null
 });
 
