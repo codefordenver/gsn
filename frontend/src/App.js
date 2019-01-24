@@ -1,100 +1,49 @@
 import React, { Component } from 'react';
 import Nav from 'components/Nav';
+import HomePage from 'components/HomePage';
 import LoginForm from 'components/LoginForm';
 import SignupForm from 'components/SignupForm';
-import District from 'components/District';
-import {getUserState, loginUser, signupUser} from 'services/authServices';
-import {connect} from 'react-redux'
+import Districts from 'components/Districts';
+import Students from 'components/Students';
+import {connect} from 'react-redux';
 import * as userActions from 'globalState/user/UserActions';
+import {Switch, Route, Router} from 'react-router-dom';
+import PrivateRoute from './PrivateRoute';
+import { history } from 'utils/history';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    displayed_form: '',
-    hasToken: localStorage.getItem('token') ? true : false,
-    };
+
+  componentWillMount() {
+    const {setUserState} = this.props;
+    setUserState();
   }
-
-  componentDidMount() {
-    if (this.state.hasToken) {
-      getUserState()
-        .then(json => {
-          console.log('getUserState', json);
-          const {setUsername, setIsLoggedIn} = this.props;
-          setUsername(json.username);
-          setIsLoggedIn(true);
-        });
-    }
-  }
-
-  handle_login = (e, data) => {
-    e.preventDefault();
-
-    loginUser(data)
-    .then(json => {
-      localStorage.setItem('token', json.token);
-
-      const {authSuccess} = this.props;
-      authSuccess({
-          token: json.token,
-          username: json.user.username
-      });
-
-      this.setState({
-        displayed_form: '',
-      });
-    });
-  };
-
-  handle_signup = (e, data) => {
-    e.preventDefault();
-    signupUser(data)
-      .then(json => {
-        localStorage.setItem('token', json.token);
-        this.setState({
-          logged_in: true,
-          displayed_form: '',
-          username: json.username
-        });
-      });
-  };
-
-  display_form = form => {
-    this.setState({
-      displayed_form: form
-    });
-  };
 
   render() {
-    const { username, isLoggedIn } = this.props;
+    const { username, isLoggedIn, loading } = this.props;
+    if (loading) return <h1>Loading...</h1>
 
-    let form;
-    switch (this.state.displayed_form) {
-      case 'login':
-        form = <LoginForm handle_login={this.handle_login} />;
-        break;
-      case 'signup':
-        form = <SignupForm handle_signup={this.handle_signup} />;
-        break;
-      default:
-        form = null;
-    }
+    else return (
+      <Router history={history}>
+        <div className="BaseComponent">
+          <Nav />
 
-    return (
-      <div className="BaseComponent">
-        <Nav
-          display_form={this.display_form}
-        />
-        {form}
-        <h3>
-          <p>Username: {username}</p>
-          {isLoggedIn
-            ? null
-            : 'Please Log In'}
-        </h3>
-        {isLoggedIn ? <District /> : null}
-       </div>
+          <h3>
+            {isLoggedIn && <p>Hello {username}</p>}
+            <Switch>
+              <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
+              <Route path='/login' component={LoginForm} />
+              <Route path='/register' component={SignupForm} />
+              <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
+              <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
+              <Route path='/testpath/:testparam' render={(props)=>{
+                console.log({props});
+                const {testparam} = props.match.params;
+                return <p>testpath worked: {testparam}</p>;
+              }} />
+            </Switch>
+          </h3>
+         </div>
+       </Router>
     );
   }
 }
@@ -105,11 +54,11 @@ const mapStateToProps = state => {
   return {
     username: user.get('username'),
     isLoggedIn: user.get('isLoggedIn'),
+    loading: user.get('loading'),
   }
 }
 
 export default connect(mapStateToProps,{
-  authSuccess: userActions.authSuccess,
-  setUsername: userActions.setUsername,
-  setIsLoggedIn: userActions.setIsLoggedIn,
+  setLoading: userActions.setLoading,
+  setUserState: userActions.setUserState,
 })(App);

@@ -1,24 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom';
 import * as userActions from 'globalState/user/UserActions';
 
 function Nav({isLoggedIn, logOut, display_form}) {
 
-  const logged_out_nav = (
+  const $loggedOutNav = (
     <ul>
-      <li onClick={() => display_form('login')}><span className="navitem">login</span></li>
-      <li onClick={() => display_form('signup')}><span className="navitem">signup</span></li>
+      <li className="navListItem">
+        <Link to="/login" className="navitem">Log In</Link>
+      </li>
+      <li className="navListItem">
+        <Link to="/register" className="navitem">Register</Link>
+      </li>
     </ul>
   );
 
-  const logged_in_nav = (
+  const $loggedInNav = (
     <ul>
-      <li onClick={logOut}><span className="navitem">logout</span></li>
+      <li className="navListItem">
+        <Link to="/" className="navitem">Home</Link>
+      </li>
+      <li className="navListItem">
+        <Link to="/students" className="navitem">All Students</Link>
+      </li>
+      <li className="navListItem">
+        <Link to="/districts" className="navitem">All Districts</Link>
+      </li>
+      <li className="navListItem">
+        <span className="navitem" onClick={logOut}>Log Out</span>
+      </li>
     </ul>
   );
 
-  return <div>{isLoggedIn ? logged_in_nav : logged_out_nav}</div>;
+  return <div>{isLoggedIn ? $loggedInNav : $loggedOutNav}</div>;
 }
 
 const mapStateToProps = state => {
