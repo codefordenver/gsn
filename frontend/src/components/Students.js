@@ -24,6 +24,13 @@ class Students extends Component {
       <div>
         <h1>Students</h1>
         <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>School</th>
+              <th>Birthdate</th>
+            </tr>
+          </thead>
           <tbody>
           {students.map(student=>{
             const {id, name, school, birthdate} = student;
