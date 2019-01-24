@@ -3,8 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer
+from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade, Referral
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer, ReferralSerializer
 from rest_framework import generics
 
 # Create your views here.
@@ -82,3 +82,8 @@ class GradeList(generics.ListCreateAPIView):
 class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+
+
+class ReferralList(generics.ListCreateAPIView):
+    queryset = Referral.objects.all()
+    serializer_class = ReferralSerializer

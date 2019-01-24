@@ -195,6 +195,7 @@ class Grade(models.Model):
     grade_is_final = models.BooleanField(default=True)
 
 class Referral(models.Model):
-    reference_name = models.CharField(
-    max_length = 150
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.CASCADE,
     )

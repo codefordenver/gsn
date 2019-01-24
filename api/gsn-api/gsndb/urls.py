@@ -17,5 +17,6 @@ urlpatterns = [
   path('attendance/', views.AttendanceList.as_view()),
   path('attendance/<int:pk>/', views.AttendanceDetail.as_view()),
   path('grade/', views.GradeList.as_view()),
-  path('grade/<int:pk>/', views.GradeDetail.as_view())
+  path('grade/<int:pk>/', views.GradeDetail.as_view()),
+  path('referral/', views.ReferralList.as_view()),
 ]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from gsndb.models import District, School, Student, Course, StudentSnap, Attendance, Grade, Behavior
+from gsndb.models import District, School, Student, Course, StudentSnap, Attendance, Grade, Behavior, Referral
 
 """The following serializer is verbose for the purpose of illustrating the process of data serialization and it`s interaction with django models. Every serializer hereafter will be generic in nature"""
 
@@ -61,3 +61,8 @@ class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ('id', 'student_snap', 'course', 'grade_data_entry_time', 'grade_metric', 'grade_scale', 'grade_is_final')
+
+class ReferralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Referral
+        fields = ("student",)
