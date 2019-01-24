@@ -14,11 +14,22 @@ code {
 }
 
 .navitem {
-  color: black;
   cursor: pointer;
+  background-color: black;
+  color: white;
+  border-radius: 3px;
+  border: 5px solid black;
+  text-decoration: none;
+  padding: 5px;
 }
 
 .navitem:hover {
-  color: white;
-  background-color: black;
+  color: black;
+   background-color: white;
+   transition: all .5s;
+}
+
+.navListItem {
+  margin: 25px;
+  list-style-type: none;
 }
