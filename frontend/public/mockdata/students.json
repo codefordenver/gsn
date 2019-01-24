@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "name": "Linton Stephens",
+    "school": "Aguilar Middle/High School",
+    "birthdate": "9/16/1992"
+  },
+  {
+    "id": 2,
+    "name": "Brent Ros·rio",
+    "school": "Cotopaxi Middle/High School",
+    "birthdate": "12/10/1992"
+  },
+  {
+    "id": 3,
+    "name": "Banu Rounds",
+    "school": "Custer County High School",
+    "birthdate": "7/24/1996"
+  },
+  {
+    "id": 4,
+    "name": "Biel Morgan",
+    "school": "Gardner Middle School",
+    "birthdate": "7/29/1997"
+  },
+  {
+    "id": 5,
+    "name": "Nikolai Dale",
+    "school": "Hoehne Middle/High School",
+    "birthdate": "6/5/1998"
+  },
+  {
+    "id": 6,
+    "name": "Dulcibella Legrand",
+    "school": "John Mall High School",
+    "birthdate": "8/31/1998"
+  },
+  {
+    "id": 7,
+    "name": "Petra Bentley",
+    "school": "Peakview Middle School",
+    "birthdate": "10/19/1998"
+  },
+  {
+    "id": 8,
+    "name": "Shakuntala CernÌk",
+    "school": "Primero Middle/High School",
+    "birthdate": "10/27/1999"
+  },
+  {
+    "id": 9,
+    "name": "Audovacar Mendelssohn",
+    "school": "Sangre de Cristo Elem/Junior High",
+    "birthdate": "6/26/2000"
+  },
+  {
+    "id": 10,
+    "name": "Baldo Nikolaev",
+    "school": "Sargent Elem/Junior High",
+    "birthdate": "10/9/2002"
+  },
+  {
+    "id": 11,
+    "name": "Azat Yamashita",
+    "school": "Sierra Grande Elem/Junior High",
+    "birthdate": "7/29/1997"
+  },
+  {
+    "id": 12,
+    "name": "Bora Beatty",
+    "school": "Trinidad High School",
+    "birthdate": "6/5/1998"
+  },
+  {
+    "id": 13,
+    "name": "Kirsteen Meaney",
+    "school": "Trinidad Middle School",
+    "birthdate": "8/31/1998"
+  }
+]
