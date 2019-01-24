@@ -3,8 +3,9 @@ import Nav from 'components/Nav';
 import HomePage from 'components/HomePage';
 import LoginForm from 'components/LoginForm';
 import SignupForm from 'components/SignupForm';
-import District from 'components/District';
-import {connect} from 'react-redux'
+import Districts from 'components/Districts';
+import Students from 'components/Students';
+import {connect} from 'react-redux';
 import * as userActions from 'globalState/user/UserActions';
 import {Switch, Route, Router} from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
@@ -24,9 +25,7 @@ class App extends Component {
     else return (
       <Router history={history}>
         <div className="BaseComponent">
-          <Nav
-            display_form={this.display_form}
-          />
+          <Nav />
 
           <h3>
             {isLoggedIn && <p>Hello {username}</p>}
@@ -34,7 +33,8 @@ class App extends Component {
               <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
               <Route path='/login' component={LoginForm} />
               <Route path='/register' component={SignupForm} />
-              <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={District} />
+              <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
+              <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
               <Route path='/testpath/:testparam' render={(props)=>{
                 console.log({props});
                 const {testparam} = props.match.params;
