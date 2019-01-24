@@ -6,6 +6,8 @@ from rest_framework.parsers import JSONParser
 from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade
 from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer
 from rest_framework import generics
+from gsndb.forms import UploadFileForm
+from gsndb.csvparser import CSVParser
 
 # Create your views here.
 
@@ -82,3 +84,36 @@ class GradeList(generics.ListCreateAPIView):
 class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+
+class CSVParser(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            CSVParser(request.FILES['file'])
+            response = HttpResponse()
+            response.write("File successfully parsed!")
+            response.status_code(200)
+            return response
+    else:
+        form = UploadFileForm()
+        response = HttpResponse()
+        response.write("Uh Oh, check the file you uploaded. It may be corrupted.")
+        response.status_code(400)
+
+
+"""
+//USE THE FOLLOWING JAVASCRIPT WITHIN REACT:
+
+const fileInput = document.querySelector('#your-file-input') ;
+const formData = new FormData();
+
+formData.append('file', fileInput.files[0]);
+
+const options = {
+  method: 'POST',
+  body: formData,
+  }
+};
+
+fetch('your-upload-url', options);
+"""
