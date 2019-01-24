@@ -1,44 +1,44 @@
 [
   {
-    "date": "TOTALS",
-    "unexcused": 3,
-    "excused": 1,
-    "tardies": 8
+    "attendance_data_entry_time": "TOTALS",
+    "attendance_total_unexcused_absences": 3,
+    "attendance_total_excused_absences": 1,
+    "attendance_total_tardies": 8
   },
   {
-    "date": "3/22/2018",
-    "unexcused": 0,
-    "excused": 1,
-    "tardies": 0
+    "attendance_data_entry_time": "3/22/2018",
+    "attendance_total_unexcused_absences": 0,
+    "attendance_total_excused_absences": 1,
+    "attendance_total_tardies": 0
   },
   {
-    "date": "6/5/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
+    "attendance_data_entry_time": "6/5/2018",
+    "attendance_total_unexcused_absences": 1,
+    "attendance_total_excused_absences": 0,
+    "attendance_total_tardies": 0
   },
   {
-    "date": "8/31/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
+    "attendance_data_entry_time": "8/31/2018",
+    "attendance_total_unexcused_absences": 1,
+    "attendance_total_excused_absences": 0,
+    "attendance_total_tardies": 0
   },
   {
-    "date": "10/19/2018",
-    "unexcused": 0,
-    "excused": 0,
-    "tardies": 4
+    "attendance_data_entry_time": "10/19/2018",
+    "attendance_total_unexcused_absences": 0,
+    "attendance_total_excused_absences": 0,
+    "attendance_total_tardies": 4
   },
   {
-    "date": "10/20/2018",
-    "unexcused": 0,
-    "excused": 0,
-    "tardies": 4
+    "attendance_data_entry_time": "10/20/2018",
+    "attendance_total_unexcused_absences": 0,
+    "attendance_total_excused_absences": 0,
+    "attendance_total_tardies": 4
   },
   {
-    "date": "11/1/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
+    "attendance_data_entry_time": "11/1/2018",
+    "attendance_total_unexcused_absences": 1,
+    "attendance_total_excused_absences": 0,
+    "attendance_total_tardies": 0
   }
 ]

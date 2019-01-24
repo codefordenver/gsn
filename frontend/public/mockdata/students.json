@@ -1,80 +1,93 @@
 [
   {
     "id": 1,
-    "name": "Linton Stephens",
-    "school": "Aguilar Middle/High School",
-    "birthdate": "9/16/1992"
+    "student_first_name": "Linton",
+    "student_last_name": "Stephens",
+    "student_state_id": 14153061,
+    "student_birth_date": "9/16/1992"
   },
   {
     "id": 2,
-    "name": "Brent Ros·rio",
-    "school": "Cotopaxi Middle/High School",
-    "birthdate": "12/10/1992"
+    "student_first_name": "Brent",
+    "student_last_name": "Ros·rio",
+    "student_state_id": 96196791,
+    "student_birth_date": "12/10/1992"
   },
   {
     "id": 3,
-    "name": "Banu Rounds",
-    "school": "Custer County High School",
-    "birthdate": "7/24/1996"
+    "student_first_name": "Banu",
+    "student_last_name": "Rounds",
+    "student_state_id": 10103759,
+    "student_birth_date": "7/24/1996"
   },
   {
     "id": 4,
-    "name": "Biel Morgan",
-    "school": "Gardner Middle School",
-    "birthdate": "7/29/1997"
+    "student_first_name": "Biel",
+    "student_last_name": "Morgan",
+    "student_state_id": 10026734,
+    "student_birth_date": "7/29/1997"
   },
   {
     "id": 5,
-    "name": "Nikolai Dale",
-    "school": "Hoehne Middle/High School",
-    "birthdate": "6/5/1998"
+    "student_first_name": "Nikolai",
+    "student_last_name": "Dale",
+    "student_state_id": 42103332,
+    "student_birth_date": "6/5/1998"
   },
   {
     "id": 6,
-    "name": "Dulcibella Legrand",
-    "school": "John Mall High School",
-    "birthdate": "8/31/1998"
+    "student_first_name": "Dulcibella",
+    "student_last_name": "Legrand",
+    "student_state_id": 23196642,
+    "student_birth_date": "8/31/1998"
   },
   {
     "id": 7,
-    "name": "Petra Bentley",
-    "school": "Peakview Middle School",
-    "birthdate": "10/19/1998"
+    "student_first_name": "Petra",
+    "student_last_name": "Bentley",
+    "student_state_id": 29546204,
+    "student_birth_date": "10/19/1998"
   },
   {
     "id": 8,
-    "name": "Shakuntala CernÌk",
-    "school": "Primero Middle/High School",
-    "birthdate": "10/27/1999"
+    "student_first_name": "Shakuntala",
+    "student_last_name": "CernÌk",
+    "student_state_id": 20596204,
+    "student_birth_date": "10/27/1999"
   },
   {
     "id": 9,
-    "name": "Audovacar Mendelssohn",
-    "school": "Sangre de Cristo Elem/Junior High",
-    "birthdate": "6/26/2000"
+    "student_first_name": "Audovacar",
+    "student_last_name": "Mendelssohn",
+    "student_state_id": 12046734,
+    "student_birth_date": "6/26/2000"
   },
   {
     "id": 10,
-    "name": "Baldo Nikolaev",
-    "school": "Sargent Elem/Junior High",
-    "birthdate": "10/9/2002"
+    "student_first_name": "Baldo",
+    "student_last_name": "Nikolaev",
+    "student_state_id": 19493055,
+    "student_birth_date": "10/9/2002"
   },
   {
     "id": 11,
-    "name": "Azat Yamashita",
-    "school": "Sierra Grande Elem/Junior High",
-    "birthdate": "7/29/1997"
+    "student_first_name": "Azat",
+    "student_last_name": "Yamashita",
+    "student_state_id": 10355935,
+    "student_birth_date": "7/29/1997"
   },
   {
     "id": 12,
-    "name": "Bora Beatty",
-    "school": "Trinidad High School",
-    "birthdate": "6/5/1998"
+    "student_first_name": "Bora",
+    "student_last_name": "Beatty",
+    "student_state_id": 45096305,
+    "student_birth_date": "6/5/1998"
   },
   {
     "id": 13,
-    "name": "Kirsteen Meaney",
-    "school": "Trinidad Middle School",
-    "birthdate": "8/31/1998"
+    "student_first_name": "Kirsteen",
+    "student_last_name": "Meaney",
+    "student_state_id": 10485732,
+    "student_birth_date": "8/31/1998"
   }
 ]
