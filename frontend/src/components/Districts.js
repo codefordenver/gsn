@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {getDistricts} from 'services/districtServices.js'
+import {getDistricts} from 'services/districtServices.js';
 
-class District extends Component {
+class Districts extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,4 +38,4 @@ class District extends Component {
   }
 }
 
-export default District;
+export default Districts;
