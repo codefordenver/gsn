@@ -12,6 +12,7 @@ graphviz = "*"
 djangorestframework-jwt = "*"
 httpie = "*"
 django-cors-headers = "*"
+djangorestframework-camel-case2 = "*"
 
 [dev-packages]
 coverage = "*"
