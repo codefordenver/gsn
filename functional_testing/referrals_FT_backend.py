@@ -12,6 +12,29 @@ class Referrals(unittest.TestCase):
         """automatically removes Chrome window once testing is complete"""
         self.browser.quit()
 
+    def cross_check_list_with_drop_down_options(self, list, element_name):
+        """ takes a list a cross checks that all items in the list are present
+        in a drop down menu html element, and all options in the drop down menu
+        element are present in the list. The menu html element is identified
+        from a list of elements of the class = "form-control" by its element name.
+        Function takes two arguments: an element name as a string and a list to cross check. """
+        drop_down_menus = self.browser.find_elements_by_class_name("form-control")
+
+        for menu in drop_down_menus:
+            if menu.get_attribute("name") == element_name:
+                menu_element = menu
+
+        menu_option_elements = menu_element.find_elements_by_tag_name("option")
+        menu_option_text_list = [option.text for option in menu_option_elements]
+
+        self.assertTrue(
+        all(option.text in list for option in menu_option_elements),
+        f"Some or all drop down menu items are not in the list you are checking.")
+
+        self.assertTrue(
+        all(item in menu_option_text_list for item in list),
+        f"Some or all items in the list you are checking are not present in " + element_name + " drop down menu.")
+
     def test_can_add_and_save_new_referral(self):
 
         #user can visit root/gsndb/referral/ and see Referrals in title
@@ -20,7 +43,7 @@ class Referrals(unittest.TestCase):
         self.browser.get("http://192.168.99.100:8000/gsndb/referral/")
         self.assertIn("Referral", self.browser.title)
 
-        #user can see drop down menu labelled "Student".
+        #user can see label "Student".
 
         labels = self.browser.find_elements_by_tag_name("label")
 
@@ -40,17 +63,7 @@ class Referrals(unittest.TestCase):
             "Student object (8)",
         ]
 
-        drop_down_menus = self.browser.find_elements_by_class_name("form-control")
-
-        for menu in drop_down_menus:
-            if menu.get_attribute("name") == "student":
-                student_drop_down = menu
-
-        student_options = student_drop_down.find_elements_by_tag_name("option")
-
-        self.assertTrue(
-        all(student.text in all_students_list for student in student_options),
-        "Some or all students are not present in 'Student' drop down menu.")
+        self.cross_check_list_with_drop_down_options(all_students_list, "student")
 
         #user can see drop down menu labelled "Referral Type".
 
@@ -75,16 +88,8 @@ class Referrals(unittest.TestCase):
             "Other",
         ]
 
-        for menu in drop_down_menus:
-            if menu.get_attribute("name") == "referral_type":
-                referral_type_drop_down = menu
+        self.cross_check_list_with_drop_down_options(all_referral_types_list, "referal_type")
 
-        referral_type_options = referral_type_drop_down.find_elements_by_tag_name("option")
-
-        self.assertTrue(
-        all(referral_type.text in all_referral_types_list for referral_type in referral_type_options),
-        "Some or all referral types are not present in 'Referral type' drop down menu.")
-        
         #user can enter the date the referral was given, along with the
         #reference's name, phone number, and address.
 
