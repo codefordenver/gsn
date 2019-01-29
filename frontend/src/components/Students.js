@@ -33,10 +33,10 @@ class Students extends Component {
           </thead>
           <tbody>
           {students.map(student=>{
-            const {id, name, school, birthdate} = student;
-            return (<tr key={id}>
-              <td><Link to={`student/${id}`}>{name}</Link></td>
-              <td>{school}</td>
+            const {studentId, name, school, schoolId, birthdate} = student;
+            return (<tr key={studentId}>
+              <td><Link to={`student/${studentId}`}>{name}</Link></td>
+              <td><Link to={`school/${schoolId}`}>{school}</Link></td>
               <td>{birthdate}</td>
             </tr>)
           })}

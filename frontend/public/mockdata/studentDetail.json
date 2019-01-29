@@ -1,7 +1,12 @@
 {
-  "student_first_name": "Linton",
-  "student_last_name": "Stephens",
-  "student_gender": "Male",
-  "student_birth_date": "9/16/1992",
-  "student_state_id": "527199236"
+  "studentId": 13,
+  "name" : "Linton Jefferson Stephens",
+  "gender": "Male",
+  "school": "Aguilar Middle/High School",
+  "schoolId": 15,
+  "birthdate": "9/16/1992",
+  "grade": "Sophomore",
+  "stateId": "527199236",
+  "studentYear": "Sophomore",
+  "studentTerm": "Fall"
 }
