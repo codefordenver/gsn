@@ -1,44 +1,51 @@
-[
-  {
-    "date": "TOTALS",
-    "unexcused": 3,
-    "excused": 1,
-    "tardies": 8
-  },
-  {
-    "date": "3/22/2018",
-    "unexcused": 0,
-    "excused": 1,
-    "tardies": 0
-  },
-  {
-    "date": "6/5/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
-  },
-  {
-    "date": "8/31/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
-  },
-  {
-    "date": "10/19/2018",
-    "unexcused": 0,
-    "excused": 0,
-    "tardies": 4
-  },
-  {
-    "date": "10/20/2018",
-    "unexcused": 0,
-    "excused": 0,
-    "tardies": 4
-  },
-  {
-    "date": "11/1/2018",
-    "unexcused": 1,
-    "excused": 0,
-    "tardies": 0
-  }
-]
+{
+  "studentId": 13,
+  "name" : "Linton Jefferson Stephens",
+  "school": "Aguilar Middle/High School",
+  "schoolId": 15,
+  "birthdate": "9/16/1992",
+  "attendance": [
+    {
+      "date": "TOTALS",
+      "unexcused": 3,
+      "excused": 1,
+      "tardies": 8
+    },
+    {
+      "date": "3/22/2018",
+      "unexcused": 0,
+      "excused": 1,
+      "tardies": 0
+    },
+    {
+      "date": "6/5/2018",
+      "unexcused": 1,
+      "excused": 0,
+      "tardies": 0
+    },
+    {
+      "date": "8/31/2018",
+      "unexcused": 1,
+      "excused": 0,
+      "tardies": 0
+    },
+    {
+      "date": "10/19/2018",
+      "unexcused": 0,
+      "excused": 0,
+      "tardies": 4
+    },
+    {
+      "date": "10/20/2018",
+      "unexcused": 0,
+      "excused": 0,
+      "tardies": 4
+    },
+    {
+      "date": "11/1/2018",
+      "unexcused": 1,
+      "excused": 0,
+      "tardies": 0
+    }
+  ]
+}
