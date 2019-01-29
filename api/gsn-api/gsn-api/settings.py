@@ -62,6 +62,14 @@ REST_FRAMEWORK = {
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case2.render.CamelCaseJSONRenderer',
+        # Any other renders
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'djangorestframework_camel_case2.parser.CamelCaseJSONParser',
+        # Any other parsers
+    ),
 }
 
 ROOT_URLCONF = 'gsn-api.urls'
