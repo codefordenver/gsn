@@ -6,6 +6,7 @@ class Students extends Component {
   constructor() {
     super();
     this.state = {
+      loading: true,
       students: [],
     }
   }
@@ -19,7 +20,13 @@ class Students extends Component {
   }
 
   render() {
-    const {students} = this.state;
+    const {students, loading} = this.state;
+    if (loading) return (
+      <div>
+        <h1>Students</h1>
+        <h2>Loading...</h2>
+      </div>
+    )
     return (
       <div>
         <h1>Students</h1>
