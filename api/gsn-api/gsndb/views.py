@@ -29,10 +29,14 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SchoolSerializer
 
 
-class MyStudentList(generics.ListCreateAPIView):
+class StudentList(generics.ListCreateAPIView):
     queryset = Student.objects.all()
-    serializer_class = MyStudentSerializer
+    serializer_class = StudentSerializer
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
-    serializer_class = StudentDetailSerializer
+    serializer_class = StudentSerializer
+
+class MyStudentsList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = MyStudentsSerializer

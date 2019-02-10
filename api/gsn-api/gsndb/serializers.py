@@ -20,20 +20,7 @@ class SchoolSerializer(serializers.ModelSerializer):
             "name",
         )
 
-class MyStudentSerializer(serializers.ModelSerializer):
-    current_school = SchoolSerializer(read_only = True)
-
-    class Meta:
-        model = student
-        fields = (
-        "first_name",
-        "last_name",
-        "middle_name",
-        "current_school",
-        "birth_date",
-        )
-
-class StudentDetailSerializer(serializers.ModelSerializer):
+class StudentSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
 
     class Meta:
@@ -49,4 +36,17 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         "program",
         "reason_in_program",
         "state_id",
+        )
+
+class MyStudentsSerializer(serializers.ModelSerializer):
+    current_school = SchoolSerializer(read_only = True)
+
+    class Meta:
+        model = student
+        fields = (
+        "first_name",
+        "last_name",
+        "middle_name",
+        "current_school",
+        "birth_date",
         )
