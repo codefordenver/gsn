@@ -20,7 +20,7 @@ class SchoolSerializer(serializers.ModelSerializer):
             "name",
         )
 
-class AllStudentSerializer(serializers.ModelSerializer):
+class MyStudentSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
 
     class Meta:
@@ -34,7 +34,7 @@ class AllStudentSerializer(serializers.ModelSerializer):
         )
 
 class StudentDetailSerializer(serializers.ModelSerializer):
-    school = SchoolSerializer(read_only = True)
+    current_school = SchoolSerializer(read_only = True)
 
     class Meta:
         model = student

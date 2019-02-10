@@ -4,8 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from gsndb.models import District
-from gsndb.serializers import DistrictSerializer
+from gsndb.models import District, School, Student, Course, Grade, Behavior, Attendance, Referral
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentSerializer, StudentDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 
@@ -18,3 +18,21 @@ class DistrictList(generics.ListCreateAPIView):
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
+
+
+class SchoolList(generics.ListCreateAPIView):
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+
+class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+
+
+class MyStudentList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = MyStudentSerializer
+
+class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentDetailSerializer
