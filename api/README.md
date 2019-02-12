@@ -6,7 +6,7 @@
 * using Homebrew, install git
 
 ## Starting from scratch:
-Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'HTempleman/gsn-api' (Soon to be GSN/gsn-api hopefully!)
+Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'gsn/api'
 
 type the following command in the root directory (the directory that contains the Dockerfile)
 
