@@ -3,13 +3,13 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade, Referral
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer, ReferralSerializer
+from rest_framework.response import Response
+from gsndb.models import District, School, Student, Course, Grade, Behavior, Attendance, Referral
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentSerializer, StudentDetailSerializer
 from rest_framework import generics
+from rest_framework.views import APIView
 
 # Create your views here.
-
-"""The district views will be functional and verbose with the intent of clarifying their purpose. Every view hereafter will be generic in nature"""
 
 class DistrictList(generics.ListCreateAPIView):
     queryset = District.objects.all()
@@ -19,7 +19,6 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
-"""As stated, all of the following views will utilize generic view classes provided by the Django Rest framework."""
 
 class SchoolList(generics.ListCreateAPIView):
     queryset = School.objects.all()
@@ -38,52 +37,6 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
-
-class StudentSnapList(generics.ListCreateAPIView):
-    queryset = StudentSnap.objects.all()
-    serializer_class = StudentSnapSerializer
-
-class StudentSnapDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = StudentSnap.objects.all()
-    serializer_class = StudentSnapSerializer
-
-
-class CourseList(generics.ListCreateAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-
-class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-
-
-class BehaviorList(generics.ListCreateAPIView):
-    queryset = Behavior.objects.all()
-    serializer_class = BehaviorSerializer
-
-class BehaviorDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Behavior.objects.all()
-    serializer_class = BehaviorSerializer
-
-
-class AttendanceList(generics.ListCreateAPIView):
-    queryset = Attendance.objects.all()
-    serializer_class = AttendanceSerializer
-
-class AttendanceDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Attendance.objects.all()
-    serializer_class = AttendanceSerializer
-
-
-class GradeList(generics.ListCreateAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-
-class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-
-
-class ReferralList(generics.ListCreateAPIView):
-    queryset = Referral.objects.all()
-    serializer_class = ReferralSerializer
+class MyStudentsList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = MyStudentsSerializer

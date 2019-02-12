@@ -1,201 +1,218 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
 #
 
 # Create your models here.
 
 class District(models.Model):
-   district_state = models.CharField(max_length=2)
-   district_city = models.CharField(max_length=50)
-   district_code = models.CharField(max_length=10)
+   state = models.CharField(max_length=2)
+   city = models.CharField(max_length=50)
+   code = models.CharField(max_length=10)
+   name = models.CharField(max_length=100)
 
 class School(models.Model):
-    school_name = models.TextField(max_length=150)
+    name = models.TextField(max_length = 150)
     district = models.ForeignKey(
         'District',
         on_delete=models.CASCADE,
     )
 
 class Student(models.Model):
-    school = models.ManyToManyField(
-        'School',
-    )
-    student_first_name = models.CharField(max_length=35)
-    student_last_name = models.CharField(max_length=35)
+    first_name = models.CharField(max_length = 35)
+    last_name = models.CharField(max_length = 35)
+    middle_name = models.CharField(max_length = 35, null = True)
     """Establish choices for Gender"""
-    MALE = 'M'
-    FEMALE = 'F'
-    NONBINARY = 'NB'
-    GENDER = (
-        (MALE, 'Male'),
-        (FEMALE, 'Female'),
-        (NONBINARY, 'NonBinary'),
+    GENDER_CHOICES = (
+        ("M", 'Male'),
+        ("F", 'Female'),
+        ("NB", 'NonBinary'),
     )
-    student_gender = models.CharField(
-            max_length=2,
-            choices=GENDER,
-            default=NONBINARY,
+    gender = models.CharField(
+            max_length = 2,
+            choices = GENDER_CHOICES,
     )
-    student_birth_date = models.DateField()
-    student_state_id = models.IntegerField()
-
-class StudentSnap(models.Model):
-    school = models.ForeignKey(
-        'School',
+    birth_date = models.DateField()
+    state_id = models.IntegerField(null = True)
+    """Establish choices for Grade Year"""
+    GRADE_YEAR_CHOICES = (
+        (0, 'Kindergarten'),
+        (1, 'First Grade'),
+        (2, 'Second Grade'),
+        (3, 'Third Grade'),
+        (4, 'Fourth Grade'),
+        (5, 'Fifth Grade'),
+        (6, 'Sixth Grade'),
+        (7, 'Seventh Grade'),
+        (8, 'Eighth Grade'),
+        (9, 'Ninth Grade'),
+        (10, 'Tenth Grade'),
+        (11, 'Eleventh Grade'),
+        (12, 'Twelfth Grade')
+    )
+    grade_year = models.SmallIntegerField(
+        choices = GRADE_YEAR_CHOICES,
+    )
+    current_school = models.ForeignKey(
+        "School",
         on_delete = models.CASCADE,
     )
-    student = models.ForeignKey(
-        'Student',
-        on_delete = models.CASCADE,
-    )
-    """ESTABLISH CHOICES FOR GRADE PLACEMENT"""
-    K = 0
-    FIRST = 1
-    SECOND = 2
-    THIRD = 3
-    FOURTH = 4
-    FIFTH = 5
-    SIXTH = 6
-    SEVENTH = 7
-    EIGHTH = 8
-    NINTH = 9
-    TENTH = 10
-    ELEVENTH = 11
-    TWELFTH = 12
-    GRADE_PLACEMENT = (
-        (K, 'Kindergarten'),
-        (FIRST, 'First Grade'),
-        (SECOND, 'Second Grade'),
-        (THIRD, 'Third Grade'),
-        (FOURTH, 'Fourth Grade'),
-        (FIFTH, 'Fifth Grade'),
-        (SIXTH, 'Sixth Grade'),
-        (SEVENTH, 'Seventh Grade'),
-        (EIGHTH, 'Eighth Grade'),
-        (NINTH, 'Ninth Grade'),
-        (TENTH, 'Tenth Grade'),
-        (ELEVENTH, 'Eleventh Grade'),
-        (TWELFTH, 'Twelfth Grade')
-    )
-    student_grade_placement = models.SmallIntegerField(
-            choices=GRADE_PLACEMENT,
-            default=K,
-    )
-    """ESTABLISH CHOICES FOR ATTENDANCE TERM"""
-    SPRING = 'SPR'
-    SUMMER = "SMR"
-    FALL = 'FLL'
-    WINTER = 'WNT'
-    SPECIAL = 'SPC'
-    NOT_SPECIFIED = 'NSP'
-    TERMS = (
-        (SPRING, 'Spring'),
-        (SUMMER, 'Summer'),
-        (FALL, 'Fall'),
-        (WINTER, 'Winter'),
-        (SPECIAL, 'Special Term'),
-        (NOT_SPECIFIED, 'No Term Specified')
-    )
-    student_attendance_term = models.CharField(
-            max_length=3,
-            choices=TERMS,
-            default=NOT_SPECIFIED,
-    )
+    program = models.CharField(max_length = 100)
+    reason_in_program = models.TextField()
 
 class Course(models.Model):
     school = models.ForeignKey(
-        'School',
-        on_delete= models.CASCADE,
+        "School",
+        on_delete = models.CASCADE,
     )
-    course_name = models.CharField(max_length=100)
-    """Establish choices for course subject"""
-    MATH = 'MTH'
-    SCIENCE = 'SNC'
-    HISTORY = 'HST'
-    SOCIAL_STUDIES = 'SCS'
-    COMPUTER_EDUCATION = 'CMP'
-    STUDY_HALL = 'STD'
-    SPECIAL_EDUCATION = 'SPL'
-    ENGLISH = 'ENG'
-    ENGLISH_AS_SECOND_LANGUAGE = 'ESL'
-    SPANISH = 'SPA'
-    CHINESE = 'CHN'
-    FRENCH = 'FRH'
-    GERMAN = 'GRM'
-    JAPANESE = 'JPN'
-    LATIN = 'LTN'
-    SUBJECT_NOT_LISTED = 'SNL'
-    SUBJECT = (
-        (MATH, 'Math'),
-        (SCIENCE, 'Science'),
-        (HISTORY, 'History'),
-        (SOCIAL_STUDIES, 'Social Studies'),
-        (COMPUTER_EDUCATION, 'Computer Education'),
-        (STUDY_HALL, 'Study Hall'),
-        (SPECIAL_EDUCATION, 'Special Education'),
-        (ENGLISH, 'English'),
-        (ENGLISH_AS_SECOND_LANGUAGE, 'English As a Second Language'),
-        (SPANISH, 'Spanish'),
-        (CHINESE, 'Chinese'),
-        (FRENCH, 'French'),
-        (GERMAN, 'German'),
-        (JAPANESE, 'Japanese'),
-        (LATIN, 'Latin'),
-        (SUBJECT_NOT_LISTED, 'Subject Not Listed')
+    name = models.CharField(max_length = 50)
+    code = models.CharField(max_length = 15)
+    """establish choices for Subject"""
+    SUBJECT_CHOICES = (
+        ("MTH", 'Math'),
+        ("SCI", 'Science'),
+        ('HIS', 'History'),
+        ('SST', 'Social Studies'),
+        ('CED', 'Computer Education'),
+        ("PHS", "Physical Education"),
+        ("RDG", "Reading"),
+        ("WRT", "Writing"),
+        ("STH", 'Study Hall'),
+        ("SPE", 'Special Education'),
+        ("ENG", 'English'),
+        ("ESL", 'English As a Second Language'),
+        ("ESP", 'Spanish'),
+        ("CHI", 'Chinese'),
+        ("FRN", 'French'),
+        ("GER", 'German'),
+        ("JAP", 'Japanese'),
+        ("LTN", 'Latin'),
+        ("SNL", 'Subject Not Listed'),
     )
-    course_subject = models.CharField(
-            max_length=3,
-            choices=SUBJECT,
-            default=SUBJECT_NOT_LISTED,
+    subject = models.CharField(
+        max_length = 3,
+        choices = SUBJECT_CHOICES,
     )
 
 class Behavior(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
+    #will probably want to add choices to incident_type and _result
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.CASCADE
     )
-    behavior_incident_date_time = models.DateTimeField()
-    behavior_context = models.TextField(max_length=500)
-    behavior_result = models.TextField(max_length=500)
-
-class Attendance(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
+    school = models.ForeignKey(
+        "School",
+        on_delete = models.CASCADE
     )
-    attendance_data_entry_time = models.DateTimeField(auto_now_add=True)
-    attendance_total_unexcused_absences = models.IntegerField()
-    attendance_total_excused_absences = models.IntegerField()
-    attendance_total_tardies = models.IntegerField()
+    incident_datetime = models.DateTimeField()
+    calendar_year = models.IntegerField()
+    """establish choices for term"""
+    TERM_CHOICES = (
+        ("SPR", "Spring"),
+        ("SMR", "Summer"),
+        ("FLL", "Fall"),
+    )
+    term = models.CharField(
+        max_length = 3,
+        choices = TERM_CHOICES,
+    )
+    context = models.TextField(null = True)
+    incident_type_program = models.CharField(
+        max_length = 50,
+        null = True,
+    )
+    incident_result_program = models.CharField(
+        max_length = 50,
+        null = True,
+    )
+    incident_type_school = models.CharField(
+        max_length = 50,
+        null = True,
+    )
+    incident_result_school = models.CharField(
+        max_length = 50,
+        null = True,
+    )
 
 class Grade(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
-    )
-    course = models.ForeignKey(
-        'Course',
-        on_delete=models.CASCADE,
-    )
-    grade_data_entry_time = models.DateTimeField(auto_now_add=True)
-    grade_metric = models.DecimalField(
-            max_digits=3,
-            decimal_places=2
-    )
-    """Establish choices for GPA scale"""
-    FOUR_POINT_SCALE = 4
-    SEVEN_POINT_SCALE = 7
-    SCALE = (
-        (FOUR_POINT_SCALE, 'Four Point Scale'),
-        (SEVEN_POINT_SCALE, 'Seven Point Scale')
-    )
-    grade_scale = models.SmallIntegerField(
-            choices=SCALE,
-            default=FOUR_POINT_SCALE,
-    )
-    grade_is_final = models.BooleanField(default=True)
-
-class Referral(models.Model):
     student = models.ForeignKey(
         "Student",
         on_delete = models.CASCADE,
     )
+    course = models.ForeignKey(
+        "Course",
+        on_delete = models.CASCADE,
+    )
+    entry_datetime = models.DateTimeField(default = timezone.now)
+    calendar_year = models.IntegerField()
+    """establish choices for term"""
+    TERM_CHOICES = (
+        ("SPR", "Spring"),
+        ("SMR", "Summer"),
+        ("FLL", "Fall"),
+    )
+    term = models.CharField(
+        max_length = 3,
+        choices = TERM_CHOICES,
+    )
+    grade = models.FloatField()
+    final_boolean = models.BooleanField(default = False)
+
+class Attendance(models.Model):
+    #may want to track term attendance percentage (percent of days present)
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.CASCADE
+    )
+    school = models.ForeignKey(
+        "School",
+        on_delete = models.CASCADE
+    )
+    entry_datetime = models.DateTimeField(default = timezone.now)
+    calendar_year = models.IntegerField()
+    """establish choices for term"""
+    TERM_CHOICES = (
+        ("SPR", "Spring"),
+        ("SMR", "Summer"),
+        ("FLL", "Fall"),
+    )
+    term = models.CharField(
+        max_length = 3,
+        choices = TERM_CHOICES,
+    )
+    total_unexcused_absences = models.IntegerField(null = True)
+    total_excused_absences = models.IntegerField(null = True)
+    total_tardies = models.IntegerField(null = True)
+    term_total_boolean = models.BooleanField(default = False)
+
+class Referral(models.Model):
+    #need to add user field, which requires fleshing out user_app
+    #need to alter phone number field probably, for formatting purposes
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.CASCADE,
+    )
+    """ establish choices for Referral Type"""
+    REFERRAL_TYPE = (
+        ("MTL", "Mental Health"),
+        ("DAC", "Drug & Alcohol/Addictions Counseling"),
+        ("DHS", "Social Services (Department of Human Services)"),
+        ("YSC", "Division of Youth Services/Corrections"),
+        ("CPS", "Childcare/Preschool Services"),
+        ("FMR", "Family Resources"),
+        ("M/C", "Meals/Clothing"),
+        ("HOU", "Housing"),
+        ("SIP", "Specialized School Intervention Program"),
+        ("TRN", "Transportation"),
+        ("WFC", "Work Force Center"),
+        ("IOG", "Interagency Oversight Group (IOG)"),
+        ("OTH", "Other")
+    )
+    referral_type = models.CharField(
+        max_length = 3,
+        choices = REFERRAL_TYPE,
+    )
+    referral_date = models.DateField(default = timezone.now)
+    reference_name = models.CharField(max_length = 100, null = True)
+    reference_phone = models.BigIntegerField(null = True)
+    reference_address = models.CharField(max_length = 150, null = True)
