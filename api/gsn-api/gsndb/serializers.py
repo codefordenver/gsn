@@ -48,16 +48,29 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = ('id', 'school', 'course_name', 'course_subject')
 
 class BehaviorSerializer(serializers.ModelSerializer):
+    context = serializers.CharField(source= "behavior_context")
+    date = serializers.DateTimeField(format= "%-m/%-d/%-Y", source= 'behavior_incident_date_time')
+    result = serializers.CharField(source= "behavior_result")
     class Meta:
         model = Behavior
-        fields = ('id', 'student_snap', 'behavior_incident_date_time', 'behavior_context', 'behavior_result')
+        exclude = ('id', 'student_snap', 'behavior_incident_date_time', 'behavior_context', 'behavior_result')
 
 class AttendanceSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format= "%-m/%-d/%-Y", source= 'attendance_data_entry_time')
+    unexcused = serializers.CharField(source= 'attendance_total_unexcused_absences')
+    excused = serializers.CharField(source= 'attendance_total_excused_absences')
+    tardies = serializers.CharField(source= 'attendance_total_tardies')
     class Meta:
         model = Attendance
-        fields = ('id', 'student_snap', 'attendance_data_entry_time', 'attendance_total_unexcused_absences', 'attendance_total_excused_absences', 'attendance_total_tardies')
+        exclude = ('student_snap', 'attendance_data_entry_time', 'attendance_total_unexcused_absences', 'attendance_total_excused_absences',
+        'attendance_total_tardies', 'id')
 
 class GradeSerializer(serializers.ModelSerializer):
+    course = serializers.CharField(source= 'course.course_name', read_only=True)
+    scale = serializers.CharField(source= 'grade_scale')
+    date = serializers.DateTimeField(format = "%-m/%-d/%-Y", source= 'grade_data_entry_time')
+    metric = serializers.CharField(source= 'grade_metric')
+    final = serializers.BooleanField(source= 'grade_is_final')
     class Meta:
         model = Grade
-        fields = ('id', 'student_snap', 'course', 'grade_data_entry_time', 'grade_metric', 'grade_scale', 'grade_is_final')
+        exclude = ('id', 'student_snap', 'grade_metric', 'grade_scale', 'grade_is_final', 'grade_data_entry_time')

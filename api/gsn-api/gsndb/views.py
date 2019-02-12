@@ -1,8 +1,12 @@
+import json
+from datetime import datetime
+from rest_framework.views import APIView
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
 from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade
 from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer
 from rest_framework import generics
@@ -86,21 +90,47 @@ class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GradeSerializer
 
 
+class StudentInfo(APIView):
 
+    def post(self, request, grades=False, attendance=False, behavior=False, format=None):
+        student_name = request.data["student_name"].split()
+        first_name = student_name[0]
+        last_name = student_name[1]
+        
+        student = Student.objects.get(student_first_name=first_name, student_last_name=last_name)
+        student_id = student.student_state_id
+        birthday = student.student_birth_date
+        current_snap = StudentSnap.objects.filter(student__student_first_name=first_name).order_by('pk').reverse()[0]
+        school_name = current_snap.school.school_name
 
-"""
-//USE THE FOLLOWING JAVASCRIPT WITHIN REACT:
+        total_snaps = StudentSnap.objects.filter(student__student_first_name=first_name, student__student_last_name=last_name)
 
-const fileInput = document.querySelector('#your-file-input') ;
-const formData = new FormData();
+        kwarg_key = ""
+        kwarg_data = []
 
-formData.append('file', fileInput.files[0]);
+        for snap in total_snaps:
+            if self.kwargs.get("grades"):
+                kwarg_key = "grades"
+                grades = Grade.objects.filter(student_snap=snap)
+                cereal = GradeSerializer(grades, many=True)
+            if self.kwargs.get("attendance"):
+                kwarg_key = "attendance"
+                attendance = Attendance.objects.filter(student_snap=snap)
+                cereal = AttendanceSerializer(attendance, many=True)
+            if self.kwargs.get("behavior"):
+                kwarg_key = "behavior"
+                behavior = Behavior.objects.filter(student_snap=snap)
+                cereal = BehaviorSerializer(behavior, many=True)
+            data = JSONRenderer().render(cereal.data)
+            python_data = json.loads(data)
+            kwarg_data += python_data
+        
+        output = {
+            "studentId" : student_id,
+            "name" : request.data["student_name"],
+            "school" : school_name,
+            "birthdate" : datetime.strftime(birthday, '%-m/%-d/%Y'),
+            kwarg_key : kwarg_data
+        }
 
-const options = {
-  method: 'POST',
-  body: formData,
-  }
-};
-
-fetch('your-upload-url', options);
-"""
+        return Response(output)
