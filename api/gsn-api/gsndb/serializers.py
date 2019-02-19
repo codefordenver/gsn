@@ -20,11 +20,11 @@ class SchoolSerializer(serializers.ModelSerializer):
             "name",
         )
 
-class StudentSerializer(serializers.ModelSerializer):
+class StudentDetailSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
 
     class Meta:
-        model = student
+        model = Student
         fields = (
         "first_name",
         "last_name",
@@ -38,11 +38,11 @@ class StudentSerializer(serializers.ModelSerializer):
         "state_id",
         )
 
-class MyStudentsSerializer(serializers.ModelSerializer):
+class MyStudentSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
 
     class Meta:
-        model = student
+        model = Student
         fields = (
         "first_name",
         "last_name",
