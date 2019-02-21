@@ -1,12 +1,14 @@
 from django.test import TestCase
 from django.urls import resolve
-from gsndb.models import District
+from gsndb.models import District, School, Student
 
 class ReferralsTest(TestCase):
 
     def test_can_create_district_instance(self):
         self.client.get("/gsndb/district/")
-        instance = District.objects.create()
+
+    def test_exp_url(self):
+        self.client.get("/exp/student/2/")
 
 
 

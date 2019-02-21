@@ -1,0 +1,152 @@
+// gsn SQL schema
+digraph html_table {
+	A [label=<<TABLE>
+			<TR><TD><B>District</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD>code</TD></TR>
+			<TR><TD>city</TD></TR>
+			<TR><TD>state</TD></TR>
+			<TR><TD>name</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	B [label=<<TABLE>
+			<TR><TD><B>School</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>district_id (FK)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	C [label=<<TABLE>
+			<TR><TD><B>Student</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>current_school_id (FK)</I></TD></TR>
+			<TR><TD>first_name</TD></TR>
+			<TR><TD>last_name</TD></TR>
+			<TR><TD>middle_name</TD></TR>
+			<TR><TD>gender</TD></TR>
+			<TR><TD>birthdate</TD></TR>
+			<TR><TD>grade_year</TD></TR>
+			<TR><TD>stateId</TD></TR>
+			<TR><TD>program</TD></TR>
+			<TR><TD>reason_in_program<TR>
+	</TABLE>> shape=plaintext]
+
+	D [label = <<TABLE>
+			<TR><TD><B>User</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD>username</TD></TR>
+			<TR><TD>first_name</TD></TR>
+			<TR><TD>last_name</TD></TR>
+			<TR><TD>email</TD></TR>
+			<TR><TD>password</TD></TR>
+			<TR><TD>groups</TD></TR>
+			<TR><TD>user_permissions</TD></TR>
+			<TR><TD>is_staff</TD></TR>
+			<TR><TD>is_active</TD></TR>
+			<TR><TD>is_superuser</TD></TR>
+	</TABLE>> shape = plaintext]
+
+	E [label=<<TABLE>
+			<TR><TD><B>Calendar</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD>year</TD></TR>
+			<TR><TD>term</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	F [label=<<TABLE>
+			<TR><TD><B>Course</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>school_id (FK)</I></TD></TR>
+			<TR><TD>name</TD></TR>
+			<TR><TD>subject</TD></TR>
+			<TR><TD>code</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	G [label=<<TABLE>
+			<TR><TD><B>Behavior</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>student_id (FK)</I></TD></TR>
+			<TR><TD><I>school_id (FK)</I></TD></TR>
+			<TR><TD><I>calendar_id (FK)</I></TD></TR>
+			<TR><TD>incident_datetime</TD></TR>
+			<TR><TD>incident_result_program</TD></TR>
+			<TR><TD>incident_type_program</TD></TR>
+			<TR><TD>incident_result_school</TD></TR>
+			<TR><TD>incident_type_school</TD></TR>
+			<TR><TD>context</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	H [label=<<TABLE>
+			<TR><TD><B>Attendance</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>student_id (FK)</I></TD></TR>
+			<TR><TD><I>school_id (FK)</I></TD></TR>
+			<TR><TD><I>calendar_id (FK)</I></TD></TR>
+			<TR><TD>entry_date_time</TD></TR>
+			<TR><TD>total_unexabs</TD></TR>
+			<TR><TD>total_exabs</TD></TR>
+			<TR><TD>total_tardies</TD></TR>
+			<TR><TD>avg_daily_attendance</TD></TR>
+			<TR><TD>term_final_boolean</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	I [label=<<TABLE>
+			<TR><TD><B>Grade</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>student_id (FK)</I></TD></TR>
+			<TR><TD><I>course_id (FK)</I></TD></TR>
+			<TR><TD><I>calendar_id (FK)</I></TD></TR>
+			<TR><TD>entry_datetime</TD></TR>
+			<TR><TD>grade</TD></TR>
+			<TR><TD>final_boolean</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	J [label=<<TABLE>
+			<TR><TD><B>Referral</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>user_id (FK)</I></TD></TR>
+			<TR><TD><I>student_id (FK)</I></TD></TR>
+			<TR><TD>type</TD></TR>
+			<TR><TD>date</TD></TR>
+			<TR><TD>reference_name</TD></TR>
+			<TR><TD>reference_phone</TD></TR>
+			<TR><TD>reference_address</TD></TR>
+			<TR><TD>reason</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	K [label=<<TABLE>
+			<TR><TD><B>Note</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>user_id (FK)</I></TD></TR>
+			<TR><TD><I>related_content_id (Dynamic FK)</I></TD></TR>
+			<TR><TD>datetime</TD></TR>
+			<TR><TD>content</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	L [label=<<TABLE>
+			<TR><TD><B>Bookmark</B></TD></TR>
+			<TR><TD><I>id</I></TD></TR>
+			<TR><TD><I>user_id (FK)</I></TD></TR>
+			<TR><TD>datetime</TD></TR>
+			<TR><TD>url</TD></TR>
+			<TR><TD>react_component</TD></TR>
+			<TR><TD>json_request_data</TD></TR>
+	</TABLE>> shape=plaintext]
+
+	A -> B
+	B -> C
+	B -> F
+	B -> G
+	B -> H
+	C -> G
+	C -> H
+	C -> I
+	C -> J
+	D -> J
+	D -> K
+	D -> L
+	E -> G
+	E -> H
+	E -> I
+	F -> I
+}
