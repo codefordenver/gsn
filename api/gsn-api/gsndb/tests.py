@@ -7,8 +7,6 @@ class ReferralsTest(TestCase):
     def test_can_create_district_instance(self):
         self.client.get("/gsndb/district/")
 
-    def test_exp_url(self):
-        self.client.get("/exp/student/2/")
 
 
 

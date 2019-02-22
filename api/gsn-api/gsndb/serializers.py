@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from gsndb.models import District, School, Student, Course, Grade, Attendance, Behavior, Referral
+from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral
+from user_app.models import CustomUser
+from user_app.serializers import CustomUserSerializer
 
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,6 +55,42 @@ class MyStudentsSerializer(serializers.ModelSerializer):
             "birth_date",
         )
 
+class CalendarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calendar
+        fields = (
+            "id",
+            "year",
+            "term",
+        )
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = (
+            "id",
+            "school",
+            "name",
+            "code",
+            "subject",
+        )
+
+class BehaviorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Behavior
+        fields = (
+            "id",
+            "student",
+            "school",
+            "calendar",
+            "incident_datetime",
+            "context",
+            "incident_type_program",
+            "incident_result_program",
+            "incident_type_school",
+            "incident_result_school",
+        )
+
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
@@ -60,11 +98,10 @@ class GradeSerializer(serializers.ModelSerializer):
             "id",
             "student",
             "course",
+            "calendar",
             "entry_datetime",
-            "calendar_year",
-            "term",
             "grade",
-            "final_boolean",
+            "term_final_value",
         )
 
 class GradeForStudentSerializer(serializers.ModelSerializer):
@@ -81,13 +118,32 @@ class GradeForStudentSerializer(serializers.ModelSerializer):
             "grade_set",
         )
 
-class CourseSerializer(serializers.ModelSerializer):
+class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
+        model = Attendance
         fields = (
             "id",
+            "student",
             "school",
-            "name",
-            "code",
-            "subject",
+            "calendar",
+            "entry_date_time",
+            "total_unexabs",
+            "total_exabs",
+            "total_tardies",
+            "avg_daily_attendance",
+            "term_final_value",
+        )
+
+class ReferralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Referral
+        fields = (
+            "id",
+            "user",
+            "student",
+            "type",
+            "date_given",
+            "reference_name",
+            "reference_phone",
+            "reference_address",
         )

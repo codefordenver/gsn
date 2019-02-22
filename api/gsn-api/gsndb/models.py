@@ -220,7 +220,6 @@ class Grade(models.Model):
     term_final_value = models.BooleanField(default = False)
 
 class Attendance(models.Model):
-    #may want to track term attendance percentage (percent of days present)
     student = models.ForeignKey(
         "Student",
         on_delete = models.PROTECT,
@@ -241,7 +240,6 @@ class Attendance(models.Model):
     term_final_value = models.BooleanField(default = False)
 
 class Referral(models.Model):
-    #need to add user field, which requires fleshing out user_app
     #need to alter phone number field probably, for formatting purposes
     user = models.ForeignKey(
         get_user_model(),
