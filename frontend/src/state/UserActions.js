@@ -55,6 +55,8 @@ export const register = ({username, password}) => dispatch => {
   dispatch(setLoading(true));
   signupUser({username, password})
     .then(json => {
+      console.log('register json', json);
+      dispatch(setLoading(false));
       dispatch(
         authSuccess({
             token: json.token,
