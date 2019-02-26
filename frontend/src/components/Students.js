@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {Link} from 'react-router-dom';
 import {getStudents} from 'services/studentServices.js';
 
-function Students (props) {
+export default function Students (props) {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,5 +45,3 @@ function Students (props) {
     </div>
   )
 }
-
-export default Students;

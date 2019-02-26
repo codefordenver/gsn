@@ -1,41 +1,33 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
+import {Link} from 'react-router-dom';
 import {getDistricts} from 'services/districtServices.js';
 
-class Districts extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      json: [],
-      dataIsLoaded: false,
-    };
+export default function Districts (props) {
+  const [districts, setDistricts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick(e) {
-    e.preventDefault();
-    getDistricts()
-    .then(json => {
-      this.setState({json})
-      this.setState({dataIsLoaded: true})
+  useEffect(() => {
+    console.log('useEffect ran in Districts.js');
+    getDistricts().then(districts=> {
+      setDistricts(districts);
+      setLoading(false);
     });
-  }
+  }, []);
 
-  render(){
-    return (
-      <div className="District">
-        <h1>District</h1>
-        <button onClick={this.handleClick}>
-           Get District Data
-        </button>
-        <pre>
-          {this.state.dataIsLoaded
-            ? JSON.stringify(this.state.json, null, 2)
-            : null}
-        </pre>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div>
+      <h1>Districts</h1>
+      <h2>Loading...</h2>
+    </div>
+  )
+
+  return(
+    <div>
+      <h1>Districts</h1>
+      {districts.map(district=>{
+        const {id, districtState, districtCity, districtCode} = district;
+        return <p><Link to={`district/${id}`}>{districtCode}: {districtCity}, {districtState}</Link></p>
+      })}
+    </div>
+  );
 }
-
-export default Districts;
