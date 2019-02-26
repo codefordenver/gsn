@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom';
 import * as userActions from 'state/UserActions';
 
-function Nav({isLoggedIn, logOut, display_form}) {
+function Nav({isLoggedIn, logOut}) {
 
   const $loggedOutNav = (
     <ul>
@@ -45,7 +45,3 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {logOut: userActions.logOut})(Nav);
-
-Nav.proptypes = {
-  display_form: PropTypes.func.isRequired,
-}
