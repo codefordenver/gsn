@@ -6,7 +6,7 @@ import SignupForm from 'components/SignupForm';
 import Districts from 'components/Districts';
 import Students from 'components/Students';
 import {connect} from 'react-redux';
-import * as userActions from 'globalState/user/UserActions';
+import * as userActions from 'state/UserActions';
 import {Switch, Route, Router} from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import { history } from 'utils/history';
