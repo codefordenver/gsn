@@ -7,8 +7,8 @@ import {
   CLEAR_ERROR,
 } from './UserConstants';
 
-import {createAction} from 'utils/ActionUtils';
-import {getUserState, loginUser, signupUser} from 'services/authServices';
+import { createAction } from 'utils/ActionUtils';
+import { getUserState, loginUser, signupUser } from 'services/authServices';
 
 import { history } from 'utils/history';
 
@@ -30,7 +30,6 @@ export const setUserState = () => (dispatch) => {
         dispatch(setIsLoggedIn(true));
         dispatch(setLoading(false));
       }).catch(error=>{
-        console.error(error);
         dispatch(authError(error));
       });
   } else {
@@ -52,8 +51,7 @@ export const logIn = ({username, password, path='/'}) => (dispatch) => {
     );
     history.push(path);
   }).catch(error=>{
-    console.error(error);
-    dispatch(setLoading(false));
+    dispatch(authError(error));
   });
 };
 
@@ -70,8 +68,7 @@ export const register = ({username, password}) => dispatch => {
         })
       );
     }).catch(error=>{
-      console.error(error);
-      dispatch(setLoading(false));
+      dispatch(authError(error));
     });
 };
 
@@ -97,5 +94,6 @@ export const authSuccess = ({username, token}) => (dispatch) => {
 export const authError = error => (dispatch) => {
   dispatch(setLoading(false));
   dispatch(logOut());
+  console.error(error);
   dispatch(setError(error));
 }
