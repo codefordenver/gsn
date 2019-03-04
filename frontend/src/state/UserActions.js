@@ -7,7 +7,7 @@ import {
   CLEAR_ERROR,
 } from './UserConstants';
 
-import { createAction } from 'utils/ActionUtils2';
+import { createAction } from 'utils/actionUtils';
 import { getUserState, loginUser, signupUser } from 'services/authServices';
 
 import { history } from 'utils/history';
