@@ -6,13 +6,22 @@ export function request({
   headers={'Content-Type': 'application/json'},
   body
 }) {
-  if (url) {
-    return fetch(`${API_ROOT}${url}`,{method, headers, body})
-    .then(result => {
-      const {status, statusText} = result;
-      if (status >= 200 && status < 300) return result.json();
-      if (status >= 400 && status < 600) return Promise.reject(new Error(statusText));
-    })
-    // .catch(error => Promise.reject(error));
-  }
+  return new Promise((resolve, reject)=>{
+    if (url) {
+      fetch(`${API_ROOT}${url}`,{method, headers, body})
+      .then(result => {
+        const {status, statusText} = result;
+        if (status >= 400 && status < 600){
+          reject (statusText);
+        } else if (status >= 200 && status < 300) {
+          resolve (result.json());
+        } else {
+          reject (`Uncaught status range (code: ${status}, text: ${statusText})`);
+        }
+      });
+    } else {
+      reject ('No url given to request');
+    }
+  });
+
 }

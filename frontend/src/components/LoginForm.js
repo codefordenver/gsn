@@ -5,15 +5,18 @@ import {connect} from 'react-redux';
 import * as userActions from 'state/UserActions';
 
 function LoginForm (props) {
-  
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const {loading, logIn} = props;
+  const {loading, error, logIn} = props;
   return (
       <div>
         <h1>Log In</h1>
+
+        {error && <p>Error: {error}</p>}
+
         <label htmlFor="username">Username</label>
 
         <input onChange={(e)=>setUsername(e.target.value)}
@@ -30,7 +33,15 @@ function LoginForm (props) {
           value={password}
           disabled={loading} />
 
-        <input type="button" onClick={()=>logIn({username, password})} disabled={loading} value="Log In" />
+        <input type="button"
+          onClick={
+            ()=>{
+              setSubmitted(true);
+              if (username && password) logIn({username, password});
+            }
+          }
+          disabled={loading} value="Log In" />
+
         {loading && <p>Loading...</p>}
 
         <p>No account? <Link to='/register'>Register</Link></p>
@@ -38,4 +49,12 @@ function LoginForm (props) {
   );
 }
 
-export default connect(({user})=>({loading: user.get('loading')}), {logIn:userActions.logIn})(LoginForm);
+const mapStateToProps = ({user})=>({
+  loading: user.get('loading'),
+  error: user.get('error'),
+});
+
+export default connect(
+  mapStateToProps,
+  { logIn: userActions.logIn }
+)(LoginForm);

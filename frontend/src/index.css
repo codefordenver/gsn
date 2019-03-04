@@ -33,3 +33,7 @@ code {
   margin: 25px;
   list-style-type: none;
 }
+
+input.is-invalid {
+  background-color: pink;
+}
