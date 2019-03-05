@@ -1,3 +1,13 @@
+# Frontend Readme
+
+This frontend uses Create React App, Storybook, and Material UI
+
+## To view front-end components use:
+
+### `npm run storybook`
+
+### Original CRA below
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

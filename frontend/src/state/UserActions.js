@@ -10,7 +10,7 @@ import {
 import { createAction } from 'utils/actionUtils';
 import { getUserState, loginUser, signupUser } from 'services/authServices';
 
-import { history } from 'utils/history';
+import history from 'utils/history';
 
 export const setToken = createAction(SET_TOKEN);
 export const setUsername = createAction(SET_USERNAME);
@@ -64,7 +64,7 @@ export const register = ({username, password}) => dispatch => {
       dispatch(
         authSuccess({
             token: json.token,
-            username: json.user.username
+            username: json.username
         })
       );
     }).catch(error=>{
@@ -83,12 +83,19 @@ export const authRequest = () => (dispatch) => {
   dispatch(clearError());
 }
 
-export const authSuccess = ({username, token}) => (dispatch) => {
-  dispatch(setLoading(false));
-  dispatch(setIsLoggedIn(true));
-  dispatch(setUsername(username));
-  dispatch(setToken(token));
-  localStorage.setItem('token', token);
+export const authSuccess = (user) => (dispatch) => {
+  console.log('authSuccess',user);
+  if (user) {
+    const {username, token} = user;
+    dispatch(setLoading(false));
+    dispatch(setIsLoggedIn(true));
+    dispatch(setUsername(username));
+    dispatch(setToken(token));
+    localStorage.setItem('token', token);
+  } else {
+    console.error('null passed into authSuccess')
+  }
+
 }
 
 export const authError = error => (dispatch) => {
