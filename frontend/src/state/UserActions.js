@@ -7,8 +7,8 @@ import {
   CLEAR_ERROR,
 } from './UserConstants';
 
-import {createAction} from 'utils/ActionUtils';
-import {getUserState, loginUser, signupUser} from 'services/authServices';
+import { createAction } from 'utils/actionUtils';
+import { getUserState, loginUser, signupUser } from 'services/authServices';
 
 import history from 'utils/history';
 
@@ -19,18 +19,23 @@ export const setIsLoggedIn = createAction(SET_IS_LOGGED_IN);
 export const setError = createAction(SET_ERROR);
 export const clearError = createAction(CLEAR_ERROR);
 
-
 export const setUserState = () => (dispatch) => {
-  dispatch(authRequest());
-  getUserState()
-    .then(json => {
-      dispatch(setUsername(json.username));
-      dispatch(setIsLoggedIn(true));
-      dispatch(setLoading(false));
-    }).catch(error=>{
-      console.error(error);
-      dispatch(authError(error));
-    });
+  const token = localStorage.getItem('token');
+
+  if (token != null) {
+    dispatch(authRequest());
+    getUserState(token)
+      .then(json => {
+        dispatch(setUsername(json.username));
+        dispatch(setIsLoggedIn(true));
+        dispatch(setLoading(false));
+      }).catch(error=>{
+        dispatch(authError(error));
+      });
+  } else {
+    dispatch(setLoading(false));
+    dispatch(setIsLoggedIn(false));
+  }
 
 }
 
@@ -46,8 +51,7 @@ export const logIn = ({username, password, path='/'}) => (dispatch) => {
     );
     history.push(path);
   }).catch(error=>{
-    console.error(error);
-    dispatch(setLoading(false));
+    dispatch(authError(error));
   });
 };
 
@@ -64,8 +68,7 @@ export const register = ({username, password}) => dispatch => {
         })
       );
     }).catch(error=>{
-      console.error(error);
-      dispatch(setLoading(false));
+      dispatch(authError(error));
     });
 };
 
@@ -91,5 +94,6 @@ export const authSuccess = ({username, token}) => (dispatch) => {
 export const authError = error => (dispatch) => {
   dispatch(setLoading(false));
   dispatch(logOut());
+  console.error(error);
   dispatch(setError(error));
 }

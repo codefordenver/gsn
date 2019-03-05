@@ -14,36 +14,52 @@ import history from 'utils/history';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
+const loggedOutNav = [
+  // {path: '/login', text:'Log In'},
+  // {path: '/register', text: 'Register'},
+];
+
+const loggedInNav = [
+  {path: '/', text:'Home'},
+  {path: '/students', text: 'All Students'},
+  {path: '/districts', text:'All Districts'},
+];
+
 function App (props) {
-  const {setUserState} = props;
+  const { setUserState } = props;
 
   useEffect(() => {
     setUserState();
   }, []);
 
-  const { username, isLoggedIn, loading } = props;
-  if (loading) return <h1>Loading...</h1>
+  const { username, isLoggedIn, loading, logOut } = props;
+  if (loading) return <h1>Loading...</h1>;
 
-  else return (
-    <Router history={history}>
-      <div className="BaseComponent">
-      <CssBaseline />
+  else {
+    const logOutItem = {action: logOut, text: 'Log Out'};
+    const navItems = [...loggedInNav, logOutItem]
 
-        <h3>
-          {isLoggedIn && <p>Hello {username}</p>}
-          <Switch>
-            <Route path='/login' component={Login} />
-            <Route path='/register' component={SignupForm} />
-            <PrivateRoute path='/' isLoggedIn={isLoggedIn} component={Nav} />
-            <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
-            <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
-            <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
-            <PrivateRoute path='/student/:studentId' isLoggedIn={isLoggedIn} component={StudentDetail} />
-          </Switch>
-        </h3>
-       </div>
-     </Router>
-  );
+    return (
+      <Router history={history}>
+        <div >
+          <CssBaseline />
+          {isLoggedIn && <Nav navItems={navItems} />}
+
+          <h3>
+            {isLoggedIn && <p>Hello {username}</p>}
+            <Switch>
+              <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
+              <Route path='/login' component={Login} />
+              <Route path='/register' component={SignupForm} />
+              <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
+              <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
+              <PrivateRoute path='/student/:studentId' isLoggedIn={isLoggedIn} component={StudentDetail} />
+            </Switch>
+          </h3>
+         </div>
+       </Router>
+    );
+  }
 }
 
 const mapStateToProps = state => {
@@ -57,6 +73,6 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps,{
-  setLoading: userActions.setLoading,
   setUserState: userActions.setUserState,
+  logOut: userActions.logOut,
 })(App);

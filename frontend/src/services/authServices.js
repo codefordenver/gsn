@@ -1,8 +1,6 @@
 import {request} from './request';
 
-export const getUserState = () => {
-  const token = localStorage.getItem('token');
-
+export const getUserState = (token) => {
   return token
   ? request({
     url: 'user_app/current_user/',
@@ -10,7 +8,7 @@ export const getUserState = () => {
       Authorization: `JWT ${token}`
     }
   })
-  : Promise.reject(new Error('no token'))
+  : Promise.reject(new Error('no token passed to getUserState service'))
 };
 
 export const loginUser = ({username, password}) => {
