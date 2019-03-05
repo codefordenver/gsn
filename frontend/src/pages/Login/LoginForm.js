@@ -16,7 +16,7 @@ function LoginForm (props) {
   const {loading, error, logIn} = props;
   return (
       <Layout>
-        <Typography variant="h1" gutterBottom={true}>Log In</Typography>
+        <Typography variant="h1" gutterBottom>Log In</Typography>
 
         {error && <p>Error: {error}</p>}
 
@@ -30,7 +30,7 @@ function LoginForm (props) {
           disabled={loading}
           margin="normal"
           variant="outlined"
-          fullWidth={true}
+          fullWidth
         />
 
         <TextField
@@ -43,8 +43,8 @@ function LoginForm (props) {
           disabled={loading}
           margin="normal"
           variant="outlined"
-          fullWidth={true}
-          gutterBottom={true}
+          fullWidth
+          gutterBottom
         />
 
         <Button
@@ -58,7 +58,8 @@ function LoginForm (props) {
           disabled={loading}
           variant="raised"
           color="primary"
-          fullWidth={true}>
+          fullWidth
+          gutterBottom>
           Log In
         </Button>
 
