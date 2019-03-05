@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import Nav from 'components/Nav';
 import HomePage from 'components/HomePage';
-import LoginForm from 'components/LoginForm';
-import SignupForm from 'components/SignupForm';
+import Login from 'pages/Login';
+import SignupForm from 'pages/Register';
 import Districts from 'components/Districts';
 import Students from 'components/Students';
 import StudentDetail from 'components/StudentDetail';
@@ -10,13 +10,14 @@ import {connect} from 'react-redux';
 import * as userActions from 'state/UserActions';
 import {Switch, Route, Router} from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
-import { history } from 'utils/history';
+import history from 'utils/history';
+
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 function App (props) {
   const {setUserState} = props;
 
   useEffect(() => {
-    console.log('useEffect ran in App.js');
     setUserState();
   }, []);
 
@@ -26,14 +27,15 @@ function App (props) {
   else return (
     <Router history={history}>
       <div className="BaseComponent">
-        <Nav />
+      <CssBaseline />
 
         <h3>
           {isLoggedIn && <p>Hello {username}</p>}
           <Switch>
-            <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
-            <Route path='/login' component={LoginForm} />
+            <Route path='/login' component={Login} />
             <Route path='/register' component={SignupForm} />
+            <PrivateRoute path='/' isLoggedIn={isLoggedIn} component={Nav} />
+            <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
             <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
             <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
             <PrivateRoute path='/student/:studentId' isLoggedIn={isLoggedIn} component={StudentDetail} />

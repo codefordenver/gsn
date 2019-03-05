@@ -1,5 +1,5 @@
 export default {
-  "extends": ["airbnb", "plugin:jest/recommended"],
+  "extends": ["airbnb", "plugin:jest/recommended", "react-app"],
   "parser": "babel-eslint",
   "env": {
     "browser": true,

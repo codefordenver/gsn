@@ -10,7 +10,7 @@ import {
 import {createAction} from 'utils/ActionUtils';
 import {getUserState, loginUser, signupUser} from 'services/authServices';
 
-import { history } from 'utils/history';
+import history from 'utils/history';
 
 export const setToken = createAction(SET_TOKEN);
 export const setUsername = createAction(SET_USERNAME);

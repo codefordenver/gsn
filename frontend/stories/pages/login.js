@@ -1,9 +1,9 @@
 import React from "react";
 import {storiesOf} from "@storybook/react";
 import { Provider } from "react-redux";
-import store from "../../src/store";
+import store from "../../src/state/store";
 
-import Login from "../../src/layouts/loginLayout"
+import Login from "../../src/pages/login/LoginForm"
 import { Router} from 'react-router-dom';
 import history from "../../src/utils/history"
 
