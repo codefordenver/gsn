@@ -35,8 +35,8 @@ export default function Students (props) {
         {students.map(student=>{
           const {studentId, name, school, schoolId, birthdate} = student;
           return (<tr key={studentId}>
-            <td><Link to={`student/${studentId}`}>{name}</Link></td>
-            <td><Link to={`school/${schoolId}`}>{school}</Link></td>
+            <td><Link to={`/student/${studentId}`}>{name}</Link></td>
+            <td><Link to={`/school/${schoolId}`}>{school}</Link></td>
             <td>{birthdate}</td>
           </tr>)
         })}
