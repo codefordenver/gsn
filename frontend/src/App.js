@@ -14,13 +14,8 @@ import history from 'utils/history';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-const loggedOutNav = [
-  // {path: '/login', text:'Log In'},
-  // {path: '/register', text: 'Register'},
-];
-
 const loggedInNav = [
-  {path: '/', text:'Home'},
+  {path: '/', text: 'Home' },
   {path: '/students', text: 'All Students'},
   {path: '/districts', text:'All Districts'},
 ];

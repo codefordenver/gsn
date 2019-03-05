@@ -8,42 +8,59 @@ import * as userActions from 'state/UserActions';
 import { Button, TextField, Typography, Divider } from '@material-ui/core';
 
 function LoginForm (props) {
-  
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const {loading, logIn } = props;
+  const {loading, error, logIn} = props;
   return (
       <Layout>
-        <Typography variant="h1" gutterBottom>Log In</Typography>
+        <Typography variant="h1" gutterBottom={true}>Log In</Typography>
+
+        {error && <p>Error: {error}</p>}
 
         <TextField
           onChange={(e)=>setUsername(e.target.value)}
-          type='text' className={`form-control username${submitted && !username ? ' is-invalid' : ''}`}
+          type='text'
+          error={submitted && !username}
           name='username'
           label="User Name"
-          value={username}  
+          value={username}
           disabled={loading}
           margin="normal"
           variant="outlined"
-          fullWidth
-          />
+          fullWidth={true}
+        />
 
-        <TextField onChange={(e)=>setPassword(e.target.value)}
+        <TextField
+          onChange={(e)=>setPassword(e.target.value)}
           type='password'
-          className={`form-control password${submitted && !password ? ' is-invalid' : ''}`}
+          error={submitted && !password}
           name='password'
           label="Password"
           value={password}
           disabled={loading}
           margin="normal"
           variant="outlined"
-          fullWidth
-          gutterBottom
-          />
+          fullWidth={true}
+          gutterBottom={true}
+        />
 
-        <Button style={{ marginTop: 16 }} onClick={()=>logIn({username, password})} disabled={loading} variant="raised" color="primary" fullWidth gutterBottom>Log In</Button>
+        <Button
+          style={{ marginTop: 16 }}
+          onClick={
+            ()=>{
+              setSubmitted(true);
+              if (username && password) logIn({username, password});
+            }
+          }
+          disabled={loading}
+          variant="raised"
+          color="primary"
+          fullWidth={true}>
+          Log In
+        </Button>
 
         {loading && <Typography>Loading...</Typography>}
 
@@ -53,5 +70,12 @@ function LoginForm (props) {
       </Layout>
   );
 }
+const mapStateToProps = ({user})=>({
+  loading: user.get('loading'),
+  error: user.get('error'),
+});
 
-export default connect(({user})=>({loading: user.get('loading')}), {logIn:userActions.logIn})(((LoginForm)));
+export default connect(
+  mapStateToProps,
+  { logIn: userActions.logIn }
+)(LoginForm);
