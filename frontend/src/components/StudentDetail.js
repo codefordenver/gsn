@@ -46,7 +46,7 @@ export default function StudentDetail(props) {
       <p><strong>Year:</strong> {studentYear}</p>
       <p><strong>Term: </strong> {studentTerm}</p>
       <p><strong>State Id:</strong> {stateId}</p>
-      <p><strong>School:</strong> <Link to={`school/${schoolId}`}>{school}</Link></p>
+      <p><strong>School:</strong> <Link to={`/school/${schoolId}`}>{school}</Link></p>
     </div>
   )
 }
