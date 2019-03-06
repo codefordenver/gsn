@@ -7,8 +7,7 @@ services:
       - gsn-data:/var/lib/postgresql/data/
   web:
     build: .
-    command: python /code/gsn-api/manage.py migrate --noinput
-    command: python /code/gsn-api/manage.py runserver 0.0.0.0:8000
+    entrypoint: "/code/docker-entrypoint.sh"
     volumes:
       - .:/code
     ports:

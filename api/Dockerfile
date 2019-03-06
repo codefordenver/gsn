@@ -14,6 +14,8 @@ WORKDIR /code
 # Move Project to to the working directory
 ADD . /code/
 
+EXPOSE 8000
+
 # Install dependencies
 RUN pip install --upgrade pip && pip install pipenv
 RUN pipenv install --deploy --system --skip-lock --dev

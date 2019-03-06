@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gsn-api.gsnsecrets.gsn_django_secretkey'
+SECRET_KEY = 'gsn_api.gsnsecrets.gsn_django_secretkey'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -72,7 +72,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-ROOT_URLCONF = 'gsn-api.urls'
+ROOT_URLCONF = 'gsn_api.urls'
 
 TEMPLATES = [
     {
@@ -90,7 +90,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gsn-api.wsgi.application'
+WSGI_APPLICATION = 'gsn_api.wsgi.application'
 
 
 # Database
@@ -107,7 +107,7 @@ DATABASES = {
 }
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'gsn-api.utils.my_jwt_response_handler',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'gsn_api.utils.my_jwt_response_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=60)
 }
 
