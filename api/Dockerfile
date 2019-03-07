@@ -12,7 +12,7 @@ RUN mkdir /code
 WORKDIR /code
 
 # Move Project to to the working directory
-ADD . /code/
+COPY . /code/
 
 EXPOSE 8000
 
