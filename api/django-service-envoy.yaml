@@ -19,12 +19,42 @@ static_resources:
             name: local_route
             virtual_hosts:
             - name: local_service
-              domains: ["*"]
+              domains: ["gsndev.com"]
+              routes:
+              - match:
+                  prefix: ""
+                redirect:
+                  path_redirect: ""
+                  https_redirect: true
+          http_filters:
+          - name: envoy.router
+  -name: listener_1
+    address:
+      socket_address: { address: 0.0.0.0, port_value: 443 }
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains: ["gsndev.com"]
               routes:
               - match: { prefix: "" }
                 route: { cluster: some_service }
           http_filters:
           - name: envoy.router
+      tls_context:
+        common_tls_context:
+          tls_certificates:
+            - certificate_chain:
+                filename: "/etc/letsencrypt/live/gsndev.com/cert.pem"
+              private_key:
+                filename: "/etc/letsencrypt/live/gsndev.com/privkey.pem"
   clusters:
   - name: some_service
     connect_timeout: 0.25s
