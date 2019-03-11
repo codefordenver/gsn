@@ -11,6 +11,8 @@ services:
       dockerfile: Dockerfile-django
     volumes:
       - .:/code
+      ## Uncomment the following during production.
+      ## - /etc/letsencrypt/:/etc/letsencrypt
     expose:
       - "80"
     ports:
