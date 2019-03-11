@@ -16,8 +16,10 @@ services:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
     expose:
       - "80"
+      - "443"
     ports:
       - 80:80
+      - 443:443
     environment:
       - SECRET_KEY=developerkey
     depends_on:

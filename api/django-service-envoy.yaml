@@ -22,7 +22,7 @@ static_resources:
               - match:
                   prefix: ""
                 redirect:
-                  path_redirect: ""
+                  port_redirect: 443
                   https_redirect: true
           http_filters:
           - name: envoy.router
