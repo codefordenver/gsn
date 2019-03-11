@@ -12,8 +12,8 @@ services:
     volumes:
       - .:/code
       ## Uncomment the following during production.
-      - /etc/letsencrypt/:/etc/letsencrypt/
-      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+      ##- /etc/letsencrypt/:/etc/letsencrypt/
+      ##- /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
     expose:
       - "80"
       - "443"
