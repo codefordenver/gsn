@@ -17,11 +17,11 @@ static_resources:
           route_config:
             virtual_hosts:
             - name: local_service
-              domains: ["gsndev.com"]
+              domains: ["*"]
               routes:
               - match:
                   prefix: ""
-                  route: { cluster: some_service }
+                route: { cluster: some_service }
           http_filters:
           - name: envoy.router
             config: {}
