@@ -11,8 +11,6 @@ static_resources:
     filter_chains:
     - filters:
       - name: envoy.http_connection_manager
-        typed_config:
-          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
           stat_prefix: ingress_http
           codec_type: AUTO
           route_config:
@@ -27,13 +25,12 @@ static_resources:
                   https_redirect: true
           http_filters:
           - name: envoy.router
+            config: {}
     address:
       socket_address: { address: 0.0.0.0, port_value: 443 }
     filter_chains:
     - filters:
       - name: envoy.http_connection_manager
-        typed_config:
-          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
           stat_prefix: ingress_http
           codec_type: AUTO
           route_config:
@@ -46,6 +43,7 @@ static_resources:
                 route: { cluster: some_service }
           http_filters:
           - name: envoy.router
+            config: {}
       tls_context:
         common_tls_context:
           tls_certificates:
@@ -53,6 +51,9 @@ static_resources:
                 filename: "/etc/letsencrypt/live/gsndev.com/fullchain.pem"
               private_key:
                 filename: "/etc/letsencrypt/live/gsndev.com/privkey.pem"
+        validation_context:
+          trusted_ca:
+            filename: "/etc/ssl/certs/ca-certificates.crt"
   clusters:
   - name: some_service
     connect_timeout: 0.25s
