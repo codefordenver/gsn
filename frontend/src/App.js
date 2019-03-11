@@ -13,6 +13,8 @@ import PrivateRoute from './PrivateRoute';
 import history from 'utils/history';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { MuiThemeProvider } from '@material-ui/core';
+import theme from "./utils/theme"
 
 const loggedInNav = [
   {path: '/', text: 'Home' },
@@ -35,24 +37,27 @@ function App (props) {
     const navItems = [...loggedInNav, logOutItem]
 
     return (
-      <Router history={history}>
-        <div >
-          <CssBaseline />
-          {isLoggedIn && <Nav navItems={navItems} />}
+      <MuiThemeProvider theme={theme} >
+        <Router history={history}>
+        <div>
+            <CssBaseline />
+            {isLoggedIn && <Nav navItems={navItems} />}
 
-          <h3>
-            {isLoggedIn && <p>Hello {username}</p>}
-            <Switch>
-              <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
-              <Route path='/login' component={Login} />
-              <Route path='/register' component={SignupForm} />
-              <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
-              <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
-              <PrivateRoute path='/student/:studentId' isLoggedIn={isLoggedIn} component={StudentDetail} />
-            </Switch>
-          </h3>
-         </div>
-       </Router>
+            <h3>
+              {isLoggedIn && <p>Hello {username}</p>}
+            </h3>
+              <Switch>
+                <PrivateRoute exact path='/' isLoggedIn={isLoggedIn} component={HomePage} />
+                <Route path='/login' component={Login} />
+                <Route path='/register' component={SignupForm} />
+                <PrivateRoute path='/districts' isLoggedIn={isLoggedIn} component={Districts} />
+                <PrivateRoute path='/students' isLoggedIn={isLoggedIn} component={Students} />
+                <PrivateRoute path='/student/:studentId' isLoggedIn={isLoggedIn} component={StudentDetail} />
+              </Switch>
+            </div>
+        </Router>
+       </MuiThemeProvider>
+
     );
   }
 }

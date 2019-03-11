@@ -5,7 +5,8 @@ import Layout from "../../components/layouts/SignUpLayout"
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as userActions from 'state/UserActions';
-import { Button, TextField, Typography, Divider } from '@material-ui/core';
+import { Button, InputBase, Typography, Divider, withStyles } from '@material-ui/core';
+import styles from "../../components/sharedStyles/LoginStyles"
 
 function LoginForm (props) {
 
@@ -13,42 +14,51 @@ function LoginForm (props) {
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const {loading, error, logIn} = props;
+  const {
+    classes: { divider, header, input, link, text },
+    loading,
+    logIn,
+    error,
+    } = props;
+
   return (
       <Layout>
-        <Typography variant="h1" gutterBottom>Log In</Typography>
+        <Typography
+        className={header}
+        variant="h1"
+        gutterBottom
+        >
+          Log In
+        </Typography>
 
+        {/* TODO Add Error Field */}
         {error && <p>Error: {error}</p>}
 
-        <TextField
+        <InputBase
+          className={input}
           onChange={(e)=>setUsername(e.target.value)}
           type='text'
           error={submitted && !username}
           name='username'
-          label="User Name"
+          placeholder="User Name"
           value={username}
           disabled={loading}
-          margin="normal"
-          variant="outlined"
           fullWidth
         />
 
-        <TextField
+        <InputBase
+          className={input}
           onChange={(e)=>setPassword(e.target.value)}
           type='password'
           error={submitted && !password}
           name='password'
-          label="Password"
+          placeholder="Password"
           value={password}
           disabled={loading}
-          margin="normal"
-          variant="outlined"
           fullWidth
-          gutterBottom
         />
 
         <Button
-          style={{ marginTop: 16 }}
           onClick={
             ()=>{
               setSubmitted(true);
@@ -56,18 +66,23 @@ function LoginForm (props) {
             }
           }
           disabled={loading}
-          variant="raised"
-          color="primary"
+          variant="contained"
+          color="secondary"
           fullWidth
-          gutterBottom>
+          >
           Log In
         </Button>
 
         {loading && <Typography>Loading...</Typography>}
 
-        <Divider style={{ marginTop: 16, marginBottom: 16 }}/>
+        <Divider className={divider}/>
 
-        <Typography>No account? <Link to='/register' style={{color: "cyan"}}>Register</Link></Typography>
+        <Typography className={text}>
+          No account?&nbsp;
+          <Link to='/register' className={link}>
+            Register
+          </Link>
+        </Typography>
       </Layout>
   );
 }
@@ -79,4 +94,7 @@ const mapStateToProps = ({user})=>({
 export default connect(
   mapStateToProps,
   { logIn: userActions.logIn }
-)(LoginForm);
+)(
+  withStyles(styles)
+  (LoginForm)
+);
