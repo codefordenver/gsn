@@ -53,9 +53,9 @@ static_resources:
                 filename: "/etc/letsencrypt/live/gsndev.com/fullchain.pem"
               private_key:
                 filename: "/etc/letsencrypt/live/gsndev.com/privkey.pem"
-        validation_context:
-          trusted_ca:
-            filename: "/etc/ssl/certs/ca-certificates.crt"
+          validation_context:
+            trusted_ca:
+              filename: "/etc/ssl/certs/ca-certificates.crt"
   clusters:
   - name: some_service
     connect_timeout: 0.25s
