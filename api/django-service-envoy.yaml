@@ -16,7 +16,6 @@ static_resources:
           stat_prefix: ingress_http
           codec_type: AUTO
           route_config:
-            name: local_route
             virtual_hosts:
             - name: local_service
               domains: ["gsndev.com"]
@@ -28,7 +27,6 @@ static_resources:
                   https_redirect: true
           http_filters:
           - name: envoy.router
-  -name: listener_1
     address:
       socket_address: { address: 0.0.0.0, port_value: 443 }
     filter_chains:
@@ -52,7 +50,7 @@ static_resources:
         common_tls_context:
           tls_certificates:
             - certificate_chain:
-                filename: "/etc/letsencrypt/live/gsndev.com/cert.pem"
+                filename: "/etc/letsencrypt/live/gsndev.com/fullchain.pem"
               private_key:
                 filename: "/etc/letsencrypt/live/gsndev.com/privkey.pem"
   clusters:
