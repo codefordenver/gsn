@@ -18,6 +18,9 @@ export function request({
         } else {
           reject (`Uncaught status range (code: ${status}, text: ${statusText})`);
         }
+      }).catch((error)=>{
+        console.error({error});
+        reject (error.message || 'Unknown fetch issue');
       });
     } else {
       reject ('No url given to request');
