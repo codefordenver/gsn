@@ -26,7 +26,7 @@ export default function Districts (props) {
       <h1>Districts</h1>
       {districts.map(district=>{
         const {id, districtState, districtCity, districtCode} = district;
-        return <p><Link to={`district/${id}`}>{districtCode}: {districtCity}, {districtState}</Link></p>
+        return <p key={id}><Link to={`district/${id}`}>{districtCode}: {districtCity}, {districtState}</Link></p>
       })}
     </div>
   );
