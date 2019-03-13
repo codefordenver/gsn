@@ -21,6 +21,11 @@ function LoginForm (props) {
     error,
     } = props;
 
+  const completeLogin = ()=>{
+    setSubmitted(true);
+    if (username && password) logIn({username, password});
+  }
+
   return (
       <Layout>
         <Typography
@@ -43,6 +48,7 @@ function LoginForm (props) {
           placeholder="User Name"
           value={username}
           disabled={loading}
+          onKeyPress={(e)=>e.key==='Enter' ? completeLogin() : ()=>{}}
           fullWidth
         />
 
@@ -55,16 +61,12 @@ function LoginForm (props) {
           placeholder="Password"
           value={password}
           disabled={loading}
+          onKeyPress={(e)=>e.key==='Enter' ? completeLogin() : ()=>{}}
           fullWidth
         />
 
         <Button
-          onClick={
-            ()=>{
-              setSubmitted(true);
-              if (username && password) logIn({username, password});
-            }
-          }
+          onClick={completeLogin}
           disabled={loading}
           variant="contained"
           color="secondary"
@@ -90,6 +92,8 @@ const mapStateToProps = ({user})=>({
   loading: user.get('loading'),
   error: user.get('error'),
 });
+
+/* eslint-disable no-unexpected-multiline */
 
 export default connect(
   mapStateToProps,

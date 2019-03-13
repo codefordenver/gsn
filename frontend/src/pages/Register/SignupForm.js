@@ -22,6 +22,12 @@ function SignupForm(props) {
     error,
     register
   } = props;
+
+  const completeSignup = ()=>{
+    setSubmitted(true);
+    if (username && password) register({username, password});
+  }
+
   return (
     <Layout>
         <Typography
@@ -44,6 +50,7 @@ function SignupForm(props) {
           placeholder="User Name"
           value={username}
           disabled={loading}
+          onKeyPress={(e)=>e.key==='Enter' ? completeSignup() : ()=>{}}
           fullWidth
         />
 
@@ -56,16 +63,12 @@ function SignupForm(props) {
           placeholder="Password"
           value={password}
           disabled={loading}
+          onKeyPress={(e)=>e.key==='Enter' ? completeSignup() : ()=>{}}
           fullWidth
         />
 
         <Button
-          onClick={
-            ()=>{
-              setSubmitted(true);
-              if (username && password) register({username, password});
-            }
-          }
+          onClick={completeSignup}
           disabled={loading}
           variant="contained"
           color="secondary"
@@ -91,6 +94,8 @@ const mapStateToProps = ({user})=>({
   loading: user.get('loading'),
   error: user.get('error'),
 });
+
+/* eslint-disable no-unexpected-multiline */
 
 export default connect(
   mapStateToProps,
