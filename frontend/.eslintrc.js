@@ -23,7 +23,7 @@ module.exports = {
     "react/jsx-one-expression-per-line": 0,
     "react/jsx-no-bind": 0,
     "react/destructuring-assignment": 0,
-    // "react/forbid-prop-types": ["error", {"forbid": ["any"]}],
+    "react/forbid-prop-types": ["error", {"forbid": ["any"]}],
     "react/require-default-props": 0,
     "react/no-string-refs": 0,
     "react/no-multi-comp": 0,
