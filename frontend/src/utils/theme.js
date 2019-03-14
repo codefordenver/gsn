@@ -16,11 +16,11 @@ export default createMuiTheme({
     },
   },
   grays: {
-    g0: "#f2f5f7",
-    g1: "#f2f5f7",
-    g2: "#dae3e7",
-    g3: "#989898",
-    g4: "#2e3033"
+    g0: '#f2f5f7',
+    g1: '#f2f5f7',
+    g2: '#dae3e7',
+    g3: '#989898',
+    g4: '#2e3033',
   },
   typography: {
     useNextVariants: true,
@@ -37,23 +37,23 @@ export default createMuiTheme({
     // TODO Revisit the spacing between the left nav and toolbar
     MuiListItem: {
       button: {
-        paddingLeft: "26px"
+        paddingLeft: '26px',
       },
-      'root' : {
+      root: {
         '&$selected': {
-          borderLeft: `6px solid #074462`,
+          borderLeft: '6px solid #074462',
           backgroundColor: '#dae3e7',
-          paddingLeft: "20px"
-        }
-      }
+          paddingLeft: '20px',
+        },
+      },
     },
     MuiToolbar: {
-      gutters:{
-        paddingLeft: "12px",
+      gutters: {
+        paddingLeft: '12px',
         '@media (min-width: 600px)': {
-          paddingLeft: "12px"
-        }
+          paddingLeft: '12px',
+        },
       },
-    }
+    },
   },
 });

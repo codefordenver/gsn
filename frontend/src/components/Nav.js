@@ -1,12 +1,17 @@
 import React from 'react';
-import NavItem from 'components/NavItem';
+import PropTypes from 'prop-types';
+import NavItem, { NavItemPropTypes } from 'components/NavItem';
 
-export default function Nav({navItems}) {
+export default function Nav({ navItems }) {
   return (
-    <div>
-      <ul>
-        {navItems.map((navItem, index)=><NavItem key={navItem+index} {...navItem} />)}
-      </ul>
-    </div>
-  )
+      <div>
+          <ul>
+              {navItems.map(navItem => <NavItem {...navItem} />)}
+          </ul>
+      </div>
+  );
 }
+
+Nav.propTypes = {
+  navItems: PropTypes.arrayOf(PropTypes.shape(NavItemPropTypes)),
+};

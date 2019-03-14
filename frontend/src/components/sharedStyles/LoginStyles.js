@@ -6,15 +6,15 @@ export default theme => ({
   },
   header: {
     ...theme.typography.h4,
-    color: theme.grays.g0
+    color: theme.grays.g0,
   },
   input: {
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
   },
   link: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   },
   text: {
-    color: theme.grays.g0
-  }
+    color: theme.grays.g0,
+  },
 });

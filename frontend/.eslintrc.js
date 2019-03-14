@@ -16,13 +16,14 @@ module.exports = {
     }
   },
   "rules": {
-    "indent": ["error", 4],
+    // "indent": ["error", 4],
+    "import/no-extraneous-dependencies": 0,
     "react/jsx-indent": ["error", 4],
     "react/jsx-filename-extension": 0,
     "react/jsx-one-expression-per-line": 0,
     "react/jsx-no-bind": 0,
     "react/destructuring-assignment": 0,
-    "react/forbid-prop-types": ["error", {"forbid": ["any"]}],
+    // "react/forbid-prop-types": ["error", {"forbid": ["any"]}],
     "react/require-default-props": 0,
     "react/no-string-refs": 0,
     "react/no-multi-comp": 0,
