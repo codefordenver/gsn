@@ -1,94 +1,102 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 // import PropTypes from 'prop-types';
-import Layout from "../../components/layouts/SignUpLayout"
 
-import {Link} from 'react-router-dom';
-import {connect} from 'react-redux';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import * as userActions from 'state/UserActions';
-import { Button, InputBase, Typography, Divider, withStyles } from '@material-ui/core';
-import styles from "../../components/sharedStyles/LoginStyles"
+import {
+  Button, InputBase, Typography, Divider, withStyles,
+} from '@material-ui/core';
+import Layout from '../../components/layouts/SignUpLayout';
+import styles from '../../components/sharedStyles/LoginStyles';
 
-function LoginForm (props) {
-
+function LoginForm(props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const {
-    classes: { divider, header, input, link, text },
+    classes: {
+      divider, header, input, link, text,
+    },
     loading,
     logIn,
     error,
-    } = props;
+  } = props;
 
-  const completeLogin = ()=>{
+  const completeLogin = () => {
     setSubmitted(true);
-    if (username && password) logIn({username, password});
-  }
+    if (username && password) logIn({ username, password });
+  };
 
   return (
       <Layout>
-        <Typography
-        className={header}
-        variant="h1"
-        gutterBottom
-        >
-          Log In
-        </Typography>
-
-        {/* TODO Add Error Field */}
-        {error && <p>Error: {error}</p>}
-
-        <InputBase
-          className={input}
-          onChange={(e)=>setUsername(e.target.value)}
-          type='text'
-          error={submitted && !username}
-          name='username'
-          placeholder="User Name"
-          value={username}
-          disabled={loading}
-          onKeyPress={(e)=>e.key==='Enter' ? completeLogin() : ()=>{}}
-          fullWidth
-        />
-
-        <InputBase
-          className={input}
-          onChange={(e)=>setPassword(e.target.value)}
-          type='password'
-          error={submitted && !password}
-          name='password'
-          placeholder="Password"
-          value={password}
-          disabled={loading}
-          onKeyPress={(e)=>e.key==='Enter' ? completeLogin() : ()=>{}}
-          fullWidth
-        />
-
-        <Button
-          onClick={completeLogin}
-          disabled={loading}
-          variant="contained"
-          color="secondary"
-          fullWidth
+          <Typography
+            className={header}
+            variant="h1"
+            gutterBottom
           >
           Log In
-        </Button>
+          </Typography>
 
-        {loading && <Typography>Loading...</Typography>}
+          {/* TODO Add Error Field */}
+          {error && (
+          <p>
+Error:
+              {error}
+          </p>
+          )}
 
-        <Divider className={divider}/>
+          <InputBase
+            className={input}
+            onChange={e => setUsername(e.target.value)}
+            type="text"
+            error={submitted && !username}
+            name="username"
+            placeholder="User Name"
+            value={username}
+            disabled={loading}
+            onKeyPress={e => (e.key === 'Enter' ? completeLogin() : () => {})}
+            fullWidth
+          />
 
-        <Typography className={text}>
+          <InputBase
+            className={input}
+            onChange={e => setPassword(e.target.value)}
+            type="password"
+            error={submitted && !password}
+            name="password"
+            placeholder="Password"
+            value={password}
+            disabled={loading}
+            onKeyPress={e => (e.key === 'Enter' ? completeLogin() : () => {})}
+            fullWidth
+          />
+
+          <Button
+            onClick={completeLogin}
+            disabled={loading}
+            variant="contained"
+            color="secondary"
+            fullWidth
+          >
+          Log In
+          </Button>
+
+          {loading && <Typography>Loading...</Typography>}
+
+          <Divider className={divider} />
+
+          <Typography className={text}>
           No account?&nbsp;
-          <Link to='/register' className={link}>
+              <Link to="/register" className={link}>
             Register
-          </Link>
-        </Typography>
+              </Link>
+          </Typography>
       </Layout>
   );
 }
-const mapStateToProps = ({user})=>({
+const mapStateToProps = ({ user }) => ({
   loading: user.get('loading'),
   error: user.get('error'),
 });
@@ -97,8 +105,7 @@ const mapStateToProps = ({user})=>({
 
 export default connect(
   mapStateToProps,
-  { logIn: userActions.logIn }
+  { logIn: userActions.logIn },
 )(
-  withStyles(styles)
-  (LoginForm)
+  withStyles(styles)(LoginForm),
 );

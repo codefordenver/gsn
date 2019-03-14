@@ -1,4 +1,4 @@
-import {fromJS} from 'immutable';
+import { fromJS } from 'immutable';
 import {
   SET_TOKEN,
   SET_USERNAME,
@@ -13,12 +13,11 @@ const initialState = fromJS({
   isLoggedIn: false,
   username: null,
   loading: true,
-  error: null
+  error: null,
 });
 
 export default function reducer(state = initialState, action) {
-
-  const {type, payload} = action;
+  const { type, payload } = action;
 
   switch (type) {
     case SET_TOKEN:
@@ -41,7 +40,5 @@ export default function reducer(state = initialState, action) {
 
     default:
       return state;
-
   }
-
 }

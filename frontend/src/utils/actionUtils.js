@@ -1,4 +1,4 @@
-export const createAction = (type, payload) => (payload) => ({
+export const createAction = (type, payload) => payload => ({
   type,
   payload,
 });

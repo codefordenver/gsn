@@ -4,9 +4,9 @@ import user from 'state/UserReducer';
 
 const store = createStore(
   combineReducers({
-    user
+    user,
   }),
-  applyMiddleware(thunk)
+  applyMiddleware(thunk),
 );
 
 // Hydrate the authToken from localStorage if it exist
