@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   "extends": ["airbnb", "plugin:jest/recommended", "react-app"],
   "parser": "babel-eslint",
   "env": {
