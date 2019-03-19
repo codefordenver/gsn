@@ -2,6 +2,13 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
+"""updates to be made
+- implement bookmark model
+- implement note model
+- track program in separate table
+- define how to handle enumerations of behavior, attendance codes
+"""
+
 # Create your models here.
 
 class District(models.Model):
