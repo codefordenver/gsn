@@ -93,7 +93,7 @@ class Referrals(unittest.TestCase):
         #user can enter the date the referral was given, along with the
         #reference's name, phone number, and address.
 
-        #once user enters a new referral entry, their entry appears in the
+        #When user enters a new referral entry, their entry appears in the
         #list of referrals given.
 
         self.fail("Finish the test!")
