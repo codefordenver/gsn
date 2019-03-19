@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStudentDetail } from 'services/studentServices';
+import PropTypes from 'prop-types';
 
 export default function StudentDetail(props) {
   const [studentDetail, setStudentDetail] = useState({});
@@ -79,3 +80,7 @@ export default function StudentDetail(props) {
       </div>
   );
 }
+
+StudentDetail.propTypes = {
+  match: PropTypes.number,
+};

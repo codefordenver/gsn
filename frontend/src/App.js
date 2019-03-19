@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import * as userActions from 'state/UserActions';
 import { Switch, Route, Router } from 'react-router-dom';
 import history from 'utils/history';
+import PropTypes from 'prop-types';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider } from '@material-ui/core';
@@ -76,6 +77,16 @@ const mapStateToProps = (state) => {
     loading: user.get('loading'),
   };
 };
+
+App.propTypes = {
+  username: PropTypes.string,
+  isLoggedIn: PropTypes.bool,
+  loading: PropTypes.bool,
+  logOut: PropTypes.func,
+  setUserState: PropTypes.func,
+};
+
+// username, isLoggedIn, loading, logOut,
 
 export default connect(mapStateToProps, {
   setUserState: userActions.setUserState,

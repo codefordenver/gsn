@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -102,6 +102,18 @@ const mapStateToProps = ({ user }) => ({
 });
 
 /* eslint-disable no-unexpected-multiline */
+LoginForm.propTypes = {
+  loading: PropTypes.bool,
+  logIn: PropTypes.func,
+  error: PropTypes.objectOf(PropTypes.string),
+  classes: PropTypes.shape({
+    divider: PropTypes.string,
+    header: PropTypes.string,
+    input: PropTypes.string,
+    link: PropTypes.string,
+    text: PropTypes.string,
+  }),
+};
 
 export default connect(
   mapStateToProps,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   List, ListItem, ListItemIcon, ListItemText, withStyles,
 } from '@material-ui/core';
@@ -58,7 +59,7 @@ const styles = theme => ({
 });
 const LiLink = withStyles(styles)(BaseLink);
 
-function Navigation(props) {
+export default function Navigation() {
   const [selectedIndex, updateSelected] = useState(0);
   const setIndex = index => updateSelected(index);
 
@@ -77,5 +78,6 @@ function Navigation(props) {
   );
 }
 
+BaseLink.propTypes = {
 
-export default Navigation;
+}
