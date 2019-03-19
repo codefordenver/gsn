@@ -41,7 +41,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "state_id",
         )
 
-class MyStudentsSerializer(serializers.ModelSerializer):
+class MyStudentSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
 
     class Meta:
