@@ -8,10 +8,7 @@ module.exports = {
   "settings": {
     "import/resolver": {
       "node": {
-        "moduleDirectory": [
-          "node_modules",
-          "src"
-        ]
+        "moduleDirectory": ["node_modules", "src"]
       }
     }
   },
@@ -23,7 +20,7 @@ module.exports = {
     "react/jsx-one-expression-per-line": 0,
     "react/jsx-no-bind": 0,
     "react/destructuring-assignment": 0,
-    "react/forbid-prop-types": ["error", {"forbid": ["any"]}],
+    "react/forbid-prop-types": ["error", { "forbid": ["any"] }],
     "react/require-default-props": 0,
     "react/no-string-refs": 0,
     "react/no-multi-comp": 0,
@@ -38,7 +35,7 @@ module.exports = {
     "array-callback-return": 0,
     "consistent-return": 0,
     "class-methods-use-this": 0,
-    "max-len": ["error", {"code": 175}],
+    "max-len": ["error", { "code": 175 }],
     "linebreak-style": 0,
     "lines-between-class-members": 0,
     "camelcase": 0,

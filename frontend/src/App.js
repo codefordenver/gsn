@@ -1,20 +1,11 @@
 import React, { useEffect } from 'react';
-import Nav from 'components/Nav';
-import HomePage from 'components/HomePage';
-import Login from 'pages/Login';
-import SignupForm from 'pages/Register';
-import Districts from 'components/Districts';
-import Students from 'components/Students';
-import StudentDetail from 'components/StudentDetail';
 import { connect } from 'react-redux';
 import * as userActions from 'state/UserActions';
-import { Switch, Route, Router } from 'react-router-dom';
-import history from 'utils/history';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider } from '@material-ui/core';
-import PrivateRoute from './PrivateRoute';
 import theme from './utils/theme';
+import Routes from './components/Routes';
 
 const loggedInNav = [
   { key: 'navitem1', path: '/', text: 'Home' },
@@ -40,28 +31,8 @@ function App(props) {
 
   return (
       <MuiThemeProvider theme={theme}>
-          <Router history={history}>
-              <div>
-                  <CssBaseline />
-                  {isLoggedIn && <Nav navItems={navItems} />}
-
-                  <h3>
-                      {isLoggedIn && (
-                      <p>
-                        Hello {username}
-                      </p>
-                      )}
-                  </h3>
-                  <Switch>
-                      <PrivateRoute exact path="/" isLoggedIn={isLoggedIn} component={HomePage} />
-                      <Route path="/login" component={Login} />
-                      <Route path="/register" component={SignupForm} />
-                      <PrivateRoute path="/districts" isLoggedIn={isLoggedIn} component={Districts} />
-                      <PrivateRoute path="/students" isLoggedIn={isLoggedIn} component={Students} />
-                      <PrivateRoute path="/student/:studentId" isLoggedIn={isLoggedIn} component={StudentDetail} />
-                  </Switch>
-              </div>
-          </Router>
+          <CssBaseline />
+          <Routes />
       </MuiThemeProvider>
 
   );

@@ -21,7 +21,6 @@
     "@storybook/react": "^4.1.13",
     "babel-eslint": "^9.0.0",
     "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-react-app": "^3.0.7",
     "eslint-plugin-flowtype": "^2.50.3",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.3.0",

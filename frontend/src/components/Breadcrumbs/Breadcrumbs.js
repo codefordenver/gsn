@@ -7,6 +7,7 @@ function getRoutes(paths) {
   const pathArray = paths.split('/');
   pathArray.shift();
   let t = '';
+  // eslint-disable-next-line no-return-assign
   return pathArray.map(x => ({
     name: x.replace('-', ' '),
     route: t += `/${x}`,
