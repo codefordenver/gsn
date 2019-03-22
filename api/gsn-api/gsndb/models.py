@@ -85,6 +85,10 @@ class Student(models.Model):
         "School",
         on_delete = models.PROTECT,
     )
+	program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
+    )
     first_name = models.CharField(max_length = 35)
     last_name = models.CharField(max_length = 35)
     middle_name = models.CharField(max_length = 35, null = True)
@@ -123,7 +127,7 @@ class Student(models.Model):
     PROGRAM_CHOICES = (
         ("EA", "Expelled and At-Risk Student Servies"),
     )
-    program = models.CharField(
+    	 = models.CharField(
         max_length = 2,
         choices = PROGRAM_CHOICES,
     )
@@ -164,7 +168,7 @@ class Course(models.Model):
     )
 
 class Calendar(models.Model):
-    year = models. IntegerField()
+    year = models.IntegerField()
     """establish choices for term"""
     TERM_CHOICES = (
         ("SPR", "Spring"),
@@ -189,6 +193,10 @@ class Behavior(models.Model):
     calendar = models.ForeignKey(
         "Calendar",
         on_delete = models.PROTECT
+    )
+	program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
     )
     incident_datetime = models.DateTimeField(default = timezone.now)
     context = models.TextField(null = True)
@@ -222,6 +230,10 @@ class Grade(models.Model):
         "Calendar",
         on_delete = models.PROTECT,
     )
+	program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
+    )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField()
     term_final_value = models.BooleanField(default = False)
@@ -239,6 +251,10 @@ class Attendance(models.Model):
         "Calendar",
         on_delete = models.PROTECT,
     )
+	program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
+    )
     entry_datetime = models.DateTimeField(default = timezone.now)
     total_unexabs = models.IntegerField(null = True)
     total_exabs = models.IntegerField(null = True)
@@ -254,6 +270,10 @@ class Referral(models.Model):
     )
     student = models.ForeignKey(
         "Student",
+        on_delete = models.PROTECT,
+    )
+	program = models.ForeignKey(
+        "Program",
         on_delete = models.PROTECT,
     )
     """ establish choices for Referral Type"""
@@ -280,6 +300,9 @@ class Referral(models.Model):
     reference_name = models.CharField(max_length = 100, null = True)
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
+
+class Program(models.Model):
+	name = models.TextField(max_length=50)
 
 """ tables yet to be implemented
 
