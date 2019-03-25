@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -7,24 +7,57 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import { Menu, MenuItem } from '@material-ui/core';
+import { connect } from 'react-redux';
+import * as userActions from 'state/UserActions';
 import { UserSolidCircle } from '../Icons';
 
-import Logo from '../../../public/img/gsn_logo_mark.png';
+// import Logo from '../../../public/img/gsn_logo_mark.png';
+
 
 import LeftNav from '../LeftNav';
 import Breadcrumbs from '../Breadcrumbs';
 
 function ClippedDrawer(props) {
-  const { classes, user_name } = props;
+  const { classes, logOut, user_name } = props;
+  // const [open, toggleOpen] = useState(false);
+  const [anchorEl, setAnchor] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = event => setAnchor(event.currentTarget);
+  const handleClose = event => setAnchor(null);
 
   return (
       <div className={classes.root}>
-          <CssBaseline />
           <AppBar elevation={0} position="fixed" className={classes.appBar}>
               <Toolbar>
-                  <IconButton color="primary">
+                  <IconButton
+                    aria-owns={open ? 'menu-appbar' : undefined}
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="primary"
+                  >
                       <UserSolidCircle />
                   </IconButton>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    open={open}
+                    onClose={handleClose}
+                  >
+                      <MenuItem
+                        onClick={logOut}
+                      >Logout
+                      </MenuItem>
+                  </Menu>
                   <Typography
                     className={classes.name}
                     variant="h6"
@@ -34,7 +67,7 @@ function ClippedDrawer(props) {
                   </Typography>
                   <div className={classes.spacer} />
                   <div>
-                      <img src={Logo} height="auto" width="100" />
+                      {/* <img src={Logo} height="auto" width="100" /> */}
                   </div>
               </Toolbar>
           </AppBar>
@@ -54,29 +87,7 @@ function ClippedDrawer(props) {
               <div className={classes.toolbar} />
               <Breadcrumbs />
               <div className={classes.content}>
-                  <Typography paragraph>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-            ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-            facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-            gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-            donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-            adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-            Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-            imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-            arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-            donec massa sapien faucibus et molestie ac.
-                  </Typography>
-                  <Typography paragraph>
-            Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-            facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-            tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-            consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-            vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-            hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-            tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-            nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-            accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-                  </Typography>
+                  {props.children}
               </div>
           </main>
       </div>
@@ -85,11 +96,8 @@ function ClippedDrawer(props) {
 
 ClippedDrawer.propTypes = {
   classes: PropTypes.object.isRequired,
+  children: PropTypes.object,
   user_name: PropTypes.string.isRequired,
-};
-
-ClippedDrawer.defaultProps = {
-  user_name: 'Error: No user name found',
 };
 
 const drawerWidth = 240;
@@ -110,15 +118,17 @@ const styles = theme => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    borderRight: `1px solid ${theme.palette.primary.main}`,
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing.unit * 3,
     backgroundColor: theme.grays.g2,
+    minHeight: '85.5vh',
   },
   main: {
-    borderLeft: `1px solid ${theme.palette.primary.main}`,
     backgroundColor: 'white',
+    width: '100%',
   },
   name: { paddingLeft: theme.spacing.unit * 2 },
   nav: {
@@ -129,4 +139,7 @@ const styles = theme => ({
   toolbar: theme.mixins.toolbar,
 });
 
-export default withStyles(styles)(ClippedDrawer);
+export default connect(
+  null,
+  { logOut: userActions.logOut },
+)(withStyles(styles)(ClippedDrawer));

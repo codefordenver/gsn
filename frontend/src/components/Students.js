@@ -40,8 +40,8 @@ export default function Students(props) {
                     } = student;
                     return (
                         <tr key={studentId}>
-                            <td><Link to={`/student/${studentId}`}>{name}</Link></td>
-                            <td><Link to={`/school/${schoolId}`}>{school}</Link></td>
+                            <td><Link to={`/students/${studentId}`}>{name}</Link></td>
+                            <td><Link to={`/schools/${schoolId}`}>{school}</Link></td>
                             <td>{birthdate}</td>
                         </tr>
                     );
