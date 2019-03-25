@@ -190,6 +190,15 @@ class Behavior(models.Model):
         "Calendar",
         on_delete = models.PROTECT
     )
+    course = models.ForeignKey(
+        "Course",
+        null = True,
+        on_delete = models.PROTECT
+    )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
+    )
     incident_datetime = models.DateTimeField(default = timezone.now)
     context = models.TextField(null = True)
     incident_type_program = models.CharField(
@@ -222,6 +231,10 @@ class Grade(models.Model):
         "Calendar",
         on_delete = models.PROTECT,
     )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
+    )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField()
     term_final_value = models.BooleanField(default = False)
@@ -243,7 +256,7 @@ class Attendance(models.Model):
     total_unexabs = models.IntegerField(null = True)
     total_exabs = models.IntegerField(null = True)
     total_tardies = models.IntegerField(null = True)
-    avg_daily_attendance = models.FloatField()
+    avg_daily_attendance = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
 
 class Referral(models.Model):
@@ -280,6 +293,7 @@ class Referral(models.Model):
     reference_name = models.CharField(max_length = 100, null = True)
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
+    reason = models.TextField(null = True)
 
 """ tables yet to be implemented
 
