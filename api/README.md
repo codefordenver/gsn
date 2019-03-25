@@ -23,7 +23,7 @@ docker-compose up
 Your local server should now be running and ready to accept connections. In order to load the dummy data, open up a separate tab in your shell, go to the same directory as before, and type the following command:
 
 ```bash
-docker-compose exec web python /code/gsn-api/manage.py loaddata firstfixture.json
+docker-compose exec web python /code/gsn_api/manage.py loaddata database_fixture.json
 ```
 
 
