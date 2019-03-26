@@ -201,6 +201,15 @@ class Behavior(models.Model):
         "Program",
         on_delete = models.PROTECT,
     )
+    course = models.ForeignKey(
+        "Course",
+        null = True,
+        on_delete = models.PROTECT
+    )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
+    )
     incident_datetime = models.DateTimeField(default = timezone.now)
     context = models.TextField(null = True)
     incident_type_program = models.CharField(
@@ -236,6 +245,10 @@ class Grade(models.Model):
 	program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
+    )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField()
