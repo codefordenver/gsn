@@ -262,7 +262,7 @@ class Attendance(models.Model):
     total_unexabs = models.IntegerField(null = True)
     total_exabs = models.IntegerField(null = True)
     total_tardies = models.IntegerField(null = True)
-    avg_daily_attendance = models.FloatField()
+    avg_daily_attendance = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
 
 class Referral(models.Model):
@@ -303,6 +303,7 @@ class Referral(models.Model):
     reference_name = models.CharField(max_length = 100, null = True)
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
+    reason = models.TextField(null = True)
 
 
 """ tables yet to be implemented
