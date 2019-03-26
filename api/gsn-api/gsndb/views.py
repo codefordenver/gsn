@@ -31,11 +31,11 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class StudentList(generics.ListCreateAPIView):
     queryset = Student.objects.all()
-    serializer_class = StudentDetailSerializer
+    serializer_class = StudentSerializer
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
-    serializer_class = StudentDetailSerializer
+    serializer_class = StudentSerializer
 
 
 class CourseList(generics.ListCreateAPIView):

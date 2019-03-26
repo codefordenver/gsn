@@ -88,7 +88,7 @@ class Student(models.Model):
         "School",
         on_delete = models.PROTECT,
     )
-	program = models.ForeignKey(
+    program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
@@ -125,14 +125,6 @@ class Student(models.Model):
     )
     grade_year = models.SmallIntegerField(
         choices = GRADE_YEAR_CHOICES,
-    )
-    """establish choices for program"""
-    PROGRAM_CHOICES = (
-        ("EA", "Expelled and At-Risk Student Servies"),
-    )
-    	 = models.CharField(
-        max_length = 2,
-        choices = PROGRAM_CHOICES,
     )
     reason_in_program = models.TextField()
 
@@ -197,7 +189,7 @@ class Behavior(models.Model):
         "Calendar",
         on_delete = models.PROTECT
     )
-	program = models.ForeignKey(
+    program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
@@ -242,7 +234,7 @@ class Grade(models.Model):
         "Calendar",
         on_delete = models.PROTECT,
     )
-	program = models.ForeignKey(
+    program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
@@ -267,7 +259,7 @@ class Attendance(models.Model):
         "Calendar",
         on_delete = models.PROTECT,
     )
-	program = models.ForeignKey(
+    program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
@@ -288,7 +280,7 @@ class Referral(models.Model):
         "Student",
         on_delete = models.PROTECT,
     )
-	program = models.ForeignKey(
+    program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
