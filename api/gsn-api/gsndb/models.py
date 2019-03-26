@@ -80,6 +80,9 @@ class School(models.Model):
         on_delete=models.PROTECT,
     )
 
+class Program(models.Model):
+	name = models.TextField(max_length=50)
+
 class Student(models.Model):
     current_school = models.ForeignKey(
         "School",
@@ -301,8 +304,6 @@ class Referral(models.Model):
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
 
-class Program(models.Model):
-	name = models.TextField(max_length=50)
 
 """ tables yet to be implemented
 
