@@ -1,195 +1,327 @@
 from django.db import models
-#
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+"""updates to be made
+- implement bookmark model
+- implement note model
+- track program in separate table
+- define how to handle enumerations of behavior, attendance codes
+"""
+
+DEFAULT_CALENDAR_ID = 1
+DEFAULT_SCHOOL_ID = 1
+DEFAULT_STUDENT_ID = 1
+DEFAULT_COURSE_ID = 1
+DEFAULT_DISTRICT_ID =1
 
 # Create your models here.
 
 class District(models.Model):
-   district_state = models.CharField(max_length=2)
-   district_city = models.CharField(max_length=50)
-   district_code = models.CharField(max_length=10)
+    """establish state choices"""
+    STATE_CHOICES = (
+        ("AL", "Alabama"),
+        ("AK", "Alaska"),
+        ("AZ", "Arizona"),
+        ("AR", "Arkansas"),
+        ("CA", "California"),
+        ("CO", "Colorado"),
+        ("CT", "Connecticut"),
+        ("DE", "Delaware"),
+        ("FL", "Florida"),
+        ("GA", "Georgia"),
+        ("HI", "Hawaii"),
+        ("ID", "Idaho"),
+        ("IL", "Illinois"),
+        ("IN", "Indiana"),
+        ("IA", "Iowa"),
+        ("KS", "Kansas"),
+        ("KY", "Kentucky"),
+        ("LA", "Louisiana"),
+        ("ME", "Maine"),
+        ("MD", "Maryland"),
+        ("MA", "Massachusetts"),
+        ("MI", "Michigan"),
+        ("MN", "Minnesota"),
+        ("MS", "Mississippi"),
+        ("MO", "Missouri"),
+        ("MT", "Montana"),
+        ("NE", "Nebraska"),
+        ("NV", "Nevada"),
+        ("NH", "New Hampshire"),
+        ("NJ", "New Jersey"),
+        ("NM", "New Mexico"),
+        ("NY", "New York"),
+        ("NC", "North Carolina"),
+        ("ND", "North Dakota"),
+        ("OH", "Ohio"),
+        ("OK", "Oklahoma"),
+        ("OR", "Oregon"),
+        ("PA", "Pennsylvania"),
+        ("RI", "Rhode Island"),
+        ("SC", "South Carolina"),
+        ("SD", "South Dakota"),
+        ("TN", "Tennessee"),
+        ("TX", "Texas"),
+        ("UT", "Utah"),
+        ("VT", "Vermont"),
+        ("VA", "Virginia"),
+        ("WA", "Washington"),
+        ("WV", "West Virginia"),
+        ("WI", "Wisconsin"),
+        ("WY", "Wyoming"),
+    )
+    state = models.CharField(
+        max_length=2,
+        blank = True,
+        choices = STATE_CHOICES,
+    )
+    city = models.CharField(max_length=50, blank=True)
+    code = models.CharField(max_length=10, blank=True)
+    name = models.CharField(max_length=100, blank=True)
 
 class School(models.Model):
-    school_name = models.TextField(max_length=150)
+    name = models.TextField(max_length = 150, blank=True)
     district = models.ForeignKey(
         'District',
-        on_delete=models.CASCADE,
+        null = True,
+        on_delete=models.PROTECT,
     )
 
 class Student(models.Model):
-    school = models.ManyToManyField(
-        'School',
+    current_school = models.ForeignKey(
+        "School",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    student_first_name = models.CharField(max_length=35)
-    student_last_name = models.CharField(max_length=35)
+    first_name = models.CharField(max_length = 35, blank=True)
+    last_name = models.CharField(max_length = 35, blank=True)
+    middle_name = models.CharField(max_length = 35, blank=True)
     """Establish choices for Gender"""
-    MALE = 'M'
-    FEMALE = 'F'
-    NONBINARY = 'NB'
-    GENDER = (
-        (MALE, 'Male'),
-        (FEMALE, 'Female'),
-        (NONBINARY, 'NonBinary'),
+    GENDER_CHOICES = (
+        ("M", 'Male'),
+        ("F", 'Female'),
+        ("NB", 'NonBinary'),
     )
-    student_gender = models.CharField(
-            max_length=2,
-            choices=GENDER,
-            default=NONBINARY,
+    gender = models.CharField(
+            max_length = 2,
+            blank = True,
+            choices = GENDER_CHOICES,
     )
-    student_birth_date = models.DateField()
-    student_state_id = models.IntegerField()
-
-class StudentSnap(models.Model):
-    school = models.ForeignKey(
-        'School',
-        on_delete = models.CASCADE,
+    birth_date = models.DateField(null = True)
+    state_id = models.BigIntegerField(null = True)
+    """Establish choices for Grade Year"""
+    GRADE_YEAR_CHOICES = (
+        (0, 'Kindergarten'),
+        (1, 'First Grade'),
+        (2, 'Second Grade'),
+        (3, 'Third Grade'),
+        (4, 'Fourth Grade'),
+        (5, 'Fifth Grade'),
+        (6, 'Sixth Grade'),
+        (7, 'Seventh Grade'),
+        (8, 'Eighth Grade'),
+        (9, 'Ninth Grade'),
+        (10, 'Tenth Grade'),
+        (11, 'Eleventh Grade'),
+        (12, 'Twelfth Grade'),
     )
-    student = models.ForeignKey(
-        'Student',
-        on_delete = models.CASCADE,
+    grade_year = models.SmallIntegerField(
+        choices = GRADE_YEAR_CHOICES,
+        null = True
     )
-    """ESTABLISH CHOICES FOR GRADE PLACEMENT"""
-    K = 0
-    FIRST = 1
-    SECOND = 2
-    THIRD = 3
-    FOURTH = 4
-    FIFTH = 5
-    SIXTH = 6
-    SEVENTH = 7
-    EIGHTH = 8
-    NINTH = 9
-    TENTH = 10
-    ELEVENTH = 11
-    TWELFTH = 12
-    GRADE_PLACEMENT = (
-        (K, 'Kindergarten'),
-        (FIRST, 'First Grade'),
-        (SECOND, 'Second Grade'),
-        (THIRD, 'Third Grade'),
-        (FOURTH, 'Fourth Grade'),
-        (FIFTH, 'Fifth Grade'),
-        (SIXTH, 'Sixth Grade'),
-        (SEVENTH, 'Seventh Grade'),
-        (EIGHTH, 'Eighth Grade'),
-        (NINTH, 'Ninth Grade'),
-        (TENTH, 'Tenth Grade'),
-        (ELEVENTH, 'Eleventh Grade'),
-        (TWELFTH, 'Twelfth Grade')
+    """establish choices for program"""
+    PROGRAM_CHOICES = (
+        ("EA", "Expelled and At-Risk Student Servies"),
     )
-    student_grade_placement = models.SmallIntegerField(
-            choices=GRADE_PLACEMENT,
-            default=K,
+    program = models.CharField(
+        max_length = 2,
+        blank = True,
+        choices = PROGRAM_CHOICES,
     )
-    """ESTABLISH CHOICES FOR ATTENDANCE TERM"""
-    SPRING = 'SPR'
-    SUMMER = "SMR"
-    FALL = 'FLL'
-    WINTER = 'WNT'
-    SPECIAL = 'SPC'
-    NOT_SPECIFIED = 'NSP'
-    TERMS = (
-        (SPRING, 'Spring'),
-        (SUMMER, 'Summer'),
-        (FALL, 'Fall'),
-        (WINTER, 'Winter'),
-        (SPECIAL, 'Special Term'),
-        (NOT_SPECIFIED, 'No Term Specified')
-    )
-    student_attendance_term = models.CharField(
-            max_length=3,
-            choices=TERMS,
-            default=NOT_SPECIFIED,
-    )
+    reason_in_program = models.TextField(blank=True)
 
 class Course(models.Model):
     school = models.ForeignKey(
-        'School',
-        on_delete= models.CASCADE,
+        "School",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    course_name = models.CharField(max_length=100)
-    """Establish choices for course subject"""
-    MATH = 'MTH'
-    SCIENCE = 'SNC'
-    HISTORY = 'HST'
-    SOCIAL_STUDIES = 'SCS'
-    COMPUTER_EDUCATION = 'CMP'
-    STUDY_HALL = 'STD'
-    SPECIAL_EDUCATION = 'SPL'
-    ENGLISH = 'ENG'
-    ENGLISH_AS_SECOND_LANGUAGE = 'ESL'
-    SPANISH = 'SPA'
-    CHINESE = 'CHN'
-    FRENCH = 'FRH'
-    GERMAN = 'GRM'
-    JAPANESE = 'JPN'
-    LATIN = 'LTN'
-    SUBJECT_NOT_LISTED = 'SNL'
-    SUBJECT = (
-        (MATH, 'Math'),
-        (SCIENCE, 'Science'),
-        (HISTORY, 'History'),
-        (SOCIAL_STUDIES, 'Social Studies'),
-        (COMPUTER_EDUCATION, 'Computer Education'),
-        (STUDY_HALL, 'Study Hall'),
-        (SPECIAL_EDUCATION, 'Special Education'),
-        (ENGLISH, 'English'),
-        (ENGLISH_AS_SECOND_LANGUAGE, 'English As a Second Language'),
-        (SPANISH, 'Spanish'),
-        (CHINESE, 'Chinese'),
-        (FRENCH, 'French'),
-        (GERMAN, 'German'),
-        (JAPANESE, 'Japanese'),
-        (LATIN, 'Latin'),
-        (SUBJECT_NOT_LISTED, 'Subject Not Listed')
+    name = models.CharField(max_length = 50, blank=True)
+    code = models.CharField(max_length = 15, blank=True)
+    """establish choices for Subject"""
+    SUBJECT_CHOICES = (
+        ("MTH", 'Math'),
+        ("SCI", 'Science'),
+        ('HIS', 'History'),
+        ('SST', 'Social Studies'),
+        ('CED', 'Computer Education'),
+        ("PHS", "Physical Education"),
+        ("RDG", "Reading"),
+        ("WRT", "Writing"),
+        ("STH", 'Study Hall'),
+        ("SPE", 'Special Education'),
+        ("ENG", 'English'),
+        ("ESL", 'English As a Second Language'),
+        ("ESP", 'Spanish'),
+        ("CHI", 'Chinese'),
+        ("FRN", 'French'),
+        ("GER", 'German'),
+        ("JPN", 'Japanese'),
+        ("LTN", 'Latin'),
+        ("SNL", 'Subject Not Listed'),
     )
-    course_subject = models.CharField(
-            max_length=3,
-            choices=SUBJECT,
-            default=SUBJECT_NOT_LISTED,
+    subject = models.CharField(
+        max_length = 3,
+        blank = True,
+        choices = SUBJECT_CHOICES,
+    )
+
+class Calendar(models.Model):
+    year = models. IntegerField(null=True)
+    """establish choices for term"""
+    TERM_CHOICES = (
+        ("SPR", "Spring"),
+        ("SMR", "Summer"),
+        ("FLL", "Fall"),
+    )
+    term = models.CharField(
+        max_length = 3,
+        blank = True,
+        choices = TERM_CHOICES,
     )
 
 class Behavior(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
+    #will probably want to add choices to incident_type and _result
+    student = models.ForeignKey(
+        "Student",
+        null = True,
+        on_delete = models.PROTECT
     )
-    behavior_incident_date_time = models.DateTimeField()
-    behavior_context = models.TextField(max_length=500)
-    behavior_result = models.TextField(max_length=500)
-
-class Attendance(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
+    school = models.ForeignKey(
+        "School",
+        null = True,
+        on_delete = models.PROTECT
     )
-    attendance_data_entry_time = models.DateTimeField(auto_now_add=True)
-    attendance_total_unexcused_absences = models.IntegerField()
-    attendance_total_excused_absences = models.IntegerField()
-    attendance_total_tardies = models.IntegerField()
+    calendar = models.ForeignKey(
+        "Calendar",
+        null = True,
+        on_delete = models.PROTECT
+    )
+    incident_datetime = models.DateTimeField(default = timezone.now)
+    context = models.TextField(blank = True)
+    incident_type_program = models.CharField(
+        max_length = 50,
+        blank = True,
+    )
+    incident_result_program = models.CharField(
+        max_length = 50,
+        blank = True,
+    )
+    incident_type_school = models.CharField(
+        max_length = 50,
+        blank = True,
+    )
+    incident_result_school = models.CharField(
+        max_length = 50,
+        blank = True,
+    )
 
 class Grade(models.Model):
-    student_snap = models.ForeignKey(
-        'StudentSnap',
-        on_delete=models.CASCADE,
+    student = models.ForeignKey(
+        "Student",
+        null = True,
+        on_delete = models.PROTECT,
     )
     course = models.ForeignKey(
-        'Course',
-        on_delete=models.CASCADE,
+        "Course",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    grade_data_entry_time = models.DateTimeField(auto_now_add=True)
-    grade_metric = models.DecimalField(
-            max_digits=3,
-            decimal_places=2
+    calendar = models.ForeignKey(
+        "Calendar",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    """Establish choices for GPA scale"""
-    FOUR_POINT_SCALE = 4
-    SEVEN_POINT_SCALE = 7
-    SCALE = (
-        (FOUR_POINT_SCALE, 'Four Point Scale'),
-        (SEVEN_POINT_SCALE, 'Seven Point Scale')
+    entry_datetime = models.DateTimeField(default = timezone.now)
+    grade = models.FloatField(null = True)
+    term_final_value = models.BooleanField(default = False)
+
+
+class Attendance(models.Model):
+    student = models.ForeignKey(
+        "Student",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    grade_scale = models.SmallIntegerField(
-            choices=SCALE,
-            default=FOUR_POINT_SCALE,
+    school = models.ForeignKey(
+        "School",
+        null = True,
+        on_delete = models.PROTECT,
     )
-    grade_is_final = models.BooleanField(default=True)
+    calendar = models.ForeignKey(
+        "Calendar",
+        null = True, 
+        on_delete = models.PROTECT,
+    )
+    entry_datetime = models.DateTimeField(default = timezone.now)
+    total_unexabs = models.IntegerField(null = True)
+    total_exabs = models.IntegerField(null = True)
+    total_tardies = models.IntegerField(null = True)
+    avg_daily_attendance = models.FloatField(null = True)
+    term_final_value = models.BooleanField(default = False)
+
+class Referral(models.Model):
+    #need to alter phone number field probably, for formatting purposes
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.PROTECT,
+    )
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.PROTECT,
+    )
+    """ establish choices for Referral Type"""
+    REFERRAL_TYPE = (
+        ("MTL", "Mental Health"),
+        ("DAC", "Drug & Alcohol/Addictions Counseling"),
+        ("DHS", "Social Services (Department of Human Services)"),
+        ("YSC", "Division of Youth Services/Corrections"),
+        ("CPS", "Childcare/Preschool Services"),
+        ("FMR", "Family Resources"),
+        ("M/C", "Meals/Clothing"),
+        ("HOU", "Housing"),
+        ("SIP", "Specialized School Intervention Program"),
+        ("TRN", "Transportation"),
+        ("WFC", "Work Force Center"),
+        ("IOG", "Interagency Oversight Group (IOG)"),
+        ("OTH", "Other")
+    )
+    type = models.CharField(
+        max_length = 3,
+        choices = REFERRAL_TYPE,
+    )
+    date_given = models.DateField(default = timezone.now)
+    reference_name = models.CharField(max_length = 100, null = True)
+    reference_phone = models.BigIntegerField(null = True)
+    reference_address = models.CharField(max_length = 150, null = True)
+
+""" tables yet to be implemented
+class Note(models.Model):
+    user = models.ForeignKey(
+        "User",
+        on_delete = models.PROTECT,
+    )
+    related_contet = dymanimc_foreign_Key
+    created = models.DateTimeField(default = timezone.now)
+    content = models.TextField()
+class Bookmark(models.Model):
+    user = models.ForeignKey(
+        "User",
+        on_delete = models.PROTECT,
+    )
+    created = models.DateTimeField(default = timezone.now)
+    url = unknown
+    react_component = unknown
+    json_request_data = unknown
+    """

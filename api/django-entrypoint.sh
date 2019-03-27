@@ -1,6 +1,7 @@
 #!/bin/sh
 echo Running Django Migrations.
 cd gsn_api
+python manage.py makemigrations
 python manage.py migrate                  
 python manage.py collectstatic --noinput 
 

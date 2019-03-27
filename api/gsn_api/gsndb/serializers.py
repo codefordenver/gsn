@@ -1,76 +1,185 @@
 from rest_framework import serializers
-from gsndb.models import District, School, Student, Course, StudentSnap, Attendance, Grade, Behavior
+from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral
 
-"""The following serializer is verbose for the purpose of illustrating the process of data serialization and it`s interaction with django models. Every serializer hereafter will be generic in nature"""
 
-class DistrictSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    district_state = serializers.CharField(max_length = 2)
-    district_city = serializers.CharField(max_length=50)
-    district_code = serializers.CharField(max_length=10)
-
-    def create(self, validated_data):
-      """
-      Create and return a new `District` instance, given the validated data.
-      """
-      return District.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `District` instance, given the validated data.
-        """
-        instance.district_state = validated_data.get('district_state', instance.district_state)
-        instance.district_city = validated_data.get('district_city', instance.district_city)
-        instance.district_code = validated_data.get('district_code', instance.district_code)
-        instance.save()
-        return instance
-
-"""As stated, every serializer declared beneath this comment shall be generic in nature"""
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = (
+            "id",
+            "code",
+            "city",
+            "state",
+            "name")
 
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ('id', 'school_name', 'district')
+        fields = (
+            "id",
+            "district",
+            "name",
+        )
 
 class StudentSerializer(serializers.ModelSerializer):
+    current_school = SchoolSerializer()
+
     class Meta:
         model = Student
-        fields = ('id','student_first_name', 'student_last_name', 'student_gender', 'student_birth_date', 'student_state_id')
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "current_school",
+            "birth_date",
+            "gender",
+            "grade_year",
+            "program",
+            "reason_in_program",
+            "state_id",
+        )
 
-class StudentSnapSerializer(serializers.ModelSerializer):
+class MyStudentsSerializer(serializers.ModelSerializer):
+    current_school = SchoolSerializer(read_only = True)
+
     class Meta:
-        model = StudentSnap
-        fields = ('id', 'school', 'student', 'student_grade_placement', 'student_attendance_term')
+        model = Student
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "current_school",
+            "birth_date",
+        )
+
+class CalendarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calendar
+        fields = (
+            "id",
+            "year",
+            "term",
+        )
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ('id', 'school', 'course_name', 'course_subject')
+        fields = (
+            "id",
+            "school",
+            "name",
+            "code",
+            "subject",
+        )
 
 class BehaviorSerializer(serializers.ModelSerializer):
-    context = serializers.CharField(source= "behavior_context")
-    date = serializers.DateTimeField(format= "%-m/%-d/%-Y", source= 'behavior_incident_date_time')
-    result = serializers.CharField(source= "behavior_result")
     class Meta:
         model = Behavior
-        exclude = ('id', 'student_snap', 'behavior_incident_date_time', 'behavior_context', 'behavior_result')
-
-class AttendanceSerializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(format= "%-m/%-d/%-Y", source= 'attendance_data_entry_time')
-    unexcused = serializers.CharField(source= 'attendance_total_unexcused_absences')
-    excused = serializers.CharField(source= 'attendance_total_excused_absences')
-    tardies = serializers.CharField(source= 'attendance_total_tardies')
-    class Meta:
-        model = Attendance
-        exclude = ('student_snap', 'attendance_data_entry_time', 'attendance_total_unexcused_absences', 'attendance_total_excused_absences',
-        'attendance_total_tardies', 'id')
+        fields = (
+            "id",
+            "student",
+            "school",
+            "calendar",
+            "incident_datetime",
+            "context",
+            "incident_type_program",
+            "incident_result_program",
+            "incident_type_school",
+            "incident_result_school",
+        )
 
 class GradeSerializer(serializers.ModelSerializer):
-    course = serializers.CharField(source= 'course.course_name', read_only=True)
-    scale = serializers.CharField(source= 'grade_scale')
-    date = serializers.DateTimeField(format = "%-m/%-d/%-Y", source= 'grade_data_entry_time')
-    metric = serializers.CharField(source= 'grade_metric')
-    final = serializers.BooleanField(source= 'grade_is_final')
     class Meta:
         model = Grade
-        exclude = ('id', 'student_snap', 'grade_metric', 'grade_scale', 'grade_is_final', 'grade_data_entry_time')
+        fields = (
+            "id",
+            "student",
+            "course",
+            "calendar",
+            "entry_datetime",
+            "grade",
+            "term_final_value",
+        )
+
+class GradeForStudentSerializer(serializers.ModelSerializer):
+
+    #if URL is ______: set serializer field to _______
+    grade_set = GradeSerializer(many = True, read_only = True)
+
+    class Meta:
+        model = Student
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "grade_set",
+        )
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = (
+            "id",
+            "student",
+            "school",
+            "calendar",
+            "entry_date_time",
+            "total_unexabs",
+            "total_exabs",
+            "total_tardies",
+            "avg_daily_attendance",
+            "term_final_value",
+        )
+
+class ReferralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Referral
+        fields = (
+            "id",
+            "user",
+            "student",
+            "type",
+            "date_given",
+            "reference_name",
+            "reference_phone",
+            "reference_address",
+        )
+
+class ParedGradeSerializer(serializers.ModelSerializer):
+    grade = serializers.CharField()
+    class Meta:
+        model = Grade
+        fields = ('grade','term_final_value')
+
+
+class StudentGradeSerializer(serializers.ModelSerializer):
+    grade_set = ParedGradeSerializer(read_only=True, many=True),
+    birthday = serializers.DateField(source= 'birth_date')
+    
+    class Meta:
+        model = Student
+        fields = ('grade_set', 'birthday')
+        
+
+
+"""
+name = serializers.SerializerMethodField(),
+    school = serializers.CharField(source= 'current_school.name', read_only=True)
+    birthdate = serializers.DateTimeField(format = "%-m/%-d/%-Y", source= 'birth_date'),
+    stateId = serializers.IntegerField(source='state_id'),
+    year = serializers.IntegerField(source='grade_year')
+
+    def get_name(self, obj):
+        return '{} {} {}'.format(obj.last_name, obj.first_name, obj.middle_name)
+
+        fields = ('grades', 'current_school', 'first_name', 'last_name', 'middle_name', 'gender', 'birth_date', 'state_id', 'grade_year', 'program', 'reason_in_program') 
+
+
+            course = serializers.CharField(source= 'course.name', read_only=True),
+    term = serializers.CharField(source= 'calendar.term', read_only=True),
+    year = serializers.IntegerField(source= 'calendar.year', read_only=True),
+    grade = serializers.CharField(source= 'grade'),
+    final = serializers.BooleanField(source= 'term_final_value')
+"""
