@@ -72,21 +72,6 @@ class GradeForStudent(generics.RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
     serializer_class = GradeForStudentSerializer
 
-class ExpGFS(APIView):
-
-    def student_objects(pk = None):
-        if pk == None:
-            return Student.objects.all()
-        else:
-            return Student.objects.get(id = pk)
-
-
-    def get(request, self, group, pk, format = None):
-        if group == "student":
-            queryset = Student.objects.get(id = pk)
-            serializer = StudentSerializer(queryset)
-            return Response(serializer.data)
-
 
 class BehaviorList(generics.ListCreateAPIView):
     queryset = Behavior.objects.all()

@@ -106,8 +106,6 @@ class GradeSerializer(serializers.ModelSerializer):
         )
 
 class GradeForStudentSerializer(serializers.ModelSerializer):
-
-    #if URL is ______: set serializer field to _______
     grade_set = GradeSerializer(many = True, read_only = True)
 
     class Meta:
