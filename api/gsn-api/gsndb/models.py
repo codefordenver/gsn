@@ -88,7 +88,7 @@ class Student(models.Model):
         "School",
         on_delete = models.PROTECT,
     )
-    program = models.ForeignKey(
+    current_program = models.ForeignKey(
         "Program",
         on_delete = models.PROTECT,
     )
@@ -105,8 +105,8 @@ class Student(models.Model):
             max_length = 2,
             choices = GENDER_CHOICES,
     )
-    birth_date = models.DateField()
-    state_id = models.IntegerField(null = True)
+    birthdate = models.DateField()
+    state_id = models.CharField(max_length = 30, null = True)
     """Establish choices for Grade Year"""
     GRADE_YEAR_CHOICES = (
         (0, 'Kindergarten'),

@@ -11,7 +11,8 @@ class DistrictSerializer(serializers.ModelSerializer):
             "code",
             "city",
             "state",
-            "name")
+            "name",
+            )
 
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,10 +34,10 @@ class StudentSerializer(serializers.ModelSerializer):
             "last_name",
             "middle_name",
             "current_school",
-            "birth_date",
+            "birthdate",
             "gender",
             "grade_year",
-            "program",
+            "current_program",
             "reason_in_program",
             "state_id",
         )
