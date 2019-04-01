@@ -5,14 +5,26 @@ services:
     image: postgres
     volumes:
       - gsn-data:/var/lib/postgresql/data/
-  web:
-    build: .
-    command: python /code/gsn-api/manage.py migrate --noinput
-    command: python /code/gsn-api/manage.py runserver 0.0.0.0:8000
+    networks:
+      - edgeproxy_proxy-mesh
+  gsn_web:
+    build:
+      context: .
+      dockerfile: Dockerfile-django
     volumes:
       - .:/code
+      ## Uncomment the following during production.
+      ##- /etc/letsencrypt/:/etc/letsencrypt/
+      ##- /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+    networks:
+      edgeproxy_proxy-mesh:
+        aliases:
+          - gsn_web
+    expose:
+      - "80"
+    # Uncomment the following during development:
     ports:
-      - 8000:8000
+      - "80:80"
     environment:
       - SECRET_KEY=developerkey
     depends_on:
@@ -20,3 +32,7 @@ services:
 
 volumes:
   gsn-data:
+networks:
+  edgeproxy_proxy-mesh:
+  # Uncomment the following during production.
+  #  external: true

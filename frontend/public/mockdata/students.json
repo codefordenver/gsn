@@ -1,0 +1,93 @@
+[
+  {
+    "studentId": 1,
+    "name": "Linton Stephens",
+    "school": "Aguilar Middle/High School",
+    "schoolId": 15,
+    "birthdate": "9/16/1992"
+  },
+  {
+    "studentId": 2,
+    "name": "Brent Ros·rio",
+    "school": "Cotopaxi Middle/High School",
+    "schoolId": 16,
+    "birthdate": "12/10/1992"
+  },
+  {
+    "studentId": 3,
+    "name": "Banu Rounds",
+    "school": "Custer County High School",
+    "schoolId": 17,
+    "birthdate": "7/24/1996"
+  },
+  {
+    "studentId": 4,
+    "name": "Biel Morgan",
+    "school": "Gardner Middle School",
+    "schoolId": 18,
+    "birthdate": "7/29/1997"
+  },
+  {
+    "studentId": 5,
+    "name": "Nikolai Dale",
+    "school": "Hoehne Middle/High School",
+    "schoolId": 19,
+    "birthdate": "6/5/1998"
+  },
+  {
+    "studentId": 6,
+    "name": "Dulcibella Legrand",
+    "school": "John Mall High School",
+    "schoolId": 20,
+    "birthdate": "8/31/1998"
+  },
+  {
+    "studentId": 7,
+    "name": "Petra Bentley",
+    "school": "Peakview Middle School",
+    "schoolId": 21,
+    "birthdate": "10/19/1998"
+  },
+  {
+    "studentId": 8,
+    "name": "Shakuntala CernÌk",
+    "school": "Primero Middle/High School",
+    "schoolId": 22,
+    "birthdate": "10/27/1999"
+  },
+  {
+    "studentId": 9,
+    "name": "Audovacar Mendelssohn",
+    "school": "Sangre de Cristo Elem/Junior High",
+    "schoolId": 23,
+    "birthdate": "6/26/2000"
+  },
+  {
+    "studentId": 10,
+    "name": "Baldo Nikolaev",
+    "school": "Sargent Elem/Junior High",
+    "schoolId": 24,
+    "birthdate": "10/9/2002"
+  },
+  {
+    "studentId": 11,
+    "name": "Azat Yamashita",
+    "school": "Sierra Grande Elem/Junior High",
+    "schoolId": 25,
+    "birthdate": "7/29/1997"
+  },
+  {
+    "studentId": 12,
+    "name": "Bora Beatty",
+    "school": "Trinidad High School",
+    "schoolId": 26,
+    "birthdate": "6/5/1998"
+  },
+  {
+    "studentId": 13,
+    "name": "Kirsteen Meaney",
+    "school": "Trinidad Middle School",
+    "schoolId": 27,
+    "birthdate": "8/31/1998"
+  }
+]

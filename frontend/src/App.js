@@ -1,115 +1,46 @@
-import React, { Component } from 'react';
-import Nav from 'components/Nav';
-import LoginForm from 'components/LoginForm';
-import SignupForm from 'components/SignupForm';
-import District from 'components/District';
-import {getUserState, loginUser, signupUser} from 'services/authServices';
-import {connect} from 'react-redux'
-import * as userActions from 'globalState/user/UserActions';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
+import * as userActions from 'state/UserActions';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    displayed_form: '',
-    hasToken: localStorage.getItem('token') ? true : false,
-    };
-  }
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { MuiThemeProvider } from '@material-ui/core';
+import theme from './utils/theme';
+import Routes from './components/Routes';
 
-  componentDidMount() {
-    if (this.state.hasToken) {
-      getUserState()
-        .then(json => {
-          console.log('getUserState', json);
-          const {setUsername, setIsLoggedIn} = this.props;
-          setUsername(json.username);
-          setIsLoggedIn(true);
-        });
-    }
-  }
+// const loggedInNav = [
+//   { key: 'navitem1', path: '/', text: 'Home' },
+//   { key: 'navitem2', path: '/students', text: 'All Students' },
+//   { key: 'navitem3', path: '/districts', text: 'All Districts' },
+// ];
 
-  handle_login = (e, data) => {
-    e.preventDefault();
+function App(props) {
+  const { loading, setUserState } = props;
 
-    loginUser(data)
-    .then(json => {
-      localStorage.setItem('token', json.token);
+  useEffect(() => {
+    setUserState();
+  }, []);
 
-      const {authSuccess} = this.props;
-      authSuccess({
-          token: json.token,
-          username: json.user.username
-      });
+  if (loading) return <h1>Loading...</h1>;
 
-      this.setState({
-        displayed_form: '',
-      });
-    });
-  };
+  return (
+      <MuiThemeProvider theme={theme}>
+          <CssBaseline />
+          <Routes />
+      </MuiThemeProvider>
 
-  handle_signup = (e, data) => {
-    e.preventDefault();
-    signupUser(data)
-      .then(json => {
-        localStorage.setItem('token', json.token);
-        this.setState({
-          logged_in: true,
-          displayed_form: '',
-          username: json.username
-        });
-      });
-  };
-
-  display_form = form => {
-    this.setState({
-      displayed_form: form
-    });
-  };
-
-  render() {
-    const { username, isLoggedIn } = this.props;
-
-    let form;
-    switch (this.state.displayed_form) {
-      case 'login':
-        form = <LoginForm handle_login={this.handle_login} />;
-        break;
-      case 'signup':
-        form = <SignupForm handle_signup={this.handle_signup} />;
-        break;
-      default:
-        form = null;
-    }
-
-    return (
-      <div className="BaseComponent">
-        <Nav
-          display_form={this.display_form}
-        />
-        {form}
-        <h3>
-          <p>Username: {username}</p>
-          {isLoggedIn
-            ? null
-            : 'Please Log In'}
-        </h3>
-        {isLoggedIn ? <District /> : null}
-       </div>
-    );
-  }
+  );
 }
 
-const mapStateToProps = state => {
-  const {user} = state;
+const mapStateToProps = (state) => {
+  const { user } = state;
 
   return {
     username: user.get('username'),
     isLoggedIn: user.get('isLoggedIn'),
-  }
-}
+    loading: user.get('loading'),
+  };
+};
 
-export default connect(mapStateToProps,{
-  authSuccess: userActions.authSuccess,
-  setUsername: userActions.setUsername,
-  setIsLoggedIn: userActions.setIsLoggedIn,
+export default connect(mapStateToProps, {
+  setUserState: userActions.setUserState,
 })(App);

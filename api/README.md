@@ -6,7 +6,7 @@
 * using Homebrew, install git
 
 ## Starting from scratch:
-Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'HTempleman/gsn-api' (Soon to be GSN/gsn-api hopefully!)
+Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'gsn/api'
 
 type the following command in the root directory (the directory that contains the Dockerfile)
 
@@ -23,7 +23,7 @@ docker-compose up
 Your local server should now be running and ready to accept connections. In order to load the dummy data, open up a separate tab in your shell, go to the same directory as before, and type the following command:
 
 ```bash
-docker-compose exec web python /code/gsn-api/manage.py loaddata firstfixture.json
+docker-compose exec gsn_web python /code/gsn_api/manage.py loaddata database_fixture.json
 ```
 
 
@@ -69,6 +69,8 @@ With that out of the way, you should be good to create another docker image with
 For our project, we are storing any permenant changes made to the database locally. This is to allow any changes you make during development to persist. The up side of this is that you don't have to load the dummy data every time you create a container. The down side is that there is occasional disagreement between your local volumes and a newer version of gsn-api. To fix this, you can delete any and all volumes in local storage that aren't currently being used by containers with the following command:
 
 **_Danger- Do not do this if you have other Docker projects that are using volumes!_**
+
+
 ```bash
 docker volume prune
 ```
@@ -82,4 +84,16 @@ And then remove it specifically by typing the following:
 ```bash
 docker volume rm <VOLUME NAME>
 ```
+## Interacting with the API:
+Besides the many paths that can be used for retrieving lists and details of the gsn database. The most dynamic api view currently available allows the client to retrieve information on student **behavior**, **attendance**, and **grades**. To retrieve any of the three, simply include a JSON object in the request payload who's value is the student's first and last name. The following example uses HTTPie:
+
+```bash
+http POST http://127.0.0.1:8000/gsndb/student/attendance studentName="Alexander Glover"
+```
+Unfortunately, the API hasn't quite figured out middle names, so any information related to "Cloe White Thomas" will be inaccessible. This should hopefully be remedied within a week. I encourage anyone working on the front end to find other ways to break this style of path, as it is currently learning to walk and needs a good beating. 
+
+An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
+
+If this seems like a positively archaic perspective, I invite any and all dissenters to respectfully volunteer their opinions on the flowdock. Or perhaps create a ticket to address the issue in a seminary pow-wow. 
+
 

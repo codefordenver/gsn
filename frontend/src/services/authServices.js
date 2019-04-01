@@ -1,21 +1,22 @@
-import {request} from './request';
+import { request } from './request';
 
-export const getUserState = () => request({
-  url: 'user_app/current_user/',
-  headers: {
-    Authorization: `JWT ${localStorage.getItem('token')}`
-  }
-});
+export const getUserState = token => (token
+  ? request({
+    url: 'user_app/current_user/',
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  })
+  : Promise.reject(new Error('no token passed to getUserState service')));
 
-export const loginUser = (data) => {
-  return request({
+export const loginUser = ({ username, password }) => request({
   url: 'token-auth/',
   method: 'POST',
-  body: JSON.stringify(data),
-})};
+  body: JSON.stringify({ username, password }),
+});
 
-export const signupUser = (data) => request({
+export const signupUser = ({ username, password }) => request({
   url: 'user_app/users/',
   method: 'POST',
-  body: JSON.stringify(data),
+  body: JSON.stringify({ username, password }),
 });

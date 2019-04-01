@@ -1,0 +1,29 @@
+{
+  "studentId": 13,
+  "name" : "Linton Jefferson Stephens",
+  "school": "Aguilar Middle/High School",
+  "schoolId": 15,
+  "birthdate": "9/16/1992",
+  "behavior": [
+    {
+      "date": "2/19/2018",
+      "context": "Detrimental behavior",
+      "result": "Detention"
+    },
+    {
+      "date": "3/22/2018",
+      "context": "Alcohol violation",
+      "result": "Suspension: 1 day"
+    },
+    {
+      "date": "6/5/2018",
+      "context": "Tobacco violation",
+      "result": "Detention"
+    },
+    {
+      "date": "8/31/2018",
+      "context": "Detrimental behavior",
+      "result": "Detention"
+    }
+  ]
+}
