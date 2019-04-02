@@ -1,9 +1,0 @@
-id,current_school,program,first_name,last_name,middle_name,gender,birthdate,state_id,grade_year,reason_in_program
-1,1,1,Linton,Stephens,Baker,M,2007-01-23,4215379180,6,poor grades
-2,1,1,Brent,Rosario,Runner,M,2009-04-20,3168594265,4,truancy
-3,2,1,Banu,Rounds,Sprinter,M,2008-07-04,3591029003,5,multiple expulsions
-4,2,1,Biel,Morgan,Banker,F,2010-06-17,7493417318,3,at risk of expulsion
-5,1,2,Nikolai,Dale,Writer,M,2009-03-09,1673133814,4,chronic misbehavior
-6,1,2,Dulcibella,Legrand,Black,F,2008-08-30,7829341275,5,substance abuse
-7,2,2,Petra,Bently,White,F,2005-12-12,7187951180,8,family history of dropping out
-8,2,2,Shakuntala,Cernik,Brown,F,2010-10-31,8288556374,3,poor grades
