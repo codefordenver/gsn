@@ -88,9 +88,17 @@ class School(models.Model):
         on_delete=models.PROTECT,
     )
 
+class Program(models.Model):
+	name = models.CharField(max_length=50)
+
 class Student(models.Model):
     current_school = models.ForeignKey(
         "School",
+        null = True,
+        on_delete = models.PROTECT,
+    )
+    current_program = models.ForeignKey(
+        "Program",
         null = True,
         on_delete = models.PROTECT,
     )
@@ -128,16 +136,7 @@ class Student(models.Model):
     )
     grade_year = models.SmallIntegerField(
         choices = GRADE_YEAR_CHOICES,
-        null = True
-    )
-    """establish choices for program"""
-    PROGRAM_CHOICES = (
-        ("EA", "Expelled and At-Risk Student Servies"),
-    )
-    program = models.CharField(
-        max_length = 2,
-        blank = True,
-        choices = PROGRAM_CHOICES,
+        null = True,
     )
     reason_in_program = models.TextField(blank=True)
 
@@ -192,7 +191,6 @@ class Calendar(models.Model):
     )
 
 class Behavior(models.Model):
-    #will probably want to add choices to incident_type and _result
     student = models.ForeignKey(
         "Student",
         null = True,
@@ -207,6 +205,20 @@ class Behavior(models.Model):
         "Calendar",
         null = True,
         on_delete = models.PROTECT
+    )
+    program = models.ForeignKey(
+        "Program",
+        null = True,
+        on_delete = models.PROTECT,
+    )
+    course = models.ForeignKey(
+        "Course",
+        null = True,
+        on_delete = models.PROTECT
+    )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
     )
     incident_datetime = models.DateTimeField(default = timezone.now)
     context = models.TextField(blank = True)
@@ -243,6 +255,14 @@ class Grade(models.Model):
         null = True,
         on_delete = models.PROTECT,
     )
+    program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
+    )
+    period = models.CharField(
+        max_length = 10,
+        null = True,
+    )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
@@ -261,7 +281,11 @@ class Attendance(models.Model):
     )
     calendar = models.ForeignKey(
         "Calendar",
-        null = True, 
+        null = True,
+        on_delete = models.PROTECT,
+    )
+    program = models.ForeignKey(
+        "Program",
         on_delete = models.PROTECT,
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
@@ -272,13 +296,16 @@ class Attendance(models.Model):
     term_final_value = models.BooleanField(default = False)
 
 class Referral(models.Model):
-    #need to alter phone number field probably, for formatting purposes
     user = models.ForeignKey(
         get_user_model(),
         on_delete = models.PROTECT,
     )
     student = models.ForeignKey(
         "Student",
+        on_delete = models.PROTECT,
+    )
+    program = models.ForeignKey(
+        "Program",
         on_delete = models.PROTECT,
     )
     """ establish choices for Referral Type"""
@@ -305,6 +332,7 @@ class Referral(models.Model):
     reference_name = models.CharField(max_length = 100, null = True)
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
+    reason = models.TextField(null = True)
 
 """ tables yet to be implemented
 class Note(models.Model):
