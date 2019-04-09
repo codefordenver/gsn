@@ -68,24 +68,12 @@ class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Grade.objects.all()
     serializer_class = GradeSerializer
 
-class GradeForStudent(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
-    serializer_class = GradeForStudentSerializer
+class GradeForStudent(APIView):
 
-class ExpGFS(APIView):
-
-    def student_objects(pk = None):
-        if pk == None:
-            return Student.objects.all()
-        else:
-            return Student.objects.get(id = pk)
-
-
-    def get(request, self, group, pk, format = None):
-        if group == "student":
-            queryset = Student.objects.get(id = pk)
-            serializer = StudentSerializer(queryset)
-            return Response(serializer.data)
+    def get(self, request, pk, format = None):
+        student_obj = Student.objects.filter(pk = pk)
+        serializer = GradeForStudentSerializer(student_obj, many = True)
+        return Response(serializer.data)
 
 
 class BehaviorList(generics.ListCreateAPIView):
@@ -132,7 +120,7 @@ class StudentInfo(APIView):
             first_name = student_name[0]
             middle_name = " ".join(student_name[1:-1])
             last_name = student_name[-1]
-        
+
         student = Student.objects.get(first_name=first_name, last_name=last_name, middle_name=middle_name)
 
 
