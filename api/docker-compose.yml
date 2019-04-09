@@ -1,10 +1,12 @@
-version: '2.4'
+version: '2'
 
 services:
   db:
     image: postgres
     volumes:
       - gsn-data:/var/lib/postgresql/data/
+    networks:
+      - edgeproxy_proxy-mesh
   gsn_web:
     build: 
       context: .
@@ -14,12 +16,15 @@ services:
       ## Uncomment the following during production.
       ##- /etc/letsencrypt/:/etc/letsencrypt/
       ##- /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
+    networks:
+      edgeproxy_proxy-mesh:
+        aliases:
+          - gsn_web
     expose:
       - "80"
-      - "443"
+    # Uncomment the following during development:
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
     environment:
       - SECRET_KEY=developerkey
     depends_on:
@@ -27,3 +32,7 @@ services:
 
 volumes:
   gsn-data:
+networks:
+  edgeproxy_proxy-mesh:
+  # Uncomment the following during production.
+  #  external: true 

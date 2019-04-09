@@ -1,11 +1,6 @@
-admin:
-  access_log_path: /tmp/admin_access.log
-  address:
-    socket_address: { address: 0.0.0.0, port_value: 9901 }
-
 static_resources:
   listeners:
-  - name: listener_0
+  - name: gsn_web
     address:
       socket_address: { address: 0.0.0.0, port_value: 80 }
     filter_chains:
@@ -16,22 +11,22 @@ static_resources:
           codec_type: AUTO
           route_config:
             virtual_hosts:
-            - name: local_service
+            - name: gsn_web
               domains: ["*"]
               routes:
               - match:
                   prefix: ""
-                route: { cluster: some_service }
+                route: { cluster: local_service }
           http_filters:
           - name: envoy.router
             config: {}
   clusters:
-  - name: some_service
+  - name: local_service
     connect_timeout: 0.25s
     type: strict_dns
     lb_policy: ROUND_ROBIN
     load_assignment:
-      cluster_name: some_service
+      cluster_name: local_service
       endpoints:
       - lb_endpoints:
         - endpoint:
