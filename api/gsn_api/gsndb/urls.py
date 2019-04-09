@@ -23,8 +23,7 @@ urlpatterns = [
     path('behavior/<int:pk>/', views.BehaviorDetail.as_view()),
     path('referral/', views.ReferralList.as_view()),
     path('referral/<int:pk>/', views.ReferralDetail.as_view()),
-    path('exp/<group>/<int:pk>/', views.ExpGFS.as_view()),
     path('mystudents/', views.MyStudentsList.as_view()),
-    path('gradeforstudent/<int:pk>', views.GradeForStudent.as_view()),
+    path('gradeforstudent/<int:pk>/', views.GradeForStudent.as_view()),
 
   ]
