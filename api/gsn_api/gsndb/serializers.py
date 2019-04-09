@@ -103,19 +103,17 @@ class GradeSerializer(serializers.ModelSerializer):
             "term_final_value",
         )
 
-class GradeForStudentSerializer(serializers.ModelSerializer):
+class GradeForStudentSerializer(serializers.BaseSerializer):
 
-    #if URL is ______: set serializer field to _______
-    grade_set = GradeSerializer(many = True, read_only = True)
+    def to_representation(self, student_obj):
+        grade = GradeSerializer(student_obj.grade_set, many = True)
+        grade_json = grade.data
+        return {
+            "First Name": student_obj.first_name,
+            "Last Name": student_obj.last_name,
+            "Grades": grade_json,
+        }
 
-    class Meta:
-        model = Student
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "grade_set",
-        )
 
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -157,11 +155,11 @@ class ParedGradeSerializer(serializers.ModelSerializer):
 class StudentGradeSerializer(serializers.ModelSerializer):
     grade_set = ParedGradeSerializer(read_only=True, many=True),
     birthday = serializers.DateField(source= 'birth_date')
-    
+
     class Meta:
         model = Student
         fields = ('grade_set', 'birthday')
-        
+
 
 
 """
@@ -174,7 +172,7 @@ name = serializers.SerializerMethodField(),
     def get_name(self, obj):
         return '{} {} {}'.format(obj.last_name, obj.first_name, obj.middle_name)
 
-        fields = ('grades', 'current_school', 'first_name', 'last_name', 'middle_name', 'gender', 'birth_date', 'state_id', 'grade_year', 'program', 'reason_in_program') 
+        fields = ('grades', 'current_school', 'first_name', 'last_name', 'middle_name', 'gender', 'birth_date', 'state_id', 'grade_year', 'program', 'reason_in_program')
 
 
             course = serializers.CharField(source= 'course.name', read_only=True),
