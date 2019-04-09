@@ -1,17 +1,12 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import * as userActions from 'state/UserActions';
+import PropTypes from 'prop-types';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider } from '@material-ui/core';
 import theme from './utils/theme';
 import Routes from './components/Routes';
-
-// const loggedInNav = [
-//   { key: 'navitem1', path: '/', text: 'Home' },
-//   { key: 'navitem2', path: '/students', text: 'All Students' },
-//   { key: 'navitem3', path: '/districts', text: 'All Districts' },
-// ];
 
 function App(props) {
   const { loading, setUserState } = props;
@@ -40,6 +35,13 @@ const mapStateToProps = (state) => {
     loading: user.get('loading'),
   };
 };
+
+App.propTypes = {
+  loading: PropTypes.bool,
+  setUserState: PropTypes.func,
+};
+
+// username, isLoggedIn, loading, logOut,
 
 export default connect(mapStateToProps, {
   setUserState: userActions.setUserState,

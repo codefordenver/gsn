@@ -7,8 +7,8 @@ import HomePage from 'components/HomePage';
 import Login from 'pages/Login';
 import SignupForm from 'pages/Register';
 import Districts from 'components/Districts';
-import Students from 'components/Students';
-import StudentDetail from 'components/StudentDetail';
+import Students from 'pages/Students';
+import StudentDetail from 'pages/StudentDetail';
 
 import PrivateRoute from './PrivateRoute';
 // username: user.get('username'),
