@@ -90,18 +90,19 @@ class BehaviorSerializer(serializers.ModelSerializer):
             "incident_result_school",
         )
 
-class GradeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Grade
-        fields = (
-            "id",
-            "student",
-            "course",
-            "calendar",
-            "entry_datetime",
-            "grade",
-            "term_final_value",
-        )
+class GradeSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, grade_obj):
+        return {
+            "Grade PK": grade_obj.id,
+            "Student": grade_obj.student.id,
+            "Course": grade_obj.course.id,
+            "Calendar": grade_obj.calendar.id,
+            "entry_date": grade_obj.entry_datetime,
+            "Grade Value": grade_obj.grade,
+            "Final Grade for Term": grade_obj.term_final_value,
+        }
+
 
 class GradeForStudentSerializer(serializers.BaseSerializer):
 
