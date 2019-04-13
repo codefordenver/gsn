@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral
-
+from django.db.models.fields.related import ForeignKey
 
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,24 +21,21 @@ class SchoolSerializer(serializers.ModelSerializer):
             "name",
         )
 
-class StudentSerializer(serializers.ModelSerializer):
-    current_school = SchoolSerializer()
+class StudentSerializer(serializers.BaseSerializer):
 
-    class Meta:
-        model = Student
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "middle_name",
-            "current_school",
-            "birth_date",
-            "gender",
-            "grade_year",
-            "program",
-            "reason_in_program",
-            "state_id",
-        )
+        def to_representation(self, student_obj):
+            return {
+                "current_school": student_obj.current_school.id,
+                "current_program": student_obj.current_program.id,
+                "first_name": student_obj.first_name,
+                "last_name": student_obj.last_name,
+                "middle_name": student_obj.middle_name,
+                "gender": student_obj.gender,
+                "birth_date": student_obj.birth_date,
+                "state_id": student_obj.state_id,
+                "grade_year": student_obj.grade_year,
+                "reason_in_program": student_obj.reason_in_program,
+            }
 
 class MyStudentsSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
@@ -116,21 +113,21 @@ class GradeForStudentSerializer(serializers.BaseSerializer):
         }
 
 
-class AttendanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attendance
-        fields = (
-            "id",
-            "student",
-            "school",
-            "calendar",
-            "entry_date_time",
-            "total_unexabs",
-            "total_exabs",
-            "total_tardies",
-            "avg_daily_attendance",
-            "term_final_value",
-        )
+class AttendanceSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, attendance_obj):
+        return {
+            "student": attendance_obj.student.id,
+            "school": attendance_obj.school.id,
+            "calendar": attendance_obj.calendar.id,
+            "program": attendance_obj.program.id,
+            "entry_date": attendance_obj.entry_datetime,
+            "total_unexabs": attendance_obj.total_unexabs,
+            "total_exabs": attendance_obj.total_exabs,
+            "total_tardies": attendance_obj.total_tardies,
+            "avg_daily_attendance": attendance_obj.avg_daily_attendance,
+            "term_final_value": attendance_obj.term_final_value,
+        }
 
 class ReferralSerializer(serializers.ModelSerializer):
     class Meta:
@@ -161,6 +158,51 @@ class StudentGradeSerializer(serializers.ModelSerializer):
         model = Student
         fields = ('grade_set', 'birthday')
 
+class Child_setSerializer(serializers.BaseSerializer):
+    """'data' no longer a positional argument, now a keyword
+    argument """
+    def __init__(self, instance = None, *child_model, **kwargs):
+        super().__init__(instance = instance, **kwargs)
+        self.child_model = child_model
+        self.serializer_dic = {
+            "Student": StudentSerializer,
+            "Grade": GradeSerializer,
+            "Attendance": AttendanceSerializer,
+        }
+
+    def find_instance_to_child_connection(self, instance, child_model):
+        instance_model_name = instance.__class__.__name__
+        child_fields = child_model._meta.fields
+        for field in child_fields:
+            field_type = field.__class__
+            if field_type == ForeignKey:
+                field_name = field.__dict__["name"]
+                if field_name == instance_model_name.lower():
+                    connecting_field = field
+                    break
+        return field_name
+
+    def construct_data(self):
+        instance_model_name = self.instance.__class__.__name__
+        InstanceSerializer = self.serializer_dic[instance_model_name]
+        serialized_instance = InstanceSerializer(self.instance)
+        json = serialized_instance.data
+        if len(self.child_model) >= 1:
+            for Child in self.child_model:
+                child_model_name = Child.__name__
+                ChildSerializer = self.serializer_dic[child_model_name]
+                foreign_key = self.find_instance_to_child_connection(self.instance, Child)
+                query = {foreign_key: self.instance.id}
+                queryset = Child.objects.filter(**query)
+                child_set_serialized = ChildSerializer(queryset, many = True)
+                json[child_model_name] = child_set_serialized.data
+            return json
+        else:
+            return json
+
+    def to_representation(self, instance):
+        json_data = self.construct_data()
+        return json_data
 
 
 """
