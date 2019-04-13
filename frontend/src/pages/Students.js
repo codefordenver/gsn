@@ -53,24 +53,25 @@ function Students(props) {
               <TableBody>
                   {students.map((student, i) => {
                     const {
-                      studentId, name, school, schoolId, birthdate,
+                      id, studentFirstName, studentLastName, school, schoolId, studentBirthDate,
                     } = student;
                     return (
                         <TableRow
-                          key={studentId}
+                          key={id}
                           className={`${tRow} ${i % 2 !== 0 ? striped : ''}`}
                         >
                             <TableCell>
-                                <Link to={`/students/${studentId}`}>
-                                    <StyledLink>{name}</StyledLink>
-                                </Link>
+                                <StyledLink component={Link} to={`/students/${id}`}>
+                                    {`${studentFirstName} ${studentLastName}` || ''}
+                                    {/* empty string allows prop validation to work until data is loaded */}
+                                </StyledLink>
                             </TableCell>
                             <TableCell>
-                                <Link to={`/schools/${schoolId}`}>
-                                    <StyledLink>{school}</StyledLink>
-                                </Link>
+                                <StyledLink component={Link} to={`/schools/${schoolId}`}>
+                                    {school || ''}
+                                </StyledLink>
                             </TableCell>
-                            <TableCell align="right">{birthdate}</TableCell>
+                            <TableCell align="right">{studentBirthDate}</TableCell>
                         </TableRow>
                     );
                   })}
