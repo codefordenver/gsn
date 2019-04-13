@@ -6,12 +6,12 @@
 * using Homebrew, install git
 
 ## Starting from scratch:
-Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'gsn/api'
+Now, inside your favorite shell (Mac users typically use Terminal), go to a directory of your choosing and clone git repo from 'codefordenver/gsn'
 
 type the following command in the root directory (the directory that contains the Dockerfile)
 
 ```bash
-docker-compose run web python /code/gsn-api/manage.py migrate
+docker-compose run gsn_web python /code/gsn_api/manage.py migrate
 ```
 
 Next, type the following:
@@ -93,7 +93,4 @@ http POST http://127.0.0.1:8000/gsndb/student/attendance studentName="Alexander 
 Unfortunately, the API hasn't quite figured out middle names, so any information related to "Cloe White Thomas" will be inaccessible. This should hopefully be remedied within a week. I encourage anyone working on the front end to find other ways to break this style of path, as it is currently learning to walk and needs a good beating. 
 
 An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
-
-If this seems like a positively archaic perspective, I invite any and all dissenters to respectfully volunteer their opinions on the flowdock. Or perhaps create a ticket to address the issue in a seminary pow-wow. 
-
 
