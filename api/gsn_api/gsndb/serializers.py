@@ -159,8 +159,17 @@ class StudentGradeSerializer(serializers.ModelSerializer):
         fields = ('grade_set', 'birthday')
 
 class Child_setSerializer(serializers.BaseSerializer):
-    """'data' no longer a positional argument, now a keyword
-    argument """
+    """This class serializes an instance of a model and specified sets of data
+    from child models. For example, it can serialize an instance of the student
+    model and the set of grade data associated with it. This class functions
+    similarly to the serializers already created, such as DistrictSerializer.
+
+    There are two main differences:'data' no longer a positional argument, it is
+    now a keyword argument; and the format of the inputs it takes is now
+    Child_setSerializer(instsance, *child_model). *child_model is an arbitrary
+    number of models related to the instance by a many-to-one relationship.
+    Currently the serializer cannot serialize sets of data more than one degree
+    removed from the instance."""
     def __init__(self, instance = None, *child_model, **kwargs):
         super().__init__(instance = instance, **kwargs)
         self.child_model = child_model
@@ -168,9 +177,15 @@ class Child_setSerializer(serializers.BaseSerializer):
             "Student": StudentSerializer,
             "Grade": GradeSerializer,
             "Attendance": AttendanceSerializer,
+            "District": DistrictSerializer,
+            "School": SchoolSerializer,
+            "Course": CourseSerializer,
+            "Calendar": CalendarSerializer,
+            "Behavior": BehaviorSerializer,
+            "Referral": ReferralSerializer,
         }
 
-    def find_instance_to_child_connection(self, instance, child_model):
+    def find_foreign_key_field_connection(self, instance, child_model):
         instance_model_name = instance.__class__.__name__
         child_fields = child_model._meta.fields
         for field in child_fields:
@@ -191,11 +206,11 @@ class Child_setSerializer(serializers.BaseSerializer):
             for Child in self.child_model:
                 child_model_name = Child.__name__
                 ChildSerializer = self.serializer_dic[child_model_name]
-                foreign_key = self.find_instance_to_child_connection(self.instance, Child)
+                foreign_key = self.find_foreign_key_field_connection(self.instance, Child)
                 query = {foreign_key: self.instance.id}
                 queryset = Child.objects.filter(**query)
-                child_set_serialized = ChildSerializer(queryset, many = True)
-                json[child_model_name] = child_set_serialized.data
+                child_set_serializer = ChildSerializer(queryset, many = True)
+                json[child_model_name] = child_set_serializer.data
             return json
         else:
             return json
