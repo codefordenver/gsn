@@ -50,10 +50,10 @@ git status
 The output here should tell you many things. For one, it should confirm that you are on the branch you created in case you had any doubts. Furthermore, you should observe that your newly created file (myfile) is untracked and waiting to be staged for a commit. To stage the file, type the following:
 
 ```
-git add -A 
+git add myfile
 ```
 
-This stages all of the changes you've made, which may be a bit overkill for a single file. Now, you'll want to commit those changes and include a message that describes how things have been modified.
+This stages myfile to be committed to gits record of changes. Now, you'll want to commit those changes and include a message that describes how things have been modified.
 
 ```
 git commit -m "I added a file named myfile!"
@@ -67,5 +67,13 @@ git remote add origin https://github.com/codefordenver/gsn.git
 
 By convention, the remote repo for a github project is typically entitled "origin". You can name it whatever you like, but keeping things conventional will help to avoid confusion down the line. 
 
-## More instructions coming soon. 
+Finally, you should push your newly created branch to the remote repository on GitHub. To do this, type the following command:
+
+```git
+git push -u origin <your_branch_name> 
+```
+
+The '-u' flag instructs git to set an ~upstream~ branch in the remote repo that will track changes to your current local branch. Again, for the sake of simplicity, we're abiding by convention here when we set our upstream branch to share the same name as our local branch. You could specify that the upstream branch for <your_branch_name> have a different name of your choosing by using colon notation (`git push -u origin <your_branch_name>:<upstram_branch_name>`). Avoid doing this unless you have a good reason, otherwise you are adding unecessary complexity to the project. 
+
+Now your changes should be recorded on the remote repo. You've officially contributed to the project! Although your changes haven't affected the manner in which the API or Frontend operate, you have contributed nonetheless by learning something new and showing that your interest in GSN is more than a passing fancy!
 
