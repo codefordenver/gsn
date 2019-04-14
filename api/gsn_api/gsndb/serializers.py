@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral
+from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral, Bookmark
 
 
 class DistrictSerializer(serializers.ModelSerializer):
@@ -160,6 +160,11 @@ class StudentGradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ('grade_set', 'birthday')
+
+class BookmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bookmark
+        fields = ('id','user','url','created','json_request_data')
 
 
 
