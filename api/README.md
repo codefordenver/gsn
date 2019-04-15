@@ -1,5 +1,110 @@
+This is split into 2 sections:
 
-# GSN-API instructions:
+A. Step by step instructions for how to download the file with git, how to run docker, and how to upload back into git
+
+B. Overview of Docker & download
+
+# A. Step by step instructions for GitHub & Docker
+First you will create a local repository. Then you will add code. Then you will get Docker up and running. Then you may need to go into the container. Then you exit Docker. Then you uplaod the changes to GitHub.
+
+#### How to create local repository
+1. First you need to get a local repository from GitHub. In your command line, clone gsn.
+```git
+git clone https://github.com/codefordenver/gsn.git
+```
+2. Next, we need to decide what branch we are working on. Get a list of all branches available.
+````git
+git branch -a
+````
+3. Of this list, you need to decide which one best fits your task.  For example, if you are working on creating a Django model, you should use new_models. (Ask for help if you aren't sure).
+
+To switch to the branch you want the following:
+````git
+git checkout <BRANCH YOU WANT TO USE>
+````
+4. Then, off of this branch create a new one by typing the following command
+````git
+  git checkout -b <YOUR BRANCH NAME>
+````
+
+#### Go and add to the code
+1. Open the code in your file directory and add to the code.
+
+#### Get Docker up and running
+1. In your command line, change the current working directory to the folder that has the docker-compose.yml file (gsn > api).
+
+2. In your command line, now run 
+````git
+docker-compose up
+````
+Give it time to run. This file is running a script that will automatically make new migrations & migrate any new models.
+
+3. You can check to see if your code is up and running by going to a web browser and typing localhost:80/<PATH>. For example, localhost:80/gsndb/students.
+  
+#### If you need to get into a container
+1. If you need to get into the database container, type into a new command line
+````git
+docker-compose exec db bash
+````
+If you need to get into the web container, type into a new command line
+````git
+docker-compose exec gsn_web sh
+````
+
+From either of these you can run commands. For example, in the database container you could type in 
+````git
+psql -U postgres
+````
+to be able to access postgresql commands.
+
+2. If you need to get out of a container, simply type 
+````git
+exit
+````
+
+#### If you need to get out of Docker
+1. Unfortunately, you will have to close out of Docker and reopen every time you make a change. In order to close it down, stop the docker-compose up command by typing CTR-C. Then type
+````git
+docker-compose down
+````
+in the command line.
+
+#### If you are ready to upload changes to GitHub
+1. First you need to see what changes have been made. In your command line type
+````git
+git status
+````
+This will tell you what has been added/deleted/modified.
+
+2. Now you need to stage changes & commit. There should be on commit per file that was added/deleted/modified. Type
+````git
+git add <FILE PATH>
+````
+This staged the change from that file.
+
+3. To create a commit for this file, type in the command line
+````git
+git commit -m "Put your comments about this change here"
+````
+
+4. Now you are going to do a push request. Type in the command line
+````git
+git remote add origin https://github.com/codefordenver/gsn.git
+````
+and then
+```git
+git push -u origin <BRANCH NAME> 
+```
+Type in your username and password for GitHub.
+
+5. Go to your branch on github.com/codefordenver/gsn/tree/<BRANCH NAME>.
+ 
+6. Click the green button "Compare and Pull Request".
+
+7. Compare base (the file you found that was similar to what you were doing, eg new_models) to compare (the branch you created). Fill in a description of what you did and push "Create Pull Request".
+
+
+# B. Overview of Docker & Download- GSN-API instructions:
 
 * download docker and create account
 * install Homebrew (here I'm assuming that you're using a Macintosh)
@@ -93,4 +198,5 @@ http POST http://127.0.0.1:8000/gsndb/student/attendance studentName="Alexander 
 Unfortunately, the API hasn't quite figured out middle names, so any information related to "Cloe White Thomas" will be inaccessible. This should hopefully be remedied within a week. I encourage anyone working on the front end to find other ways to break this style of path, as it is currently learning to walk and needs a good beating. 
 
 An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
+
 
