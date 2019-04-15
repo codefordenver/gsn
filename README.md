@@ -73,7 +73,7 @@ Finally, you should push your newly created branch to the remote repository on G
 git push -u origin <your_branch_name> 
 ```
 
-The '-u' flag instructs git to set an ~upstream~ branch in the remote repo that will track changes to your current local branch. Again, for the sake of simplicity, we're abiding by convention here when we set our upstream branch to share the same name as our local branch. You could specify that the upstream branch for <your_branch_name> have a different name of your choosing by using colon notation (`git push -u origin <your_branch_name>:<upstram_branch_name>`). Avoid doing this unless you have a good reason, otherwise you are adding unecessary complexity to the project. 
+The '-u' flag instructs git to set an _upstream_ branch in the remote repo that will track changes to your current local branch. Again, for the sake of simplicity, we're abiding by convention here when we set our upstream branch to share the same name as our local branch. You could specify that the upstream branch for <your_branch_name> have a different name of your choosing by using colon notation (`git push -u origin <your_branch_name>:<upstram_branch_name>`). Avoid doing this unless you have a good reason, otherwise you are adding unecessary complexity to the project. 
 
 Now your changes should be recorded on the remote repo. You've officially contributed to the project! Although your changes haven't affected the manner in which the API or Frontend operate, you have contributed nonetheless by learning something new and showing that your interest in GSN is more than a passing fancy!
 
