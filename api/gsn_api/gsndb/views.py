@@ -69,7 +69,7 @@ class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GradeSerializer
 
 class GradeForStudent(APIView):
-    """# http POST http://127.0.0.1:8000/gsndb/student/someviewendpoint requestParameter="requestValue""""
+    """# http POST http://127.0.0.1:8000/gsndb/student/someviewendpoint requestParameter="requestValue"""
     def get(self, request, pk, format = None):
         student_obj = Student.objects.filter(pk = pk)
         serializer = GradeForStudentSerializer(student_obj, many = True)
