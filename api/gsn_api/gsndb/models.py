@@ -334,6 +334,18 @@ class Referral(models.Model):
     reference_address = models.CharField(max_length = 150, null = True)
     reason = models.TextField(null = True)
 
+class Bookmark(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.PROTECT,
+        #db_column = 'user',
+    )
+    created = models.DateTimeField(default = timezone.now)
+    url = models.CharField(max_length=500)
+    json_request_data = models.TextField()
+
+
+
 """ tables yet to be implemented
 class Note(models.Model):
     user = models.ForeignKey(
@@ -343,13 +355,5 @@ class Note(models.Model):
     related_contet = dymanimc_foreign_Key
     created = models.DateTimeField(default = timezone.now)
     content = models.TextField()
-class Bookmark(models.Model):
-    user = models.ForeignKey(
-        "User",
-        on_delete = models.PROTECT,
-    )
-    created = models.DateTimeField(default = timezone.now)
-    url = unknown
-    react_component = unknown
-    json_request_data = unknown
+
     """
