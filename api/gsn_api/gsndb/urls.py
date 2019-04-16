@@ -25,5 +25,4 @@ urlpatterns = [
     path('referral/<int:pk>/', views.ReferralDetail.as_view()),
     path('mystudents/', views.MyStudentsList.as_view()),
     path('gradeforstudent/<int:pk>/', views.GradeForStudent.as_view()),
-
   ]
