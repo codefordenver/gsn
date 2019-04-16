@@ -69,11 +69,7 @@ class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GradeSerializer
 
 class GradeForStudent(APIView):
-    """this view is currently linked to the url path
-     /gsndb/gradeforstudent/<int:pk>/. It displays grade data for a student
-     selected by the primary key entered into the last part of the endpoint.
-     Ex: /gsndb/gradeforstudent/1 returnts grade data for the student with
-     primary key 1 in the student table."""
+    """# http POST http://127.0.0.1:8000/gsndb/student/someviewendpoint requestParameter="requestValue""""
     def get(self, request, pk, format = None):
         student_obj = Student.objects.filter(pk = pk)
         serializer = GradeForStudentSerializer(student_obj, many = True)
