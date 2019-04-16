@@ -21,26 +21,6 @@ class SchoolSerializer(serializers.ModelSerializer):
             "name",
         )
 
-<<<<<<< HEAD
-class StudentSerializer(serializers.ModelSerializer):
-    current_school = SchoolSerializer()
-
-    class Meta:
-        model = Student
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "middle_name",
-            "current_school",
-            "birth_date",
-            "gender",
-            "grade_year",
-            "current_program",
-            "reason_in_program",
-            "state_id",
-        )
-=======
 class StudentSerializer(serializers.BaseSerializer):
 
         def to_representation(self, student_obj):
@@ -56,7 +36,6 @@ class StudentSerializer(serializers.BaseSerializer):
                 "grade_year": student_obj.grade_year,
                 "reason_in_program": student_obj.reason_in_program,
             }
->>>>>>> 5e3e0ef5eaadb16b215811c57ca12ebed9dbc443
 
 class MyStudentsSerializer(serializers.ModelSerializer):
     current_school = SchoolSerializer(read_only = True)
