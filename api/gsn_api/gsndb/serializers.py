@@ -138,24 +138,6 @@ class GradeForStudentSerializer(serializers.BaseSerializer):
         }
 
 
-<<<<<<< HEAD
-class AttendanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attendance
-        fields = (
-            "id",
-            "student",
-            "school",
-            "program",
-            "calendar",
-            "entry_datetime",
-            "total_unexabs",
-            "total_exabs",
-            "total_tardies",
-            "avg_daily_attendance",
-            "term_final_value",
-        )
-=======
 class AttendanceSerializer(serializers.BaseSerializer):
 
     def to_representation(self, attendance_obj):
@@ -171,7 +153,6 @@ class AttendanceSerializer(serializers.BaseSerializer):
             "avg_daily_attendance": attendance_obj.avg_daily_attendance,
             "term_final_value": attendance_obj.term_final_value,
         }
->>>>>>> 5e3e0ef5eaadb16b215811c57ca12ebed9dbc443
 
 class ReferralSerializer(serializers.ModelSerializer):
     class Meta:
