@@ -35,7 +35,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "birth_date",
             "gender",
             "grade_year",
-            "program",
+            "current_program",
             "reason_in_program",
             "state_id",
         )
@@ -82,6 +82,8 @@ class BehaviorSerializer(serializers.ModelSerializer):
             "student",
             "school",
             "calendar",
+            "program",
+            "period",
             "incident_datetime",
             "context",
             "incident_type_program",
@@ -99,6 +101,8 @@ class GradeSerializer(serializers.BaseSerializer):
             "Course": grade_obj.course.id,
             "Calendar": grade_obj.calendar.id,
             "entry_date": grade_obj.entry_datetime,
+            "period": grade_obj.period,
+            "program": grade_obj.program.id,
             "Grade Value": grade_obj.grade,
             "Final Grade for Term": grade_obj.term_final_value,
         }
@@ -123,8 +127,9 @@ class AttendanceSerializer(serializers.ModelSerializer):
             "id",
             "student",
             "school",
+            "program",
             "calendar",
-            "entry_date_time",
+            "entry_datetime",
             "total_unexabs",
             "total_exabs",
             "total_tardies",
@@ -139,11 +144,13 @@ class ReferralSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "student",
+            "program",
             "type",
             "date_given",
             "reference_name",
             "reference_phone",
             "reference_address",
+            "reason",
         )
 
 class ParedGradeSerializer(serializers.ModelSerializer):
