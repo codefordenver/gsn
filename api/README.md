@@ -12,8 +12,9 @@ First you will create a local repository. Then you will add code. Then you will 
 ```git
 git clone https://github.com/codefordenver/gsn.git
 ```
-2. Next, we need to decide what branch we are working on. Get a list of all branches available.
+2. Next, we need to decide what branch we are working on. Change directories into the gsn repository and then get a list of all branches available.
 ````git
+cd gsn
 git branch -a
 ````
 3. Of this list, you need to decide which one best fits your task.  For example, if you are working on creating a Django model, you should use new_models. (Ask for help if you aren't sure).
