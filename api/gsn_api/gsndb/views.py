@@ -1,21 +1,15 @@
-import json
-from datetime import datetime
-from rest_framework.views import APIView
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from gsndb.models import District, School, Student, StudentSnap, Course, Behavior, Attendance, Grade
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, StudentSnapSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, GradeSerializer
+from gsndb.models import District, School, Student, Calendar, Course, Grade, Behavior, Attendance, Referral, Bookmark
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentsSerializer, StudentSerializer, CalendarSerializer, GradeSerializer, GradeForStudentSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, StudentGradeSerializer, ParedGradeSerializer, BookmarkSerializer
 from rest_framework import generics
-
-
+from rest_framework.views import APIView
 
 # Create your views here.
-
-"""The district views will be functional and verbose with the intent of clarifying their purpose. Every view hereafter will be generic in nature"""
 
 class DistrictList(generics.ListCreateAPIView):
     queryset = District.objects.all()
@@ -25,7 +19,6 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
-"""As stated, all of the following views will utilize generic view classes provided by the Django Rest framework."""
 
 class SchoolList(generics.ListCreateAPIView):
     queryset = School.objects.all()
@@ -45,15 +38,6 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StudentSerializer
 
 
-class StudentSnapList(generics.ListCreateAPIView):
-    queryset = StudentSnap.objects.all()
-    serializer_class = StudentSnapSerializer
-
-class StudentSnapDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = StudentSnap.objects.all()
-    serializer_class = StudentSnapSerializer
-
-
 class CourseList(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -61,6 +45,35 @@ class CourseList(generics.ListCreateAPIView):
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+
+class CalendarList(generics.ListCreateAPIView):
+    queryset = Calendar.objects.all()
+    serializer_class = CalendarSerializer
+
+class CalendarDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Calendar.objects.all()
+    serializer_class = CalendarSerializer
+
+
+class MyStudentsList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = MyStudentsSerializer
+
+class GradeList(generics.ListCreateAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+
+class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+
+class GradeForStudent(APIView):
+    """# http POST http://127.0.0.1:8000/gsndb/student/someviewendpoint requestParameter="requestValue"""
+    def get(self, request, pk, format = None):
+        student_obj = Student.objects.filter(pk = pk)
+        serializer = GradeForStudentSerializer(student_obj, many = True)
+        return Response(serializer.data)
 
 
 class BehaviorList(generics.ListCreateAPIView):
@@ -81,56 +94,46 @@ class AttendanceDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AttendanceSerializer
 
 
-class GradeList(generics.ListCreateAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
+class ReferralList(generics.ListCreateAPIView):
+    queryset = Referral.objects.all()
+    serializer_class = ReferralSerializer
 
-class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
+class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Referral.objects.all()
+    serializer_class = ReferralSerializer
 
 
 class StudentInfo(APIView):
 
     def post(self, request, grades=False, attendance=False, behavior=False, format=None):
+
         student_name = request.data["student_name"].split()
-        first_name = student_name[0]
-        last_name = student_name[1]
-        
-        student = Student.objects.get(student_first_name=first_name, student_last_name=last_name)
-        student_id = student.student_state_id
-        birthday = student.student_birth_date
-        current_snap = StudentSnap.objects.filter(student__student_first_name=first_name).order_by('pk').reverse()[0]
-        school_name = current_snap.school.school_name
 
-        total_snaps = StudentSnap.objects.filter(student__student_first_name=first_name, student__student_last_name=last_name)
+        if len(student_name) == 2:
+            first_name = student_name[0]
+            last_name = student_name[1]
+        elif len(student_name) == 3:
+            first_name = student_name[0]
+            middle_name = student_name[1]
+            last_name = student_name[2]
+        elif len(student_name) >= 3:
+            first_name = student_name[0]
+            middle_name = " ".join(student_name[1:-1])
+            last_name = student_name[-1]
 
-        kwarg_key = ""
-        kwarg_data = []
+        student = Student.objects.get(first_name=first_name, last_name=last_name, middle_name=middle_name)
 
-        for snap in total_snaps:
-            if self.kwargs.get("grades"):
-                kwarg_key = "grades"
-                grades = Grade.objects.filter(student_snap=snap)
-                cereal = GradeSerializer(grades, many=True)
-            if self.kwargs.get("attendance"):
-                kwarg_key = "attendance"
-                attendance = Attendance.objects.filter(student_snap=snap)
-                cereal = AttendanceSerializer(attendance, many=True)
-            if self.kwargs.get("behavior"):
-                kwarg_key = "behavior"
-                behavior = Behavior.objects.filter(student_snap=snap)
-                cereal = BehaviorSerializer(behavior, many=True)
-            data = JSONRenderer().render(cereal.data)
-            python_data = json.loads(data)
-            kwarg_data += python_data
-        
-        output = {
-            "studentId" : student_id,
-            "name" : request.data["student_name"],
-            "school" : school_name,
-            "birthdate" : datetime.strftime(birthday, '%-m/%-d/%Y'),
-            kwarg_key : kwarg_data
-        }
 
-        return Response(output)
+        if self.kwargs.get("grades"):
+            serializer = StudentGradeSerializer(student)
+            return Response(serializer.data)
+
+        # http POST http://127.0.0.1:80/gsndb/student/grades studentName="Nikolai Writer Dale"
+
+class BookmarkList(generics.ListCreateAPIView):
+    queryset = Bookmark.objects.all()
+    serializer_class = BookmarkSerializer
+
+class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Bookmark.objects.all()
+    serializer_class = BookmarkSerializer
