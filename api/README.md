@@ -1,14 +1,24 @@
-This is split into 2 sections:
+This is split into 4 sections:
 
 A. Step by step instructions for how to download the file with git, how to run docker, and how to upload back into git
 
-B. Overview of Docker & download
+B. Your very first contribution to the project!
+
+C. Next contributions...
+
+D. Overview of Docker & download
 
 # A. Step by step instructions for GitHub & Docker
 First you will create a local repository. Then you will add code. Then you will get Docker up and running. Then you may need to go into the container. Then you exit Docker. Then you uplaod the changes to GitHub.
 
 #### How to create local repository
 1. First you need to get a local repository from GitHub. In your command line, clone gsn.
+
+****IF YOU ARE ON WINDOWS****
+```git
+git clone https://github.com/codefordenver/gsn.git --config core.autocrlf=false
+```
+****otherwise you can simply type****
 ```git
 git clone https://github.com/codefordenver/gsn.git
 ```
@@ -40,7 +50,9 @@ docker-compose up
 ````
 Give it time to run. This file is running a script that will automatically make new migrations & migrate any new models.
 
-3. You can check to see if your code is up and running by going to a web browser and typing localhost:80/<PATH>. For example, localhost:80/gsndb/students.
+3. You can check to see if your code is up and running by going to a web browser and typing localhost:80/<PATH>. For example, localhost:80/gsndb/student.
+****If you are on Windows****
+type 192:168:99:100/80/<PATH>. For example, 192:168:99:100/80/gsndb/student.
   
 #### If you need to get into a container
 1. If you need to get into the database container, type into a new command line
@@ -88,7 +100,17 @@ This staged the change from that file.
 git commit -m "Put your comments about this change here"
 ````
 
-4. Now you are going to do a push request. Type in the command line
+4. If you are editing a different branch, you are going to need to fetch and merge. This is to ensure you have the most up to code and aren't overwriting what someone has recently added. To do this
+
+````git
+git fetch
+````
+
+````git
+git merge
+````
+
+Then do a push request. Type in the command line
 ````git
 git remote add origin https://github.com/codefordenver/gsn.git
 ````
@@ -104,8 +126,27 @@ Type in your username and password for GitHub.
 
 7. Compare base (the file you found that was similar to what you were doing, eg new_models) to compare (the branch you created). Fill in a description of what you did and push "Create Pull Request".
 
+# B. Your very first contribution to the project!
+For your first contribution, you are going to add your name to the bottom of this ABOUTME.md
 
-# B. Overview of Docker & Download- GSN-API instructions:
+1. Using A (above), pull the master branch. Switch to a branch named add_my_name (if it isn't created, create it). 
+
+2. Open the ABOUTME.md in gsn/api. Type your name at the bottom.
+
+3. Follow the instructions from A (above) to fetch, merge, and push. (Don't forget to fetch and merge or you may write over someone else's name!)
+
+4. Congrats! You've contributed!
+
+# C. Next contributions...
+1. Next we will add more contributions. We currently have needs/tasks split under the Issues tab https://github.com/codefordenver/gsn/issues. You can filter it by "backend" or "frontend". Within "backend" you can filter it by "beginner" tasks, "medium" tasks, and "difficult" tasks. If this is your first time adding or you are still trying to get comfortable with the project, choose a "beginner" task.
+
+2. Make sure the task isn't yet assigned to anybody. If it isn't and you are interested in the task, assign yourself to it.
+
+3. Make sure to follow A (above) for basic structure of how to pull the project into a local repository, how to run docker, and how to push it back to github.
+
+4. When you are done with a task, mark it as complete. Feel free to ask any questions you have and don't feel intimidated! We have people ranging from beginner to not beginner on this project!
+
+# D. Overview of Docker & Download- GSN-API instructions:
 
 * download docker and create account
 * install Homebrew (here I'm assuming that you're using a Macintosh)
@@ -199,5 +240,4 @@ http POST http://127.0.0.1:8000/gsndb/student/attendance studentName="Alexander 
 Unfortunately, the API hasn't quite figured out middle names, so any information related to "Cloe White Thomas" will be inaccessible. This should hopefully be remedied within a week. I encourage anyone working on the front end to find other ways to break this style of path, as it is currently learning to walk and needs a good beating. 
 
 An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
-
 
