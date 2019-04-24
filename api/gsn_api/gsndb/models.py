@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey,  GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 """updates to be made
 - implement bookmark model
@@ -16,6 +18,20 @@ DEFAULT_COURSE_ID = 1
 DEFAULT_DISTRICT_ID =1
 
 # Create your models here.
+
+class Note(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.PROTECT,
+    )
+    created = models.DateTimeField(default = timezone.now)
+    text = models.TextField()
+    
+    # Below the mandatory fields for generic relation
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type','object_id')
+    
 
 class District(models.Model):
     """establish state choices"""
@@ -79,6 +95,7 @@ class District(models.Model):
     city = models.CharField(max_length=50, blank=True)
     code = models.CharField(max_length=10, blank=True)
     name = models.CharField(max_length=100, blank=True)
+    notes = GenericRelation(Note)
 
 class School(models.Model):
     name = models.TextField(max_length = 150, blank=True)
@@ -87,9 +104,11 @@ class School(models.Model):
         null = True,
         on_delete=models.PROTECT,
     )
-
+    notes = GenericRelation(Note)
+    
 class Program(models.Model):
-	name = models.CharField(max_length=50)
+    notes = GenericRelation(Note)
+    name = models.CharField(max_length=50)
 
 class Student(models.Model):
     current_school = models.ForeignKey(
@@ -139,6 +158,7 @@ class Student(models.Model):
         null = True,
     )
     reason_in_program = models.TextField(blank=True)
+    notes = GenericRelation(Note)
 
 class Course(models.Model):
     school = models.ForeignKey(
@@ -175,6 +195,7 @@ class Course(models.Model):
         blank = True,
         choices = SUBJECT_CHOICES,
     )
+    notes = GenericRelation(Note)
 
 class Calendar(models.Model):
     year = models. IntegerField(null=True)
@@ -189,6 +210,7 @@ class Calendar(models.Model):
         blank = True,
         choices = TERM_CHOICES,
     )
+    notes = GenericRelation(Note)
 
 class Behavior(models.Model):
     student = models.ForeignKey(
@@ -238,6 +260,7 @@ class Behavior(models.Model):
         max_length = 50,
         blank = True,
     )
+    notes = GenericRelation(Note)
 
 class Grade(models.Model):
     student = models.ForeignKey(
@@ -266,6 +289,7 @@ class Grade(models.Model):
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
+    notes = GenericRelation(Note)
 
 
 class Attendance(models.Model):
@@ -294,6 +318,7 @@ class Attendance(models.Model):
     total_tardies = models.IntegerField(null = True)
     avg_daily_attendance = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
+    notes = GenericRelation(Note)
 
 class Referral(models.Model):
     user = models.ForeignKey(
@@ -333,27 +358,20 @@ class Referral(models.Model):
     reference_phone = models.BigIntegerField(null = True)
     reference_address = models.CharField(max_length = 150, null = True)
     reason = models.TextField(null = True)
+    notes = GenericRelation(Note)
 
 class Bookmark(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete = models.PROTECT,
-        #db_column = 'user',
     )
     created = models.DateTimeField(default = timezone.now)
     url = models.CharField(max_length=500)
     json_request_data = models.TextField()
+    notes = GenericRelation(Note)
 
 
 
-""" tables yet to be implemented
-class Note(models.Model):
-    user = models.ForeignKey(
-        "User",
-        on_delete = models.PROTECT,
-    )
-    related_contet = dymanimc_foreign_Key
-    created = models.DateTimeField(default = timezone.now)
-    content = models.TextField()
 
-    """
+
+    
