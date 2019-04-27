@@ -5,7 +5,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from gsndb.models import District, School, Student, Calendar, Course, Grade, Behavior, Attendance, Referral, Bookmark
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentsSerializer, StudentSerializer, CalendarSerializer, GradeSerializer, GradeForStudentSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, StudentGradeSerializer, ParedGradeSerializer, BookmarkSerializer
+from gsndb.serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
 
@@ -137,3 +137,37 @@ class BookmarkList(generics.ListCreateAPIView):
 class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
+
+'''
+class SchoolFakeInfo(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSchoolSerializer
+'''
+
+class SchoolInfo(APIView):
+
+
+    #pulls list of grades
+    def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
+        if self.kwargs.get("grade"):
+            school_obj = School.objects.filter(pk = pk)
+            serializer = NestedSchoolSerializer(school_obj, many = True)
+        #elif self.kwargs.get("student"):
+            #student_obj = Student.objects.filter(pk = pk)
+            #serializer = NestedAttendanceSerializer(attendance_obj, many = True)
+        #elif self.kwargs.get("behavior"):
+            #behavior_obj = Behavior.objects.filter(pk = pk)
+            #serializer = NestedBehaviorSerializer(behavior_obj, many = True)
+        #elif self.kwargs.get("referral"):
+            #referral_obj = Referral.objects.filter(pk = pk)
+            #serializer = NestedSchoolSerializer(referral_obj, many = True)
+        
+        return Response(serializer.data)
+
+
+'''
+class SchoolInfo(generics.RetrieveAPIView):
+    queryset = School.objects.all()
+    serializer_class = NestedSchoolSerializer 
+''' 
+

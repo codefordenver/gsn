@@ -27,5 +27,9 @@ urlpatterns = [
     path('gradeforstudent/<int:pk>/', views.GradeForStudent.as_view()),
     path('bookmark/', views.BookmarkList.as_view()),
     path('bookmark/<int:pk>/', views.BookmarkDetail.as_view()),
+    path('school/grade/<int:pk>/', views.SchoolInfo.as_view(), {'grade' : True}),
+
+
+    #path('school/grade/notreal/<int:pk>/', views.SchoolFakeInfo.as_view()),
 
   ]
