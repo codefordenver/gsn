@@ -2,17 +2,6 @@ from rest_framework import serializers
 from gsndb.models import District, School, Student, Course, Calendar, Grade, Attendance, Behavior, Referral, Bookmark
 from django.db.models.fields.related import ForeignKey
 
-
-# This is alaaddin's test class
-class ProgramSerializer_test(serializers.ModelSerializer):
-    class Meta:
-        model = Program
-        fields = (
-            "id",
-            "code"
-        )
-# End ****
-
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = District
@@ -160,15 +149,17 @@ class ReferralSerializer(serializers.ModelSerializer):
             "reason",
         )
 
-class ParedGradeSerializer(serializers.ModelSerializer):
+class ParedGrade2Serializer(serializers.ModelSerializer):
+    #can we get rid of this?
     grade = serializers.CharField()
     class Meta:
         model = Grade
         fields = ('grade','term_final_value')
 
 
+
 class StudentGradeSerializer(serializers.ModelSerializer):
-    grade_set = ParedGradeSerializer(read_only=True, many=True),
+    grade_set = ParedGrade2Serializer(read_only=True, many=True),
     birthday = serializers.DateField(source= 'birth_date')
 
     class Meta:
@@ -262,3 +253,61 @@ name = serializers.SerializerMethodField(),
     grade = serializers.CharField(source= 'grade'),
     final = serializers.BooleanField(source= 'term_final_value')
 """
+
+# Below we have the serializers for the endpoints
+
+
+
+ 
+class NestedGradeSerializer(serializers.ModelSerializer):
+    def to_representation(self, grade_obj):
+        return {
+            "grade_id": grade_obj.id,
+            "course": grade_obj.course.id,
+            "grade": grade_obj.grade
+        }
+
+class NestedAttendanceSerializer(serializers.ModelSerializer):
+	class Meta: 
+		model = Attendance
+		fields = ("id","total_unexabs","total_exabs","total_tardies","avg_daily_attendance")
+
+class NestedStudentGradeSerializer(serializers.ModelSerializer):
+	
+    def to_representation(self,student_obj):
+        #if statement that determines if it is grade, attendance, course, behavior, or referral
+        grade = NestedGradeSerializer(student_obj.grade_set, many = True, read_only = True)
+        grade_json = grade.data
+        return {
+            "student_id": student_obj.id,
+            "first_name": student_obj.first_name,
+            "last_name": student_obj.last_name,
+            "grade_set": grade_json
+        }
+
+
+class NestedSchoolSerializer(serializers.ModelSerializer):
+    
+    def to_representation(self, school_obj):
+        #if statement that determines if it is grade, attendance, course, behavior, or referral; need to pass down to student
+        student = NestedStudentGradeSerializer(school_obj.student_set, many = True, read_only = True)
+        student_json = student.data
+        return {
+            "school_id": school_obj.id,
+            "school_name": school_obj.name,
+            "student_set": student_json,
+        }
+
+'''
+    class Meta:
+        model = School
+        fields = ("id","name","student_set")
+'''
+
+
+
+
+
+#student in school/program/district etc
+#Student School/program/district/etc
+#Pared student serializer
