@@ -4,12 +4,13 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from gsndb.models import District, School, Student, Calendar, Course, Grade, Behavior, Attendance, Referral, Bookmark
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentsSerializer, StudentSerializer, CalendarSerializer, GradeSerializer, GradeForStudentSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, StudentGradeSerializer, ParedGradeSerializer, BookmarkSerializer
+from gsndb.models import District, School, Student, Calendar, Course, Grade, Behavior, Attendance, Referral, Bookmark, Note
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentsSerializer, StudentSerializer, CalendarSerializer, GradeSerializer, GradeForStudentSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, StudentGradeSerializer, ParedGradeSerializer, BookmarkSerializer, NoteSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 
 # Create your views here.
+
 
 class DistrictList(generics.ListCreateAPIView):
     queryset = District.objects.all()
@@ -101,6 +102,10 @@ class ReferralList(generics.ListCreateAPIView):
 class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Referral.objects.all()
     serializer_class = ReferralSerializer
+
+class NoteList(generics.ListCreateAPIView):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
 
 
 class StudentInfo(APIView):

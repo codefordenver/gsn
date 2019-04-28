@@ -27,5 +27,6 @@ urlpatterns = [
     path('gradeforstudent/<int:pk>/', views.GradeForStudent.as_view()),
     path('bookmark/', views.BookmarkList.as_view()),
     path('bookmark/<int:pk>/', views.BookmarkDetail.as_view()),
+    path('note/', views.NoteList.as_view()),
 
   ]
