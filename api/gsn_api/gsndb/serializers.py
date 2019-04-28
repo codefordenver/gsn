@@ -267,6 +267,17 @@ class NestedGradeSerializer(serializers.ModelSerializer):
             "grade": grade_obj.grade
         }
 
+class NestedBehaviorSerializer(serializers.ModelSerializer):
+    def to_representation(self, behavior_obj):
+        return {
+            "incident_datetime": behavior_obj.incident_datetime,
+            "context": behavior_obj.context, 
+            "incident_type_program": behavior_obj.incident_type_program,
+            "incident_result_program": behavior_obj.incident_result_program,
+            "incident_type_school": behavior_obj.incident_type_school,
+            "incident_result_school": behavior_obj.incident_result_school
+        }
+
 class NestedAttendanceSerializer(serializers.ModelSerializer):
 	class Meta: 
 		model = Attendance
