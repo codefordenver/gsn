@@ -80,27 +80,27 @@ function StudentDetail(props) {
 
   const {
     // studentId,
-    studentFirstName,
-    studentLastName,
-    studentGender,
+    firstName,
+    lastName,
+    gender,
     school,
     schoolId,
-    studentBirthDate,
+    birthDate,
     grade,
-    studentStateId,
-    studentYear,
-    studentTerm,
+    stateId,
+    year,
+    term,
   } = studentDetail;
 
   return (
       <div>
-          <Typography className={header} component="h1" variant="h4">{`${studentFirstName} ${studentLastName}`}</Typography>
-          <DetailItem k="Gender" val={studentGender} />
-          <DetailItem k="Birthdate" val={studentBirthDate} />
+          <Typography className={header} component="h1" variant="h4">{`${firstName} ${lastName}`}</Typography>
+          <DetailItem k="Gender" val={gender} />
+          <DetailItem k="Birthdate" val={birthDate} />
           <DetailItem k="Grade" val={grade} />
-          <DetailItem k="Year" val={studentYear} />
-          <DetailItem k="Term" val={studentTerm} />
-          <DetailItem k="State Id" val={studentStateId} />
+          <DetailItem k="Year" val={year} />
+          <DetailItem k="Term" val={term} />
+          <DetailItem k="State Id" val={stateId} />
           <DetailLink k="School" val={school} link={`/school/${schoolId}`} />
       </div>
   );
