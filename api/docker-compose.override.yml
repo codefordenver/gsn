@@ -5,14 +5,28 @@ services:
     image: postgres
     volumes:
       - gsn-data:/var/lib/postgresql/data/
+    networks:
+      - edgeproxy_proxy-mesh
   gsn_web:
     build: 
       context: .
       dockerfile: Dockerfile-django
     volumes:
       - .:/code
+    networks:
+      edgeproxy_proxy-mesh:
+        aliases:
+          - gsn_web
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    environment:
+        DEBUG: 'true'
     depends_on:
       - db
 
 volumes:
   gsn-data:
+networks:
+  edgeproxy_proxy-mesh:
