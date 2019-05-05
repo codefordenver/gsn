@@ -8,9 +8,6 @@ urlpatterns = [
     path('school/<int:pk>/', views.SchoolDetail.as_view()),
     path('student/', views.StudentList.as_view()),
     path('student/<int:pk>/', views.StudentDetail.as_view()),
-    #path('student/grades', views.StudentInfo.as_view(), {'grades' : True}),
-    #path('student/attendance', views.StudentInfo.as_view(), {'attendance' : True}),
-    #path('student/behavior', views.StudentInfo.as_view(), {'behavior' : True}),
     path('course/', views.CourseList.as_view()),
     path('course/<int:pk>/', views.CourseDetail.as_view()),
     path('calendar/', views.CalendarList.as_view()),
@@ -36,6 +33,12 @@ urlpatterns = [
     path('student/attendance/<int:pk>/', views.StudentInfo.as_view(), {'attendance' : True}),
     path('student/referral/<int:pk>/', views.StudentInfo.as_view(), {'referral' : True}),
     path('student/behavior/<int:pk>/', views.StudentInfo.as_view(), {'behavior' : True}),
+    path('program/grade/<int:pk>/', views.ProgramInfo.as_view(), {'grade' : True}),
+    path('program/attendance/<int:pk>/', views.ProgramInfo.as_view(), {'attendance' : True}),
+    path('program/referral/<int:pk>/', views.ProgramInfo.as_view(), {'referral' : True}),
+    path('program/behavior/<int:pk>/', views.ProgramInfo.as_view(), {'behavior' : True}),
+    path('program/course/<int:pk>/', views.ProgramInfo.as_view(), {'course' : True}), #still need to work on this one
     path('note/', views.NoteList.as_view()),
+    path('note/<str:objType>/<int:pk>/', views.NoteByObject.as_view()),
 
   ]
