@@ -9,6 +9,7 @@ from gsndb.serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
 
+
 # Create your views here.
 
 
@@ -104,38 +105,10 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReferralSerializer
 
 class NoteList(generics.ListCreateAPIView):
+    #returns all notes for anything
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
-
-'''class StudentInfo(APIView):
-
-    def post(self, request, grades=False, attendance=False, behavior=False, format=None):
-
-        student_name = request.data["student_name"].split()
-
-        if len(student_name) == 2:
-            first_name = student_name[0]
-            last_name = student_name[1]
-        elif len(student_name) == 3:
-            first_name = student_name[0]
-            middle_name = student_name[1]
-            last_name = student_name[2]
-        elif len(student_name) >= 3:
-            first_name = student_name[0]
-            middle_name = " ".join(student_name[1:-1])
-            last_name = student_name[-1]
-
-        student = Student.objects.get(first_name=first_name, last_name=last_name, middle_name=middle_name)
-
-
-        if self.kwargs.get("grades"):
-            serializer = StudentGradeSerializer(student)
-            return Response(serializer.data)
-
-        # http POST http://127.0.0.1:80/gsndb/student/grades studentName="Nikolai Writer Dale"
-
-'''
 
 class BookmarkList(generics.ListCreateAPIView):
     queryset = Bookmark.objects.all()
@@ -151,23 +124,6 @@ class SchoolFakeInfo(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StudentSchoolSerializer
 '''
 
-class SchoolInfo(APIView):
-
-    def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
-        if self.kwargs.get("grade"):
-            school_obj = School.objects.filter(pk = pk)
-            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getGrades": True})
-        elif self.kwargs.get("attendance"):
-            school_obj = School.objects.filter(pk = pk)
-            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getAttendance": True})
-        #elif self.kwargs.get("behavior"):
-            #behavior_obj = Behavior.objects.filter(pk = pk)
-            #serializer = NestedBehaviorSerializer(behavior_obj, many = True)
-        #elif self.kwargs.get("referral"):
-            #referral_obj = Referral.objects.filter(pk = pk)
-            #serializer = NestedSchoolSerializer(referral_obj, many = True)
-        
-        return Response(serializer.data)
 
 
 class SchoolInfo(APIView):
@@ -200,4 +156,34 @@ class StudentInfo(APIView):
         elif self.kwargs.get("referral"):
             serializer = NestedStudentSerializer(student_obj, many = True, context = {"getReferral": True})
         return Response(serializer.data)
+
+
+class ProgramInfo(APIView):
+
+    def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
+        program_obj = Program.objects.filter(pk = pk)
+        if self.kwargs.get("grade"):
+            serializer = NestedProgramSerializer(program_obj, many = True, context = {"getGrades": True})
+        elif self.kwargs.get("attendance"):
+            serializer = NestedProgramSerializer(program_obj, many = True, context = {"getAttendance": True})
+        elif self.kwargs.get("behavior"):
+            serializer = NestedProgramSerializer(program_obj, many = True, context = {"getBehavior": True})
+        elif self.kwargs.get("referral"):
+            serializer = NestedProgramSerializer(program_obj, many = True, context = {"getReferral": True})
+        elif self.kwargs.get("course"):
+            serializer = NestedProgramSerializer(program_obj, many = True, context = {"getCourse": True})
+        
+        return Response(serializer.data)
+
+
+class NoteByObject(APIView):
+
+    def get(self, request, pk, objType):
+        
+        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
+        notes = Note.objects.filter(content_type = contType, object_id = pk)
+        data = NoteSerializer(notes, many = True).data
+        
+        return Response(data)
+
 
