@@ -369,9 +369,3 @@ class Bookmark(models.Model):
     url = models.CharField(max_length=500)
     json_request_data = models.TextField()
     notes = GenericRelation(Note)
-
-
-
-
-
-    
