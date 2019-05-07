@@ -42,6 +42,7 @@ class StudentSerializer(serializers.BaseSerializer):
             notes_json = notes.data
             
             return {
+                "id": student_obj.pk,
                 "current_school": student_obj.current_school.id,
                 "current_program": student_obj.current_program.id,
                 "first_name": student_obj.first_name,
@@ -208,6 +209,7 @@ class StudentGradeSerializer(serializers.ModelSerializer):
         model = Student
         fields = ('grade_set', 'birthday','notes')
 '''
+
 
 class BookmarkSerializer(serializers.ModelSerializer):
     notes = NoteSerializer(many=True)

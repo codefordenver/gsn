@@ -23,7 +23,7 @@ urlpatterns = [
     path('mystudents/', views.MyStudentsList.as_view()),
     #path('gradeforstudent/<int:pk>/', views.GradeForStudent.as_view()),
     path('bookmark/', views.BookmarkList.as_view()),
-    path('bookmark/<int:pk>/', views.BookmarkDetail.as_view()),
+    path('bookmark/<int:pk>/', views.BookmarkDetail.as_view())
     path('school/grade/<int:pk>/', views.SchoolInfo.as_view(), {'grade' : True}),
     path('school/attendance/<int:pk>/', views.SchoolInfo.as_view(), {'attendance' : True}),
     path('school/referral/<int:pk>/', views.SchoolInfo.as_view(), {'referral' : True}),
@@ -40,5 +40,4 @@ urlpatterns = [
     path('program/course/<int:pk>/', views.ProgramInfo.as_view(), {'course' : True}), #still need to work on this one
     path('note/', views.NoteList.as_view()),
     path('note/<str:objType>/<int:pk>/', views.NoteByObject.as_view()),
-
   ]

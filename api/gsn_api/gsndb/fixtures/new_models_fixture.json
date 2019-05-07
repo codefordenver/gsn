@@ -3674,5 +3674,27 @@
             "reference_address": "556 Clawden Ave. Denver, CO 80203",
             "reason": "The student's mother wants them to get a job."
         }
+    },
+    {
+        "model": "gsndb.bookmark",
+        "pk": 1,
+        "fields": {
+            "user":1,
+            "created":"2019-04-24",
+            "url":"www.wovenpear.com",
+            "json_request_data":"x"
+        }
+    },
+    {
+        "model": "gsndb.bookmark",
+        "pk": 2,
+        "fields": {
+            "user":2,
+            "created":"2019-02-24",
+            "url":"www.denver.org",
+            "json_request_data":"y"
+        }
     }
+
 ]
+
