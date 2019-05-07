@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from gsndb.models import *
+from gsndb.models import Note, District, School, Calendar, Referral, Bookmark, Program, Student, Course, Behavior
 from django.db.models.fields.related import ForeignKey
 
 
