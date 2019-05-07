@@ -3,7 +3,7 @@ import { Switch, Route, Router } from 'react-router-dom';
 import history from 'utils/history';
 import Layout from 'components/layouts/Default';
 // import Nav from 'components/Nav';
-import HomePage from 'components/HomePage';
+// import HomePage from 'components/HomePage';
 import Login from 'pages/Login';
 import SignupForm from 'pages/Register';
 import Districts from 'components/Districts';
@@ -11,9 +11,6 @@ import Students from 'pages/Students';
 import StudentDetail from 'pages/StudentDetail';
 
 import PrivateRoute from './PrivateRoute';
-// username: user.get('username'),
-// loading: user.get('loading'),
-
 
 export default function () {
   return (
@@ -23,10 +20,10 @@ export default function () {
               <Route exact path="/register" component={SignupForm} />
               <Switch>
                   <Layout>
-                      <PrivateRoute exact path="/" component={HomePage} />
-                      <PrivateRoute path="/districts" component={Districts} />
+                      <PrivateRoute exact path="/" component={() => 'homepage...'} />
+                      <PrivateRoute exact path="/districts" component={Districts} />
                       <PrivateRoute exact path="/students" component={Students} />
-                      <PrivateRoute path="/students/:studentId" component={StudentDetail} />
+                      <PrivateRoute exact path="/students/:studentId" component={StudentDetail} />
                   </Layout>
               </Switch>
           </Switch>
@@ -34,14 +31,3 @@ export default function () {
 
   );
 }
-
-/* <div>
-              {isLoggedIn && <Nav navItems={navItems} />} */
-/*
-        <h3>
-            {isLoggedIn && (
-            <p>
-              Hello {username}
-            </p>
-            )}
-        </h3> */

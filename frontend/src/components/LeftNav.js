@@ -34,11 +34,10 @@ const navItems = [
 ];
 
 function BaseLink(props) {
-  const { classes: { icon } } = props;
-  const renderLink = itemProps => <Link to={props.item.route} {...itemProps} />;
   const {
-    index, item, selected, setIndex,
+    classes: { icon }, index, item, selected, setIndex,
   } = props;
+  const renderLink = itemProps => <Link to={`/${item.route}`} {...itemProps} />;
 
   return (
       <ListItem
@@ -52,6 +51,15 @@ function BaseLink(props) {
       </ListItem>
   );
 }
+
+BaseLink.propTypes = {
+  classes: PropTypes.object,
+  index: PropTypes.number,
+  item: PropTypes.object,
+  selected: PropTypes.bool,
+  setIndex: PropTypes.func,
+};
+
 const styles = theme => ({
   icon: {
     color: theme.palette.primary.main,
@@ -76,8 +84,4 @@ export default function Navigation() {
           ))}
       </List>
   );
-}
-
-BaseLink.propTypes = {
-
 }
