@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from gsndb.models import District, School, Student, Calendar, Course, Grade, Behavior, Attendance, Referral, Bookmark, Note
 from gsndb.serializers import DistrictSerializer, SchoolSerializer, MyStudentsSerializer, StudentSerializer, CalendarSerializer, GradeSerializer, GradeForStudentSerializer, CourseSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, StudentGradeSerializer, ParedGradeSerializer, BookmarkSerializer, NoteSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
+from .forms import UploadFileForm
 
 # Create your views here.
 
@@ -142,3 +143,52 @@ class BookmarkList(generics.ListCreateAPIView):
 class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
+
+class CSVParser(APIView):
+
+    renderer_classes = (
+        TemplateHTMLRenderer,
+        )
+
+    parser_classes = (
+        MultiPartParser,
+    )
+
+    def file_handler(self, file_obj):
+        """Place holder method that currently returns the entire contents of a
+        file.
+
+        Note: the .read() method reads entire file to memory, so large
+        files may cause your machine to crash. Use .chunks() for larger files.
+        """
+        content = file_obj.read()
+        return content
+
+    def get(self, request):
+        """Displays html template with basic file upload functionality.
+
+        Interact with: http GET <host>/gsndb/uploadcsv/
+
+        or visit <host>/gsndb/uploadcsv in browser.
+        """
+        return Response(template_name = "backend_dev_simple_upload.html")
+
+    def post(self, request):
+        """Takes a file and turns it into an instance of Django's UploadedFile
+        class. The response generated renders an html template offering some
+        meta information.
+
+        Note: it seems UploadedFile objects cannot be accessed by python's open()
+        function.
+
+        Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
+        """
+        file_obj = request.data["mycsv"]
+        content = self.file_handler(file_obj)
+        return Response(
+            {
+                "file_name": file_obj.name,
+                "content": content,
+            },
+            template_name = "backend_dev_successful_upload.html",
+            )
