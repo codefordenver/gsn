@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <title>Upload File</title>
+  </head>
+  <body>
+    <h1>Upload CSV</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="mycsv">
+      <button type="submit">Upload</button>
+    </form>
+  </body>
+</html>
