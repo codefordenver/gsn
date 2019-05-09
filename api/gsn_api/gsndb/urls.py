@@ -28,5 +28,6 @@ urlpatterns = [
     path('bookmark/', views.BookmarkList.as_view()),
     path('bookmark/<int:pk>/', views.BookmarkDetail.as_view()),
     path('note/', views.NoteList.as_view()),
+    path('uploadcsv/', views.CSVParser.as_view()),
 
   ]
