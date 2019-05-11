@@ -157,7 +157,7 @@ class Student(models.Model):
         choices = GRADE_YEAR_CHOICES,
         null = True,
     )
-    reason_in_program = models.TextField(blank=True)
+    reason_in_program = models.CharField(max_length = 200, blank=True)
     notes = GenericRelation(Note)
 
 class Course(models.Model):
@@ -198,7 +198,7 @@ class Course(models.Model):
     notes = GenericRelation(Note)
 
 class Calendar(models.Model):
-    year = models. IntegerField(null=True)
+    year = models.IntegerField(null=True)
     """establish choices for term"""
     TERM_CHOICES = (
         ("SPR", "Spring"),
