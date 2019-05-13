@@ -1,9 +1,3 @@
-""" 
-    I am but an empty file desparetely in search of a purpose in life...
-    Please turn me into a script for parsing csv files!
-"""
-data from json 
-
 # this takes data from json (using csvParser.json to test) 
 # and inputs it into the various models
 # csvParser.json is an example of the type of json it can accept as input
