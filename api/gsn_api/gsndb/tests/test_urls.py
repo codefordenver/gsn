@@ -4,16 +4,11 @@ from django.test import TestCase
 print("test_urls")
 
 class DistrictURLTest(TestCase):
-
-    #test that the view for the URL matches the expected view
     def test_url_resolves_to_view(self):
         resolver = resolve('/gsndb/district/')
         self.assertEqual(resolver.view_name,'gsndb.views.DistrictList')
 
-
 class DistrictArgumentURLTest(TestCase):
-
-    #test that the view for the URL matches the expected view
     def test_url_resolves_to_view(self):
         resolver = resolve('/gsndb/district/7/')
         self.assertEqual(resolver.view_name,'gsndb.views.DistrictDetail')
