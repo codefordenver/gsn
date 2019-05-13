@@ -157,7 +157,7 @@ class Student(models.Model):
         choices = GRADE_YEAR_CHOICES,
         null = True,
     )
-    reason_in_program = models.CharField(max_length = 200, blank=True)
+    reason_in_program = models.TextField(blank=True)
     notes = GenericRelation(Note)
 
 class Course(models.Model):
