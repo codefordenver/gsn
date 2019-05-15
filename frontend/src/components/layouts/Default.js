@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -96,8 +95,9 @@ function ClippedDrawer(props) {
 
 ClippedDrawer.propTypes = {
   classes: PropTypes.object.isRequired,
-  children: PropTypes.object,
-  user_name: PropTypes.string.isRequired,
+  children: PropTypes.array,
+  logOut: PropTypes.func.isRequired,
+  user_name: PropTypes.string,
 };
 
 const drawerWidth = 240;

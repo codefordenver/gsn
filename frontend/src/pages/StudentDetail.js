@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Link as StyledLink, Typography, withStyles,
+  Typography, withStyles,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
 import { getStudentDetail } from 'services/studentServices';
 
 const DetailBase = ({ k, val, classes: { lDiv, rDiv, root } }) => (
-    <Typography color="primary" className={root}>
-        <div className={lDiv}>{k}:</div>
-        <div className={rDiv}>{val}</div>
-    </Typography>
+    <div color="primary" className={root}>
+        <Typography color="primary" className={lDiv}>{k}:</Typography>
+        <Typography color="primary" className={rDiv}>{val}</Typography>
+    </div>
 );
 
 DetailBase.propTypes = {
   k: PropTypes.string,
-  val: PropTypes.string,
+  val: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   classes: PropTypes.object,
 };
 
 const DLinkBase = ({
   k, val, link, classes: { lDiv, rDiv, root },
 }) => (
-    <Typography color="primary" className={root}>
-        <div className={lDiv}>{k}:</div>
-        <div className={rDiv}><Link to={link}><StyledLink>{val}</StyledLink></Link></div>
-    </Typography>
+    <div className={root}>
+        <Typography color="primary" className={lDiv}>{k}:</Typography>
+        <Typography color="primary" className={rDiv}><Link to={link}>{val}</Link></Typography>
+    </div>
 );
 
 DLinkBase.propTypes = {
   k: PropTypes.string,
-  val: PropTypes.string,
+  val: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   link: PropTypes.string,
   classes: PropTypes.object,
 };
@@ -60,10 +60,9 @@ function StudentDetail(props) {
   const [studentDetail, setStudentDetail] = useState({});
   const [loading, setLoading] = useState(true);
   const { classes: { header }, match: { params } } = props;
-  const studentId = params;
+  const { studentId } = params;
 
   useEffect(() => {
-    console.log('useEffect ran in StudentDetail', studentId);
     getStudentDetail(studentId).then((s) => {
       setStudentDetail(s);
       setLoading(false);
@@ -81,27 +80,27 @@ function StudentDetail(props) {
 
   const {
     // studentId,
-    name,
+    firstName,
+    lastName,
     gender,
     school,
     schoolId,
-    birthdate,
+    birthDate,
     grade,
     stateId,
-    studentYear,
-    studentTerm,
+    year,
+    term,
   } = studentDetail;
 
   return (
       <div>
-          <Typography className={header} component="h1" variant="h4">{name}</Typography>
+          <Typography className={header} component="h1" variant="h4">{`${firstName} ${lastName}`}</Typography>
           <DetailItem k="Gender" val={gender} />
-          <DetailItem k="Birthdate" val={birthdate} />
+          <DetailItem k="Birthdate" val={birthDate} />
           <DetailItem k="Grade" val={grade} />
-          <DetailItem k="Year" val={studentYear} />
-          <DetailItem k="Term" val={studentTerm} />
+          <DetailItem k="Year" val={year} />
+          <DetailItem k="Term" val={term} />
           <DetailItem k="State Id" val={stateId} />
-          <DetailItem k="Gender" val={stateId} />
           <DetailLink k="School" val={school} link={`/school/${schoolId}`} />
       </div>
   );
