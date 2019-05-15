@@ -26,12 +26,12 @@ class Note(models.Model):
     )
     created = models.DateTimeField(default = timezone.now)
     text = models.TextField()
-    
+
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type','object_id')
-    
+
 
 class District(models.Model):
     """establish state choices"""
@@ -105,7 +105,7 @@ class School(models.Model):
         on_delete=models.PROTECT,
     )
     notes = GenericRelation(Note)
-    
+
 class Program(models.Model):
     notes = GenericRelation(Note)
     name = models.CharField(max_length=50)
@@ -198,7 +198,7 @@ class Course(models.Model):
     notes = GenericRelation(Note)
 
 class Calendar(models.Model):
-    year = models. IntegerField(null=True)
+    year = models.IntegerField(null=True)
     """establish choices for term"""
     TERM_CHOICES = (
         ("SPR", "Spring"),
