@@ -37,7 +37,12 @@ urlpatterns = [
     path('program/attendance/<int:pk>/', views.ProgramInfo.as_view(), {'attendance' : True}),
     path('program/referral/<int:pk>/', views.ProgramInfo.as_view(), {'referral' : True}),
     path('program/behavior/<int:pk>/', views.ProgramInfo.as_view(), {'behavior' : True}),
-    path('program/course/<int:pk>/', views.ProgramInfo.as_view(), {'course' : True}), #still need to work on this one
+    path('program/course/<int:pk>/', views.ProgramInfo.as_view(), {'course' : True}),
+    path('course/grade/<int:pk>/', views.CourseInfo.as_view(), {'grade' : True}),
+    path('course/attendance/<int:pk>/', views.CourseInfo.as_view(), {'attendance' : True}),
+    path('course/referral/<int:pk>/', views.CourseInfo.as_view(), {'referral' : True}),
+    path('course/behavior/<int:pk>/', views.CourseInfo.as_view(), {'behavior' : True}),
     path('note/', views.NoteList.as_view()),
     path('note/<str:objType>/<int:pk>/', views.NoteByObject.as_view()),
+
   ]
