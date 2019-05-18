@@ -5,7 +5,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from gsndb.models import District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer
+from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, NestedCourseSerializer, MyStudentsSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
@@ -118,14 +118,6 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
-'''
-class SchoolFakeInfo(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSchoolSerializer
-'''
-
-
-
 class SchoolInfo(APIView):
 
     def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
@@ -173,6 +165,20 @@ class ProgramInfo(APIView):
         elif self.kwargs.get("course"):
             serializer = NestedProgramSerializer(program_obj, many = True, context = {"getCourse": True})
         
+        return Response(serializer.data)
+
+class CourseInfo(APIView):
+    def get(self, request, pk, grade = False, behavior = False, referral = False, attendance = False, format = None):
+        course_obj = Course.objects.filter(pk = pk)
+        if self.kwargs.get("grade"):
+            serializer = NestedCourseSerializer(course_obj, many = True, context = {"getGrades": True})
+        elif self.kwargs.get("attendance"):
+            serializer = NestedCourseSerializer(course_obj, many = True, context = {"getAttendance": True})
+        elif self.kwargs.get("behavior"):
+            serializer = NestedCourseSerializer(course_obj, many = True, context = {"getBehavior": True})
+        elif self.kwargs.get("referral"):
+            serializer = NestedCourseSerializer(course_obj, many = True, context = {"getReferral": True})
+      
         return Response(serializer.data)
 
 
