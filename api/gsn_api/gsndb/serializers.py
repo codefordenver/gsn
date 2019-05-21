@@ -410,4 +410,37 @@ class NestedSchoolSerializer(serializers.ModelSerializer):
             representation["course_set"] = NestedCourseSerializer(school_obj.course_set, many = True, read_only = True).data
 
         return representation
+
+class NestedCourseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
+        fields = ("id",)
+
+    def to_representation(self, course_obj):
+        #if statement that determines if it is grade, attendance, course, behavior, or referral; need to pass down to student
+        #student = NestedStudentGradeSerializer(school_obj.student_set, many = True, read_only = True)
+        #student_json = student.data
+
+        representation = super().to_representation(course_obj)
+        representation["course_id"] = representation.pop("id")
+        representation["course_name"] = school_obj.name
+
+        getName = self.context.get('getName', False)
+        getCode = self.context.get('getCode', False)
+        getBehavior = self.context.get('getBehavior', False)
+        getReferral = self.context.get('getReferral', False)
         
+
+
+        if getGrades:
+            representation["student_set"] = NestedStudentSerializer(course_obj.student_set, many = True, read_only = True, context = {"getGrades": True}).data
+        elif getAttendance:
+            representation["student_set"] = NestedStudentSerializer(course_obj.student_set, many = True, read_only = True, context = {"getAttendance": True}).data
+        elif getBehavior:
+            representation["student_set"] = NestedStudentSerializer(course_obj.student_set, many = True, read_only = True, context = {"getBehavior": True}).data
+        elif getReferral:
+            representation["student_set"] = NestedStudentSerializer(course_obj.student_set, many = True, read_only = True, context = {"getReferral": True}).data
+
+        return representation
+

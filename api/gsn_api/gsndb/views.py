@@ -201,3 +201,17 @@ class StudentInfo(APIView):
             serializer = NestedStudentSerializer(student_obj, many = True, context = {"getReferral": True})
         return Response(serializer.data)
 
+class CourseInfo(APIView):
+
+    def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
+        course_obj = Course.objects.filter(pk = pk)
+        if self.kwargs.get("grade"):
+            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getGrades": True})
+        elif self.kwargs.get("attendance"):
+            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getAttendance": True})
+        elif self.kwargs.get("behavior"):
+            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getBehavior": True})
+        elif self.kwargs.get("referral"):
+            serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getReferral": True})
+        
+        return Response(serializer.data)
