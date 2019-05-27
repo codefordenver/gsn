@@ -4,12 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
-from gsndb.models import District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
+from gsndb.models import District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program, FileSHA
 from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
-import csv, io
+import hashlib
 
 
 # Create your views here.
@@ -193,6 +193,10 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BookmarkSerializer
 
 class CSVParser(APIView):
+    def __init__(self):
+        self.fileName = ""
+        self.hash = ""
+        self.hasFileAlreadyUploaded = False
 
     renderer_classes = (
         TemplateHTMLRenderer,
@@ -202,17 +206,31 @@ class CSVParser(APIView):
         MultiPartParser,
     )
 
-    def file_handler(self, byte_file_obj):
+    def file_handler(self, file_obj):
         """Place holder method that currently returns the entire contents of a
         file.
 
         Note: the .read() method reads entire file to memory, so large
         files may cause your machine to crash. Use .chunks() for larger files.
         """
-        byte_string = byte_file_obj.read()
-        string = byte_string.decode("utf-8")
-        string_obj = io.StringIO(string)
-        return string_obj
+        blocksize = 65536
+        hasher = hashlib.sha1()
+        content = ""
+        self.fileName = file_obj.name
+        buf = file_obj.read(blocksize)
+        while len(buf) > 0:
+            hasher.update(buf)
+            content += buf.decode('utf-8')
+            buf = file_obj.read(blocksize)
+        self.hash = hasher.hexdigest()
+        return content
+
+
+    def has_file_already_been_uploaded(self):
+        self.hasFileAlreadyUploaded = FileSHA.objects.filter(hasher = self.hash).exists()
+        if(not self.hasFileAlreadyUploaded):
+            FileSHA.objects.create(hasher = self.hash, filePath = self.fileName)
+
 
     def get(self, request):
         """Displays html template with basic file upload functionality.
@@ -233,12 +251,24 @@ class CSVParser(APIView):
 
         Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
         """
-        byte_file_obj = request.data["mycsv"]
-        content = self.file_handler(byte_file_obj)
-        return Response(
-            {
-                "file_name": byte_file_obj.name,
-                "content": content,
-            },
-            template_name = "backend_dev_successful_upload.html",
-            )
+        file_obj = request.data["mycsv"]
+        content = self.file_handler(file_obj)
+        self.has_file_already_been_uploaded()
+
+
+        if(self.hasFileAlreadyUploaded):
+            return Response(
+                {
+                    "file_name": self.fileName,
+                    "content": content,
+                },
+                    template_name = "backend_dev_unsuccessful_hash_upload.html",
+                )
+        else:
+            return Response(
+                {
+                    "file_name": self.fileName,
+                    "content": content,
+                },
+                    template_name = "backend_dev_successful_upload.html",
+                )

@@ -106,6 +106,12 @@ class School(models.Model):
     )
     notes = GenericRelation(Note)
 
+
+class FileSHA(models.Model):
+    filePath = models.CharField(max_length = 200)
+    hasher = models.TextField()
+    created = models.DateTimeField(default = timezone.now)
+
 class Program(models.Model):
     notes = GenericRelation(Note)
     name = models.CharField(max_length=50)
