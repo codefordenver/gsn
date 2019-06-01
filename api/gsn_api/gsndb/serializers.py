@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from gsndb.models import Note, District, School, Calendar, Referral, Bookmark, Program, Student, Course, Behavior, Grade
+from gsndb.models import Note, District, School, Calendar, Referral, Bookmark, Program, Student, Course, Behavior, Grade, Attendance
 from django.db.models.fields.related import ForeignKey
 
 
@@ -13,6 +13,11 @@ class NoteSerializer(serializers.ModelSerializer):
             "object_id")
 
 # all table serializer
+'''These serializers throw errors when it doesn't have Meta in it.
+So it adds meta & the id field. Then it pops id field out and renames it 
+appropriately for the serializer. It also adds other fields to representation
+including some nested serializers.'''
+
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = District
@@ -111,32 +116,48 @@ class BehaviorSerializer(serializers.ModelSerializer):
 
 
 class AttendanceSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Attendance
+        fields = ("id",)
+
     def to_representation(self, attendance_obj):
-        return {
-            "attendanceId": attendance_obj.id,
-            "studentId": attendance_obj.student.id,
-            "studentName": attendance_obj.student.first_name + " " + attendance_obj.student.last_name,
-            "attendanceEntryDate": attendance_obj.entry_datetime,
-            "attendanceTermFinalValue": attendance_obj.term_final_value,
-            "totalUnexabs": attendance_obj.total_unexabs,
-            "totalExabs": attendance_obj.total_exabs,
-            "totalTardies": attendance_obj.total_tardies,
-            "avgDailyAttendance": attendance_obj.avg_daily_attendance,
-        }
+        representation = super().to_representation(attendance_obj)
+
+        representation["attendanceId"] = representation.pop("id")
+        representation["studentId"] = attendance_obj.student.id
+        representation["studentName"] = attendance_obj.student.first_name + " " + attendance_obj.student.last_name
+        representation["attendanceEntryDate"] = attendance_obj.entry_datetime
+        representation["attendanceTermFinalValue"] = attendance_obj.term_final_value
+        representation["totalUnexabs"] = attendance_obj.total_unexabs
+        representation["totalExabs"] = attendance_obj.total_exabs
+        representation["totalTardies"] = attendance_obj.total_tardies
+        representation["avgDailyAttendance"] = attendance_obj.avg_daily_attendance
+
+    
+        return representation
+
+
 
 class GradeSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Grade
+        fields = ("id",)
+
     def to_representation(self, grade_obj):
-        return {
-            "gradeId": grade_obj.id,
-            "studentId": grade_obj.student.id,
-            "studentName": grade_obj.student.first_name + " " + grade_obj.student.last_name,
-            "courseId": grade_obj.course.id,
-            "courseName": grade_obj.course.name,
-            "courseTermId": grade_obj.calendar.id,
-            "courseTerm": grade_obj.calendar.term + " " + str(grade_obj.calendar.year),
-            "grade": grade_obj.grade,
-            "finalGradeForTerm": grade_obj.term_final_value,
-        }
+        representation = super().to_representation(grade_obj)
+
+        representation["gradeId"] = representation.pop("id")
+        representation["studentId"] = grade_obj.student.id
+        representation["studentName"] = grade_obj.student.first_name + " " + grade_obj.student.last_name
+        representation["courseId"] = grade_obj.course.id
+        representation["courseName"] = grade_obj.course.name
+        representation["courseTermId"] = grade_obj.calendar.id
+        representation["courseTerm"] = grade_obj.calendar.term + " " + str(grade_obj.calendar.year)
+        representation["grade"] = grade_obj.grade
+        representation["finalGradeForTerm"] = grade_obj.term_final_value
+
+    
+        return representation
 
 
 #detail serializer
