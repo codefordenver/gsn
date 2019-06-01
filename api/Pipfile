@@ -14,8 +14,6 @@ httpie = "*"
 django-cors-headers = "*"
 djangorestframework-camel-case2 = "*"
 pandas = "*"
-numpy = "*"
-hashlib = "*"
 
 [dev-packages]
 coverage = "*"
