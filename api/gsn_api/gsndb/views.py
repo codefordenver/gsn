@@ -10,6 +10,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
 import hashlib
+from .services import csv_to_json_parser
 
 
 # Create your views here.
@@ -206,9 +207,9 @@ class CSVParser(APIView):
         MultiPartParser,
     )
 
-    def file_handler(self, file_obj):
-        """Place holder method that currently returns the entire contents of a
-        file.
+    def hash_handler(self, byte_file_on):
+        """A hash function that identifies gives a csv file a hash that uniquely
+        identifies it against other csv files.
 
         Note: the .read() method reads entire file to memory, so large
         files may cause your machine to crash. Use .chunks() for larger files.
@@ -216,12 +217,12 @@ class CSVParser(APIView):
         blocksize = 65536
         hasher = hashlib.sha1()
         content = ""
-        self.fileName = file_obj.name
-        buf = file_obj.read(blocksize)
+        self.fileName = byte_file_obj.name
+        buf = byte_file_obj.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
             content += buf.decode('utf-8')
-            buf = file_obj.read(blocksize)
+            buf = byte_file_obj.read(blocksize)
         self.hash = hasher.hexdigest()
         return content
 
@@ -231,6 +232,10 @@ class CSVParser(APIView):
         if(not self.hasFileAlreadyUploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.fileName)
 
+    def parse_csv_from_byte_file_obj(self, byte_file_obj):
+        byte_string = byte_file_obj.read()
+        string = byte_string.decode("utf-8")
+        string_file_obj = io.StringIO(string)
 
     def get(self, request):
         """Displays html template with basic file upload functionality.
@@ -251,8 +256,8 @@ class CSVParser(APIView):
 
         Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
         """
-        file_obj = request.data["mycsv"]
-        content = self.file_handler(file_obj)
+        byte_file_on = request.data["mycsv"]
+        content = self.hash_handler(byte_file_on)
         self.has_file_already_been_uploaded()
 
 
