@@ -1,13 +1,12 @@
-import json
-import pandas as pd
-import numpy as np
-from gsndb.models import Student, Program, District, School, Course, Grade, Attendance, Behavior, Calendar
-
 class CSVToJsonParser():
-    def __init__(self, school_of_csv_origin):
+    import json
+    import pandas as pd
+    import numpy as np
+    def __init__(self, string_file_obj, school_of_csv_origin):
         #self.string_file_obj = string_file_obj
         self.school_of_csv_origin = school_of_csv_origin
-        target_json_format = [
+        self.string_file_obj = string_file_obj
+        self.target_json_format = [
             {
             "studentFirstName": "Fuller",
             "studentLastName": "Hahn",
@@ -50,17 +49,12 @@ class CSVToJsonParser():
                 ],
             },
             ]
-        self.target_json_format = json.dumps(target_json_format, separators = (",", ":"))
 
-parser = CSVToJsonParser("Trivial")
-print(parser.target_json_format)
-
-"""
-        parent_fields = list(self.json_target_format[0].keys())
+        parent_fields = list(self.target_json_format[0].keys())
         housing_fields = []
         #housing fields are parent fields that house child fields
         for field in parent_fields:
-            if self.json_target_format[field].__class__ == list:
+            if self.target_json_format[0][field].__class__ == list:
                 housing_fields.append(field)
                 parent_fields.remove(field)
         self.target_parent_fields = parent_fields
@@ -75,10 +69,10 @@ print(parser.target_json_format)
         self.datatypes_dict = {
             #datatypes are NumPy dtypes, and 'object' for strings.
             #Note: django appears to want datetimes as strings, not np.datetime64
-            'int': np.int64,
+            'int': self.np.int64,
             'str': object,
-            'bool': np.bool_,
-            'float': np.float64,
+            'bool': self.np.bool_,
+            'float': self.np.float64,
         }
 
         target_field_datatypes = {}
@@ -95,7 +89,7 @@ print(parser.target_json_format)
                     target_field_datatypes[child_field] = pandas_datatype
         self.target_field_datatypes = target_field_datatypes
 
-        self.csv_to_json_field_dict = {
+        self.master_field_dict = {
             "Trivial": {
                 'studentFirstName': 'studentFirstName',
                 'studentLastName': 'studentLastName',
@@ -135,16 +129,16 @@ print(parser.target_json_format)
                 },
         }
 
-    def get_csv_datatypes(self, school_of_csv_origin):
-        csv_to_json_field_dict = self.csv_to_json_field_dict[school_of_csv_origin]
+    def get_csv_datatypes(self):
+        csv_to_json_field_dict = self.master_field_dict[self.school_of_csv_origin]
         csv_datatypes = {}
         for csv_field, json_field in csv_to_json_field_dict.items():
             datatype = self.target_field_datatypes[json_field]
             csv_datatypes[csv_field] = datatype
         return csv_datatypes
 
-    def get_dataframe(self, string_file_obj, csv_datatypes):
-        csv_df = pd.read_csv(string_file_obj, dtype = csv_datatypes)
+    def get_dataframe(self, csv_datatypes):
+        csv_df = self.pd.read_csv(self.string_file_obj, dtype = csv_datatypes)
         return csv_df
 
     def get_json_array(self, csv_df, id_field):
@@ -159,7 +153,7 @@ print(parser.target_json_format)
                 output[field] = getattr(row, field)
             json_array.append(output)
         for housing_field in self.target_child_fields.keys():
-            child_df_fields = self.targetchild_fields[housing_field][:]
+            child_df_fields = self.target_child_fields[housing_field][:]
             child_df_fields.append(id_field)
             child_df = csv_df[child_df_fields]
             child_df.drop_duplicates()
@@ -168,9 +162,21 @@ print(parser.target_json_format)
                 for row in child_df.itertuples():
                     if getattr(row, id_field) == parent_element[id_field]:
                         output = {}
-                        for field in child_fields:
+                        for field in self.target_child_fields[housing_field]:
                             output[field] = getattr(row, field)
                         child_array.append(output)
                 parent_element[housing_field] = child_array
         return json_array
+
+#below code exists for testing purposes only
+"""
+__location__ = os.getcwd()
+file = open(os.path.join(__location__, 'gsndb/services/test_parser.csv'))
+
+parser = CSVToJsonParser(file, "Trivial")
+dtypes = parser.get_csv_datatypes()
+csv_df = parser.get_dataframe(dtypes)
+json_array = parser.get_json_array(csv_df, "studentStateID")
+
+print(parser.json.dumps(json_array, separators = (",", ":"), indent = 4))
 """
