@@ -4,50 +4,76 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from gsndb.models import District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
-from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer
+from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
+from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
 
 
-# Create your views here.
-
+#Table views
+class StudentList(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
 class DistrictList(generics.ListCreateAPIView):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
-class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = District.objects.all()
-    serializer_class = DistrictSerializer
-
-
 class SchoolList(generics.ListCreateAPIView):
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
-
-class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = School.objects.all()
-    serializer_class = SchoolSerializer
-
-
-class StudentList(generics.ListCreateAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
-
-class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
-
 
 class CourseList(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
+class ProgramList(generics.ListCreateAPIView):
+    queryset = Program.objects.all()
+    serializer_class = ProgramSerializer
+
+#Detail views
+class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = District.objects.all()
+    serializer_class = DistrictDetailSerializer
+
+class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentDetailSerializer
+
+class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = School.objects.all()
+    serializer_class = SchoolDetailSerializer
+
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+    serializer_class = CourseDetailSerializer
+
+class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Program.objects.all()
+    serializer_class = ProgramDetailSerializer
+
+
+
+#Other
+class NoteByObject(APIView):
+
+    def get(self, request, pk, objType):
+        
+        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
+        notes = Note.objects.filter(content_type = contType, object_id = pk)
+        data = NoteSerializer(notes, many = True).data
+        
+        return Response(data)
+
+
+
+
+
+class DistrictDetail(generics.ListCreateAPIView):
+    queryset = District.objects.all()
+    serializer_class = DistrictDetailSerializer
+
 
 
 class CalendarList(generics.ListCreateAPIView):
@@ -176,14 +202,6 @@ class ProgramInfo(APIView):
         return Response(serializer.data)
 
 
-class NoteByObject(APIView):
 
-    def get(self, request, pk, objType):
-        
-        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
-        notes = Note.objects.filter(content_type = contType, object_id = pk)
-        data = NoteSerializer(notes, many = True).data
-        
-        return Response(data)
 
 
