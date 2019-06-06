@@ -9,11 +9,13 @@ from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, Course
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
+from gsndb.filterSecurity import accessibleStudents
 
+# Define user
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
-    queryset = Student.objects.all()
+    queryset = Student.objects.filter(pk__in=accessibleStudents)
     serializer_class = StudentSerializer
 
 class DistrictList(generics.ListCreateAPIView):
@@ -38,7 +40,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DistrictDetailSerializer
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
+    queryset = Student.objects.filter(pk__in=accessibleStudents)
     serializer_class = StudentDetailSerializer
 
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
