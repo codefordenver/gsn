@@ -53,9 +53,6 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    def get_queryset(self):
-        return Student.objects.filter(pk__in=accessibleStudents)
-
     class Meta:
         model = Student
         fields = ("id",)
@@ -104,9 +101,6 @@ class CourseSerializer(serializers.ModelSerializer):
         return representation
 
 class BehaviorSerializer(serializers.ModelSerializer):
-    def get_queryset(self):
-        return Behavior.objects.filter(student__in=accessibleStudents)
-
     class Meta:
         model = Behavior
         fields = ("id",)
@@ -123,9 +117,6 @@ class BehaviorSerializer(serializers.ModelSerializer):
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
-    def get_queryset(self):
-        return Attendance.objects.filter(student__in=accessibleStudents)
-
     class Meta:
         model = Attendance
         fields = ("id",)
@@ -149,9 +140,6 @@ class AttendanceSerializer(serializers.ModelSerializer):
 
 
 class GradeSerializer(serializers.ModelSerializer):
-    def get_queryset(self):
-        return Grade.objects.filter(student__in=accessibleStudents)
-
     class Meta:
         model = Grade
         fields = ("id",)
@@ -194,9 +182,6 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
 
 
 class StudentDetailSerializer(serializers.ModelSerializer):
-    def get_queryset(self):
-        return Student.objects.filter(pk__in=accessibleStudents)
-
     class Meta:
         model = Student
         fields = ("id",)
