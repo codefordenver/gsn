@@ -1,3 +1,4 @@
+import hashlib, io
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -9,8 +10,8 @@ from gsndb.serializers import DistrictSerializer, SchoolSerializer, StudentSeria
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
-import hashlib
-from .services import csv_to_json_parser
+from .services.csv_to_json_parser import CSVToJsonParser
+from .services.json_parser import parse_json_into_db
 
 
 # Create your views here.
@@ -207,7 +208,7 @@ class CSVParser(APIView):
         MultiPartParser,
     )
 
-    def hash_handler(self, byte_file_on):
+    def hash_handler(self, byte_file_obj):
         """A hash function that identifies gives a csv file a hash that uniquely
         identifies it against other csv files.
 
@@ -232,11 +233,6 @@ class CSVParser(APIView):
         if(not self.hasFileAlreadyUploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.fileName)
 
-    def parse_csv_from_byte_file_obj(self, byte_file_obj):
-        byte_string = byte_file_obj.read()
-        string = byte_string.decode("utf-8")
-        string_file_obj = io.StringIO(string)
-
     def get(self, request):
         """Displays html template with basic file upload functionality.
 
@@ -256,10 +252,9 @@ class CSVParser(APIView):
 
         Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
         """
-        byte_file_on = request.data["mycsv"]
-        content = self.hash_handler(byte_file_on)
+        byte_file_obj = request.data["mycsv"]
+        content = self.hash_handler(byte_file_obj)
         self.has_file_already_been_uploaded()
-
 
         if(self.hasFileAlreadyUploaded):
             return Response(
@@ -270,10 +265,18 @@ class CSVParser(APIView):
                     template_name = "backend_dev_unsuccessful_hash_upload.html",
                 )
         else:
+            string_io_obj = io.StringIO(content)
+            school_of_csv_origin = "Trivial"
+            parser = CSVToJsonParser(string_io_obj, school_of_csv_origin)
+            dtypes = parser.get_csv_datatypes()
+            csv_df = parser.get_dataframe(dtypes)
+            identifying_column = "studentStateID"
+            json_array = parser.get_json_array(csv_df, identifying_column)
+            parse_json_into_db(json_array)
             return Response(
                 {
                     "file_name": self.fileName,
-                    "content": content,
+                    "content": json_array,
                 },
                     template_name = "backend_dev_successful_upload.html",
                 )
