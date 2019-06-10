@@ -61,7 +61,7 @@ function Students(props) {
                           className={`${tRow} ${i % 2 !== 0 ? striped : ''}`}
                         >
                             <TableCell>
-                                <StyledLink component={Link} to={`/gsndb/student/${id}`}>
+                                <StyledLink component={Link} to={`/students/${id}`}>
                                     {`${firstName} ${lastName}` || ''}
                                     {/* empty string allows prop validation to work until data is loaded */}
                                 </StyledLink>
