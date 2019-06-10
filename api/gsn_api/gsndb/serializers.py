@@ -199,9 +199,9 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["studentYear"] = student_obj.grade_year
         representation["reasonInProgram"] = student_obj.reason_in_program
 
-        representation["gradeSet"] = GradeSerializer(student_obj.grade_set.filter(student__in=accessibleStudents), many = True, read_only = True).data
-        representation["attendanceSet"] = AttendanceSerializer(student_obj.attendance_set.filter(student__in=accessibleStudents), many = True, read_only = True).data
-        representation["behaviorSet"] = BehaviorSerializer(student_obj.behavior_set.filter(student__in=accessibleStudents), many = True, read_only = True).data
+        representation["gradeSet"] = GradeSerializer(student_obj.grade_set, many = True, read_only = True).data
+        representation["attendanceSet"] = AttendanceSerializer(student_obj.attendance_set, many = True, read_only = True).data
+        representation["behaviorSet"] = BehaviorSerializer(student_obj.behavior_set, many = True, read_only = True).data
 
         return representation
 
