@@ -383,3 +383,6 @@ class StudentUserHasAccess(models.Model):
         "Student",
         on_delete = models.PROTECT,
     )
+
+    class Meta:
+        unique_together = ('user', 'student',)
