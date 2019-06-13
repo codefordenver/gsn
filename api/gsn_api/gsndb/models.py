@@ -394,3 +394,16 @@ class MyStudents(models.Model):
         on_delete = models.PROTECT,
         unique=True,
     )
+
+class StudentUserHasAccess(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.PROTECT,
+    )
+    program = models.ForeignKey(
+        "Program",
+        on_delete = models.PROTECT,
+    )
+
+    class Meta:
+        unique_together = ('user', 'program',)
