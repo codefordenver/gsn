@@ -386,3 +386,11 @@ class StudentUserHasAccess(models.Model):
 
     class Meta:
         unique_together = ('user', 'student',)
+
+
+class MyStudents(models.Model):
+    studentUserHasAccess = models.ForeignKey(
+        "StudentUserHasAccess",
+        on_delete = models.PROTECT,
+        unique=True,
+    )
