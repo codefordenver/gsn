@@ -25,16 +25,30 @@ class FilterSecurity():
         my_students = StudentUserHasAccess.objects.filter(user=self.user, pk__in=my_students_pk).values('student')
         return my_students
 
+    def get_accessible_districts(self):
+        school_list = self.get_accessible_districts()
+        district_list = School.objects.filter(pk__in=school_list).values('district')
+        return district_list
+
     def get_my_districts(self):
         school_list = self.get_my_schools()
         district_list = School.objects.filter(pk__in=school_list).values('district')
         return district_list
         
+    def get_accessible_schools(self):
+        student_list = self.get_accessible_students()
+        school_list = Student.objects.filter(pk__in=student_list).values('current_school')
+        return school_list
 
     def get_my_schools(self):
         student_list = self.get_my_students()
         school_list = Student.objects.filter(pk__in=student_list).values('current_school')
         return school_list
+
+    def get_accessible_courses(self):
+        student_list = self.get_accessible_students()
+        course_list = Grade.objects.filter(student__in=student_list).values('course')
+        return course_list
 
     def get_my_courses(self):
         student_list = self.get_my_students()
