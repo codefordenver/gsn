@@ -9,87 +9,120 @@ from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, Course
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
-from gsndb.filterSecurity import accessibleStudents, myStudents, myPrograms, allAccess, myAccess
+from gsndb.filterSecurity import FilterSecurity
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
-    def get(self, request, accessLevel, format = None):
-        if accessLevel == myAccess:
-            queryset = Student.objects.filter(pk__in = myStudents)
-        if accessLevel == allAccess:
-            queryset = Student.objects.filter(pk__in = accessibleStudents)
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):  
+
+        if access_level == self.user.get_my_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_my_students())
+        elif access_level == self.user.get_all_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_accessible_students())
         serializer = StudentSerializer(queryset , many = True)
         return Response(serializer.data)
 
 class DistrictList(generics.ListCreateAPIView):
-    def get(self, request, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = District.objects.all()
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = District.objects.filter(pk__in = self.user.get_my_districts())
+        elif access_level == self.user.get_all_access():
+            queryset = District.objects.filter(pk__in = self.user.get_accessible_districts())
         serializer = DistrictSerializer(queryset , many = True)
         return Response(serializer.data)
 
 class SchoolList(generics.ListCreateAPIView):
-    def get(self, request, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = School.objects.all()
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = School.objects.filter(pk__in = self.user.get_my_schools())
+        elif access_level == self.user.get_all_access():
+            queryset = School.objects.filter(pk__in = self.user.get_accessible_schools())
         serializer = SchoolSerializer(queryset , many = True)
         return Response(serializer.data)
 
 class CourseList(generics.ListCreateAPIView):
-    def get(self, request, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = Course.objects.all()
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Course.objects.filter(pk__in = self.user.get_my_courses())
+        elif access_level == self.user.get_all_access():
+            queryset = Course.objects.filter(pk__in = self.user.get_accessible_courses())
         serializer = CourseSerializer(queryset , many = True)
         return Response(serializer.data)
 
 class ProgramList(generics.ListCreateAPIView):
+    user = FilterSecurity()
+
     def get(self, request, accessLevel, format = None):
-        if accessLevel == myAccess:
+        if access_level == self.user.get_my_access():
+            queryset = Program.objects.filter(pk__in = self.user.get_my_programs())
+        if access_level == self.user.get_all_access():
             queryset = Program.objects.all()
-        if accessLevel == allAccess:
-            queryset = Program.objects.filter(pk__in = myPrograms)
         serializer = ProgramSerializer(queryset , many = True)
         return Response(serializer.data)
 
 
 #Detail views
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
-    def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = District.objects.filter(pk=pk)
-        serializer = DistrictDetailSerializer(queryset , many = True, context = {"access": accessLevel})
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = District.objects.filter(pk=pk,pk__in=self.user.get_my_districts())
+        elif access_level == self.user.get_all_access():
+            queryset = District.objects.filter(pk=pk,pk__in=self.user.get_accessible_districts())
+        serializer = DistrictDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
-    def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == myAccess:
-            queryset = Student.objects.filter(pk__in = myStudents, pk=pk)
-        if accessLevel == allAccess:
-            queryset = Student.objects.filter(pk__in = accessibleStudents,pk=pk)
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_my_students(), pk=pk)
+        elif access_level == self.user.get_all_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_accessible_students(), pk=pk)
         serializer = StudentSerializer(queryset , many = True)
         return Response(serializer.data)
 
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
-    def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = School.objects.filter(pk=pk)
-        serializer = SchoolDetailSerializer(queryset , many = True, context = {"access": accessLevel})
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = School.objects.filter(pk=pk,pk__in=self.user.get_my_schools())
+        elif access_level == self.user.get_all_access():
+            queryset =  School.objects.filter(pk=pk,pk__in=self.user.get_accessible_schools())
+        serializer = SchoolDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
 
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
-    def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == myAccess or accessLevel == allAccess:
-            queryset = Course.objects.filter(pk=pk)
-        serializer = CourseDetailSerializer(queryset , many = True, context = {"access": accessLevel})
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Course.objects.filter(pk=pk, pk__in=self.user.get_my_courses())
+        elif access_level == self.user.get_all_access():
+            queryset = Course.objects.filter(pk=pk, pk__in=self.user.get_accessible_courses())
+        serializer = CourseDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
 
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
     def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == myAccess:
+        if accessLevel == self.user.get_my_access():
             queryset = Program.objects.filter(pk=pk)
-        if accessLevel == allAccess:
-            queryset = Program.objects.filter(pk__in = myPrograms,pk=pk)
-        serializer = ProgramDetailSerializer(queryset , many = True)
+        elif accessLevel == self.user.get_all_access():
+            queryset = Program.objects.filter(pk__in=self.user.get_my_programs(),pk=pk)
+        serializer = ProgramDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
 
 

@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('token-auth/', obtain_jwt_token),
     path('user_app/', include('user_app.urls')),
-    path('gsndb/<str:accessLevel>/', include('gsndb.urls')),
+    path('gsndb/<str:access_level>/', include('gsndb.urls')),
 ]

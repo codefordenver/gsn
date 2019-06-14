@@ -389,10 +389,9 @@ class StudentUserHasAccess(models.Model):
 
 
 class MyStudents(models.Model):
-    studentUserHasAccess = models.ForeignKey(
+    student_user_has_access = models.OneToOneField(
         "StudentUserHasAccess",
         on_delete = models.PROTECT,
-        unique=True,
     )
 
 class StudentUserHasAccess(models.Model):

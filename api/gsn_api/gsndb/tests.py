@@ -18,4 +18,4 @@ StudentUserHasAccess.objects.create(user=user,student=student3)
 
 #accessibleStudents = StudentUserHasAccess.objects.filter(user=user,student=student).values('pk')
 
-MyStudents.objects.create(studentUserHasAccess=suha)
+MyStudents.objects.create(student_user_has_access=suha)
