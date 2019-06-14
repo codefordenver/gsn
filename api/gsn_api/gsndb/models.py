@@ -394,7 +394,7 @@ class MyStudents(models.Model):
         on_delete = models.PROTECT,
     )
 
-class StudentUserHasAccess(models.Model):
+class MyPrograms(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete = models.PROTECT,

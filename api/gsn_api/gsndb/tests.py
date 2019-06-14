@@ -1,17 +1,17 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from gsndb.models import StudentUserHasAccess, MyStudents, Student
+from gsndb.models import StudentUserHasAccess, MyStudents, Student, Program
 
 
 
 # Create your tests here.
 user = User.objects.first()
-
+program = Program.objects.get(pk=1)
 student1 = Student.objects.get(pk=1)
 student2 = Student.objects.get(pk=2)
 student3 = Student.objects.get(pk=3)
 
-#StudentUserHasAccess.objects.create(user=user,student=student1)
+StudentUserHasAccess.objects.create(user=user,student=student1)
 suha = StudentUserHasAccess.objects.get(user=user,student=student1)
 StudentUserHasAccess.objects.create(user=user,student=student2)
 StudentUserHasAccess.objects.create(user=user,student=student3)

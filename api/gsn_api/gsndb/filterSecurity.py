@@ -17,7 +17,7 @@ class FilterSecurity():
         return self.my_access
 
     def get_my_programs(self):
-        my_programs = MyPrograms.objects.filter(user=user).values('program')
+        my_programs = MyPrograms.objects.filter(user=self.user).values('program')
         return my_programs
 
     def get_accessible_students(self):

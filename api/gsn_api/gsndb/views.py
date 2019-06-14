@@ -60,7 +60,7 @@ class CourseList(generics.ListCreateAPIView):
 class ProgramList(generics.ListCreateAPIView):
     user = FilterSecurity()
 
-    def get(self, request, accessLevel, format = None):
+    def get(self, request, access_level, format = None):
         if access_level == self.user.get_my_access():
             queryset = Program.objects.filter(pk__in = self.user.get_my_programs())
         if access_level == self.user.get_all_access():
@@ -117,10 +117,10 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
 
-    def get(self, request, pk, accessLevel, format = None):
-        if accessLevel == self.user.get_my_access():
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
             queryset = Program.objects.filter(pk=pk)
-        elif accessLevel == self.user.get_all_access():
+        elif access_level == self.user.get_all_access():
             queryset = Program.objects.filter(pk__in=self.user.get_my_programs(),pk=pk)
         serializer = ProgramDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
