@@ -26,7 +26,7 @@ class FilterSecurity():
         return my_students
 
     def get_accessible_districts(self):
-        school_list = self.get_accessible_districts()
+        school_list = self.get_accessible_schools()
         district_list = School.objects.filter(pk__in=school_list).values('district')
         return district_list
 
@@ -34,7 +34,7 @@ class FilterSecurity():
         school_list = self.get_my_schools()
         district_list = School.objects.filter(pk__in=school_list).values('district')
         return district_list
-        
+
     def get_accessible_schools(self):
         student_list = self.get_accessible_students()
         school_list = Student.objects.filter(pk__in=student_list).values('current_school')
@@ -54,5 +54,3 @@ class FilterSecurity():
         student_list = self.get_my_students()
         course_list = Grade.objects.filter(student__in=student_list).values('course')
         return course_list
-
-
