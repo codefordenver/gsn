@@ -454,6 +454,48 @@
         }
     },
     {
+        "model": "gsndb.mystudents",
+        "pk": 1,
+        "fields": {
+            "student_user_has_access": 1
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 2,
+        "fields": {
+            "student_user_has_access": 2
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 3,
+        "fields": {
+            "student_user_has_access": 5
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 4,
+        "fields": {
+            "student_user_has_access": 6
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 5,
+        "fields": {
+            "student_user_has_access": 9
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 6,
+        "fields": {
+            "student_user_has_access": 11
+        }
+    },
+    {
         "model": "gsndb.grade",
         "pk": 1,
         "fields": {
