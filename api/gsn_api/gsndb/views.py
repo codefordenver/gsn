@@ -9,129 +9,66 @@ from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, Course
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
-from gsndb.filterSecurity import accessibleStudents
-
-# Define user
+from gsndb.filterSecurity import FilterSecurity
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
-    queryset = Student.objects.filter(pk__in=accessibleStudents)
-    serializer_class = StudentSerializer
+    user = FilterSecurity()
 
-class DistrictList(generics.ListCreateAPIView):
-    queryset = District.objects.all()
-    serializer_class = DistrictSerializer
+    def get(self, request, access_level, format = None):
 
-class SchoolList(generics.ListCreateAPIView):
-    queryset = School.objects.all()
-    serializer_class = SchoolSerializer
-
-class CourseList(generics.ListCreateAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-
-class ProgramList(generics.ListCreateAPIView):
-    queryset = Program.objects.all()
-    serializer_class = ProgramSerializer
-
-#Detail views
-class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = District.objects.all()
-    serializer_class = DistrictDetailSerializer
-
-class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.filter(pk__in=accessibleStudents)
-    serializer_class = StudentDetailSerializer
-
-class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = School.objects.all()
-    serializer_class = SchoolDetailSerializer
-
-class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseDetailSerializer
-
-class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Program.objects.all()
-    serializer_class = ProgramDetailSerializer
-
-
-
-#Other
-class NoteByObject(APIView):
-
-    def get(self, request, pk, objType):
-        
-        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
-        notes = Note.objects.filter(content_type = contType, object_id = pk)
-        data = NoteSerializer(notes, many = True).data
-        
-        return Response(data)
-
-
-
-
-
-class DistrictDetail(generics.ListCreateAPIView):
-    queryset = District.objects.all()
-    serializer_class = DistrictDetailSerializer
-
-
-
-class CalendarList(generics.ListCreateAPIView):
-    queryset = Calendar.objects.all()
-    serializer_class = CalendarSerializer
-
-class CalendarDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Calendar.objects.all()
-    serializer_class = CalendarSerializer
-
-
-class MyStudentsList(generics.ListCreateAPIView):
-    queryset = Student.objects.all()
-    serializer_class = MyStudentsSerializer
-
-class GradeList(generics.ListCreateAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-
-class GradeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Grade.objects.all()
-    serializer_class = GradeSerializer
-
-class GradeForStudent(APIView):
-    """# http POST http://127.0.0.1:8000/gsndb/student/someviewendpoint requestParameter="requestValue"""
-    def get(self, request, pk, format = None):
-        student_obj = Student.objects.filter(pk = pk)
-        serializer = GradeForStudentSerializer(student_obj, many = True)
+        if access_level == self.user.get_my_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_my_students())
+        elif access_level == self.user.get_all_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_accessible_students())
+        serializer = StudentSerializer(queryset , many = True)
         return Response(serializer.data)
 
 
-class BehaviorList(generics.ListCreateAPIView):
-    queryset = Behavior.objects.all()
-    serializer_class = BehaviorSerializer
+class DistrictList(generics.ListCreateAPIView):
+    user = FilterSecurity()
 
-class BehaviorDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Behavior.objects.all()
-    serializer_class = BehaviorSerializer
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = District.objects.filter(pk__in = self.user.get_my_districts())
+        elif access_level == self.user.get_all_access():
+            queryset = District.objects.filter(pk__in = self.user.get_accessible_districts())
+        serializer = DistrictSerializer(queryset , many = True)
+        return Response(serializer.data)
+
+class SchoolList(generics.ListCreateAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = School.objects.filter(pk__in = self.user.get_my_schools())
+        elif access_level == self.user.get_all_access():
+            queryset = School.objects.filter(pk__in = self.user.get_accessible_schools())
+        serializer = SchoolSerializer(queryset , many = True)
+        return Response(serializer.data)
+
+class CourseList(generics.ListCreateAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Course.objects.filter(pk__in = self.user.get_my_courses())
+        elif access_level == self.user.get_all_access():
+            queryset = Course.objects.filter(pk__in = self.user.get_accessible_courses())
+        serializer = CourseSerializer(queryset , many = True)
+        return Response(serializer.data)
 
 
-class AttendanceList(generics.ListCreateAPIView):
-    queryset = Attendance.objects.all()
-    serializer_class = AttendanceSerializer
+class ProgramList(generics.ListCreateAPIView):
+    user = FilterSecurity()
 
-class AttendanceDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Attendance.objects.all()
-    serializer_class = AttendanceSerializer
-
-
-class ReferralList(generics.ListCreateAPIView):
-    queryset = Referral.objects.all()
-    serializer_class = ReferralSerializer
-
-class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Referral.objects.all()
-    serializer_class = ReferralSerializer
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Program.objects.filter(pk__in=self.user.get_my_programs())
+        elif access_level == self.user.get_all_access():
+            queryset = Program.objects.filter(pk__in=self.user.get_accessible_programs())
+        serializer = ProgramSerializer(queryset , many = True)
+        return Response(serializer.data)
 
 class NoteList(generics.ListCreateAPIView):
     #returns all notes for anything
@@ -142,17 +79,77 @@ class BookmarkList(generics.ListCreateAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
+#Detail views
+class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = District.objects.filter(pk=pk,pk__in=self.user.get_my_districts())
+        elif access_level == self.user.get_all_access():
+            queryset = District.objects.filter(pk=pk,pk__in=self.user.get_accessible_districts())
+        serializer = DistrictDetailSerializer(queryset , many = True, context = {"access": access_level})
+        return Response(serializer.data)
+
+class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_my_students(), pk=pk)
+        elif access_level == self.user.get_all_access():
+            queryset = Student.objects.filter(pk__in = self.user.get_accessible_students(), pk=pk)
+        serializer = StudentDetailSerializer(queryset , many = True)
+        return Response(serializer.data)
+
+
+class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = School.objects.filter(pk=pk,pk__in=self.user.get_my_schools())
+        elif access_level == self.user.get_all_access():
+            queryset =  School.objects.filter(pk=pk,pk__in=self.user.get_accessible_schools())
+        serializer = SchoolDetailSerializer(queryset , many = True, context = {"access": access_level})
+        return Response(serializer.data)
+
+class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Course.objects.filter(pk=pk, pk__in=self.user.get_my_courses())
+        elif access_level == self.user.get_all_access():
+            queryset = Course.objects.filter(pk=pk, pk__in=self.user.get_accessible_courses())
+        serializer = CourseDetailSerializer(queryset , many = True, context = {"access": access_level})
+        return Response(serializer.data)
+
+class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Program.objects.filter(pk=pk, pk__in=self.user.get_my_programs())
+        elif access_level == self.user.get_all_access():
+            queryset = Program.objects.filter(pk=pk, pk__in=self.user.get_accessible_programs())
+        serializer = ProgramDetailSerializer(queryset , many = True, context = {"access": access_level})
+        return Response(serializer.data)
+
 class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
-'''
-class SchoolFakeInfo(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Student.objects.all()
-    serializer_class = StudentSchoolSerializer
-'''
+#Other
+class NoteByObject(APIView):
 
+    def get(self, request, pk, objType):
 
+        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
+        notes = Note.objects.filter(content_type = contType, object_id = pk)
+        data = NoteSerializer(notes, many = True).data
+
+        return Response(data)
 
 class SchoolInfo(APIView):
 
@@ -168,14 +165,14 @@ class SchoolInfo(APIView):
             serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getReferral": True})
         elif self.kwargs.get("course"):
             serializer = NestedSchoolSerializer(school_obj, many = True, context = {"getCourse": True})
-        
+
         return Response(serializer.data)
 
 class StudentInfo(APIView):
 
     def get(self, request, pk, grade = False, course = False, behavior = False, referral = False, attendance = False, format = None):
         student_obj = Student.objects.filter(pk = pk)
-        if self.kwargs.get("grade"):    
+        if self.kwargs.get("grade"):
             serializer = NestedStudentSerializer(student_obj, many = True, context = {"getGrades": True})
         elif self.kwargs.get("attendance"):
             serializer = NestedStudentSerializer(student_obj, many = True, context = {"getAttendance": True})
@@ -200,10 +197,5 @@ class ProgramInfo(APIView):
             serializer = NestedProgramSerializer(program_obj, many = True, context = {"getReferral": True})
         elif self.kwargs.get("course"):
             serializer = NestedProgramSerializer(program_obj, many = True, context = {"getCourse": True})
-        
+
         return Response(serializer.data)
-
-
-
-
-

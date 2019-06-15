@@ -386,3 +386,10 @@ class StudentUserHasAccess(models.Model):
 
     class Meta:
         unique_together = ('user', 'student',)
+
+
+class MyStudents(models.Model):
+    student_user_has_access = models.OneToOneField(
+        "StudentUserHasAccess",
+        on_delete = models.PROTECT,
+    )
