@@ -54,3 +54,13 @@ class FilterSecurity():
         student_list = self.get_my_students()
         course_list = Grade.objects.filter(student__in=student_list).values('course')
         return course_list
+
+    def get_accessible_programs(self):
+        student_list = self.get_accessible_students()
+        program_list = Student.objects.filter(pk__in=student_list).values('current_program')
+        return program_list
+
+    def get_my_programs(self):
+        student_list = self.get_my_students()
+        program_list = Student.objects.filter(pk__in=student_list).values('current_program')
+        return program_list

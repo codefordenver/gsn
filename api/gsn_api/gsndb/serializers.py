@@ -294,19 +294,30 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 class ProgramDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
     accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
 
     class Meta:
         model = Program
         fields = ("id",)
 
     def to_representation(self, program_obj):
+        access_level = self.context.get("access", False)
+
         representation = super().to_representation(program_obj)
 
         representation["programId"] = representation.pop("id")
         representation["programName"] = program_obj.name
 
-        representation["gradeSet"] = GradeSerializer(program_obj.grade_set.filter(student__in=accessible_students), many = True, read_only = True).data
-        representation["studentSet"] = StudentSerializer(program_obj.student_set.filter(pk__in=accessible_students), many = True, read_only = True).data
+        if access_level == self.user.get_all_access():
+            representation["gradeSet"] = GradeSerializer(program_obj.grade_set.filter(student__in=self.accessible_students), many = True, read_only = True).data
+            representation["attendanceSet"] = AttendanceSerializer(program_obj.attendance_set.filter(student__in=self.accessible_students), many = True, read_only = True).data
+            representation["behaviorSet"] = BehaviorSerializer(program_obj.behavior_set.filter(student__in=self.accessible_students), many = True, read_only = True).data
+            representation["studentSet"] = StudentSerializer(program_obj.student_set.filter(pk__in=self.accessible_students), many = True, read_only = True).data
+        if access_level == self.user.get_my_access():
+            representation["gradeSet"] = GradeSerializer(program_obj.grade_set.filter(student__in=self.my_students), many = True, read_only = True).data
+            representation["attendanceSet"] = AttendanceSerializer(program_obj.attendance_set.filter(student__in=self.my_students), many = True, read_only = True).data
+            representation["behaviorSet"] = BehaviorSerializer(program_obj.behavior_set.filter(student__in=self.my_students), many = True, read_only = True).data
+            representation["studentSet"] = StudentSerializer(program_obj.student_set.filter(pk__in=self.my_students), many = True, read_only = True).data
 
         return representation
 

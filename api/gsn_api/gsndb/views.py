@@ -60,8 +60,15 @@ class CourseList(generics.ListCreateAPIView):
 
 
 class ProgramList(generics.ListCreateAPIView):
-    queryset = Program.objects.all()
-    serializer_class = ProgramSerializer
+    user = FilterSecurity()
+
+    def get(self, request, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Program.objects.filter(pk__in=self.user.get_my_programs())
+        elif access_level == self.user.get_all_access():
+            queryset = Program.objects.filter(pk__in=self.user.get_accessible_programs())
+        serializer = ProgramSerializer(queryset , many = True)
+        return Response(serializer.data)
 
 class NoteList(generics.ListCreateAPIView):
     #returns all notes for anything
@@ -119,8 +126,15 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response(serializer.data)
 
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Program.objects.all()
-    serializer_class = ProgramDetailSerializer
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        if access_level == self.user.get_my_access():
+            queryset = Program.objects.filter(pk=pk, pk__in=self.user.get_my_programs())
+        elif access_level == self.user.get_all_access():
+            queryset = Program.objects.filter(pk=pk, pk__in=self.user.get_accessible_programs())
+        serializer = ProgramDetailSerializer(queryset , many = True, context = {"access": access_level})
+        return Response(serializer.data)
 
 class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
