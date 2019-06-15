@@ -166,6 +166,8 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
     accessible_schools = user.get_accessible_schools()
     my_schools = user.get_my_schools()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
 
     class Meta:
         model = District
@@ -183,9 +185,16 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
 
         if access_level == self.user.get_all_access():
             representation["schoolSet"] = SchoolSerializer(district_obj.school_set.filter(pk__in=self.accessible_schools), many = True, read_only = True).data
+            representation["studentSet"] = StudentSerializer(Student.objects.filter(pk__in=self.accessible_students, current_school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["gradeSet"] = GradeSerializer(Grade.objects.filter(student_id__in = self.accessible_students, course__school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["attendanceSet"] = AttendanceSerializer(Attendance.objects.filter(student_id__in = self.accessible_students, school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["behaviorSet"] = BehaviorSerializer(Behavior.objects.filter(student_id__in = self.accessible_students, school__district_id = district_obj.id), many = True, read_only = True).data
         elif access_level == self.user.get_my_access():
             representation["schoolSet"] = SchoolSerializer(district_obj.school_set.filter(pk__in=self.my_schools), many = True, read_only = True).data
-
+            representation["studentSet"] = StudentSerializer(Student.objects.filter(pk__in=self.my_students, current_school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["gradeSet"] = GradeSerializer(Grade.objects.filter(student_id__in = self.my_students, course__school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["attendanceSet"] = AttendanceSerializer(Attendance.objects.filter(student_id__in = self.my_students, school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["behaviorSet"] = BehaviorSerializer(Behavior.objects.filter(student_id__in = self.my_students, school__district_id = district_obj.id), many = True, read_only = True).data
         return representation
 
 
