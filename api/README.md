@@ -241,3 +241,22 @@ Unfortunately, the API hasn't quite figured out middle names, so any information
 
 An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
 
+
+## Instructions for admin users updating the server:
+
+Once you have been given access and read/write/docker permissions to the development server, you will be capable of integrating changes tht have been made into the codebase so that frontend developers can interact with the most up-to-date version of the api! 
+
+#### Updating The Server From the Master Branch:
+*First, make sure you are in the /home/gsn/ directory*
+```bash
+git pull origin master
+cd api
+docker-compose down
+docker rmi api_gsn_web
+docker-compose -f docker-compose.yml -f docker-compose-prod.yml up -d
+```
+
+And that should be it! If the api doesn't go live after a minute or so, you may need to destroy and rebuild the api_gsn_web image once more. For reasons that should be apparent to me, but aren't nonetheless, it occasionally takes multiple image builds to get the container up and running. This odd behavior should likely be posted as an issue in need of resolution...
+
+Another point: We should probably get around to hosting our images on docker-hub. Our current implementation is a little ad-hoc. 
+

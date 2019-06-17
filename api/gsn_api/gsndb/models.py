@@ -111,6 +111,10 @@ class Program(models.Model):
     name = models.CharField(max_length=50)
 
 class Student(models.Model):
+    ''' IMPORTANT:
+    This model must be filtered before outputting to user. It needs
+    to be filtered by user through StudentUserHasAccess model
+    '''
     current_school = models.ForeignKey(
         "School",
         null = True,
@@ -369,3 +373,23 @@ class Bookmark(models.Model):
     url = models.CharField(max_length=500)
     json_request_data = models.TextField()
     notes = GenericRelation(Note)
+
+class StudentUserHasAccess(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete = models.PROTECT,
+    )
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.PROTECT,
+    )
+
+    class Meta:
+        unique_together = ('user', 'student',)
+
+
+class MyStudents(models.Model):
+    student_user_has_access = models.OneToOneField(
+        "StudentUserHasAccess",
+        on_delete = models.PROTECT,
+    )

@@ -358,6 +358,144 @@
         }
     },
     {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "student": 1
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "student": 2
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 3,
+        "fields": {
+            "user": 1,
+            "student": 3
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 4,
+        "fields": {
+            "user": 1,
+            "student": 4
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 5,
+        "fields": {
+            "user": 1,
+            "student": 5
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 6,
+        "fields": {
+            "user": 1,
+            "student": 6
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 7,
+        "fields": {
+            "user": 1,
+            "student": 7
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 8,
+        "fields": {
+            "user": 1,
+            "student": 8
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 9,
+        "fields": {
+            "user": 2,
+            "student": 1
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 10,
+        "fields": {
+            "user": 2,
+            "student": 2
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 11,
+        "fields": {
+            "user": 2,
+            "student": 3
+        }
+    },
+    {
+        "model": "gsndb.studentuserhasaccess",
+        "pk": 12,
+        "fields": {
+            "user": 2,
+            "student": 4
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 1,
+        "fields": {
+            "student_user_has_access": 1
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 2,
+        "fields": {
+            "student_user_has_access": 2
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 3,
+        "fields": {
+            "student_user_has_access": 5
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 4,
+        "fields": {
+            "student_user_has_access": 6
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 5,
+        "fields": {
+            "student_user_has_access": 9
+        }
+    },
+    {
+        "model": "gsndb.mystudents",
+        "pk": 6,
+        "fields": {
+            "student_user_has_access": 11
+        }
+    },
+    {
         "model": "gsndb.grade",
         "pk": 1,
         "fields": {
@@ -3697,4 +3835,3 @@
     }
 
 ]
-
