@@ -164,6 +164,7 @@ class GradeSerializer(serializers.ModelSerializer):
 #detail serializer
 class DistrictDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
+    current_user = user.get_user()
     accessible_schools = user.get_accessible_schools()
     my_schools = user.get_my_schools()
     accessible_students = user.get_accessible_students()
@@ -176,12 +177,14 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, district_obj):
         access_level = self.context.get("access", False)
         representation = super().to_representation(district_obj)
-
+        
         representation["districtId"] = representation.pop("id")
         representation["districtName"] = district_obj.name
         representation["state"] = district_obj.state
         representation["city"] = district_obj.city
         representation["code"] = district_obj.code
+
+        representation["noteSet"] = NoteSerializer(district_obj.notes.filter(user=self.current_user), many = True).data
 
         if access_level == self.user.get_all_access():
             representation["schoolSet"] = SchoolSerializer(district_obj.school_set.filter(pk__in=self.accessible_schools), many = True, read_only = True).data
@@ -199,6 +202,13 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
 
 
 class StudentDetailSerializer(serializers.ModelSerializer):
+    user = FilterSecurity()
+    current_user = user.get_user()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
+    accessible_courses = user.get_accessible_courses()
+    my_courses = user.get_my_courses()
+
     class Meta:
         model = Student
         fields = ("id",)
@@ -216,6 +226,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["studentYear"] = student_obj.grade_year
         representation["reasonInProgram"] = student_obj.reason_in_program
 
+        representation["noteSet"] = NoteSerializer(student_obj.notes.filter(user=self.current_user), many = True).data
         representation["gradeSet"] = GradeSerializer(student_obj.grade_set, many = True, read_only = True).data
         representation["attendanceSet"] = AttendanceSerializer(student_obj.attendance_set, many = True, read_only = True).data
         representation["behaviorSet"] = BehaviorSerializer(student_obj.behavior_set, many = True, read_only = True).data
@@ -225,6 +236,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
 
 class SchoolDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
+    current_user = user.get_user()
     accessible_students = user.get_accessible_students()
     my_students = user.get_my_students()
     accessible_courses = user.get_accessible_courses()
@@ -248,6 +260,7 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
         grade_list = Grade.objects.filter(student_id__in = student_id_list)
 
 
+        representation["noteSet"] = NoteSerializer(school_obj.notes.filter(user=self.current_user), many = True).data
 
         if access_level == self.user.get_all_access():
             representation["gradeSet"] = GradeSerializer(grade_list.filter(student__in=self.accessible_students), many = True, read_only = True).data
@@ -268,6 +281,7 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
+    current_user = user.get_user()
     accessible_students = user.get_accessible_students()
     my_students = user.get_my_students()
 
@@ -290,6 +304,8 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         student_id_list = Grade.objects.filter(course_id = representation["courseId"]).values("student_id")
         student_list = Student.objects.filter(pk__in = student_id_list)
 
+        representation["noteSet"] = NoteSerializer(course_obj.notes.filter(user=self.current_user), many = True).data
+
         if access_level == self.user.get_all_access():
             representation["gradeSet"] = GradeSerializer(course_obj.grade_set.filter(student__in=self.accessible_students), many = True, read_only = True).data
             representation["behaviorSet"] = BehaviorSerializer(course_obj.behavior_set.filter(student__in=self.accessible_students), many = True, read_only = True).data
@@ -302,6 +318,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
 class ProgramDetailSerializer(serializers.ModelSerializer):
     user = FilterSecurity()
+    current_user = user.get_user()
     accessible_students = user.get_accessible_students()
     my_students = user.get_my_students()
 
@@ -316,6 +333,8 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
 
         representation["programId"] = representation.pop("id")
         representation["programName"] = program_obj.name
+
+        representation["noteSet"] = NoteSerializer(program_obj.notes.filter(user=self.current_user), many = True).data
 
         if access_level == self.user.get_all_access():
             representation["gradeSet"] = GradeSerializer(program_obj.grade_set.filter(student__in=self.accessible_students), many = True, read_only = True).data

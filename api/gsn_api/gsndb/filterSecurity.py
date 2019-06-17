@@ -15,6 +15,9 @@ class FilterSecurity():
 
     def get_my_access(self):
         return self.my_access
+        
+    def get_user(self):
+        return self.user
 
     def get_accessible_students(self):
         accessible_students = StudentUserHasAccess.objects.filter(user=self.user).values('student')
