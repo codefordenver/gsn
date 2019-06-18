@@ -5,6 +5,8 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
 from gsndb.filterSecurity import FilterSecurity
+from django.utils import timezone
+from django.http import HttpResponseNotAllowed
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
@@ -84,6 +86,22 @@ class BookmarkList(generics.ListCreateAPIView):
     serializer_class = BookmarkSerializer
 
 #Detail views
+
+def parse_POST_into_note_data(request, pk, annotated_model, user):
+    """
+    annotated_model must be a lower case string: "district" for example. user
+    must be the get_user() method of FilterSecurity.
+    """
+    text = request.data["text"]
+    output = {
+        "user": user,
+        "created": timezone.now(),
+        "text": text,
+        "content_type": ContentType.objects.get(model = annotated_model).id,
+        "object_id": pk
+    }
+    return output
+
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
 
@@ -94,6 +112,46 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
             queryset = District.objects.filter(pk=pk,pk__in=self.user.get_accessible_districts())
         serializer = DistrictDetailSerializer(queryset , many = True, context = {"access": access_level})
         return Response(serializer.data)
+
+    def post(self, request, pk, access_level, format = None):
+        """
+        Goal: allowing for posting of notes to district object, and allow for
+        generalization to course, school, student, program.
+
+        Workflow:
+        - generate POST request containing all data needed to generate note.
+            - {
+                "text": "a very important note",
+            }
+        - extract data from POST request in view's post method.
+        - parse data to generate serializable JSON containing all fields/values for new note.
+            {
+                "user": 1,
+                "created": timezone.now(),
+                "text": "a very important note",
+                "content_type": ContentType.objects.get(model = "model_of_note").pk
+                "object_id": pk,
+            }
+        - verify that user has the right to insert new note into database
+            look into verification of user rights
+                - utilizer FilterSecurity().get_my_districts()/get_all_districts()
+        - Save new note into database
+            serializer.save
+        - refresh page to show addition of note to detail page
+        - Change NoteByObject view to handle note updates via POST request
+        """
+        """
+        Note: the CamelCaseJSONParser that our backend defaults to automatically
+        turns camelCase requests generated on the front end into snake_case in
+        the back end.
+        """
+        current_district = District.objects.get(pk = pk).id
+        if current_district not in user.get_accessible_districts():
+            return HttpResponseNotAllowed(["POST"])
+        else:
+            parse_POST_into_note_data(request, pk, "district", user.get_user())
+
+        return Response(request.data["content_type"])
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
@@ -146,7 +204,11 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 
 #Other
 class NoteByObject(APIView):
-
+    """
+    - check if updating a new note
+    - serializer.save will update a note if note called when serializer instantiated
+        - NoteSerializer(existing_note)
+    """
     def get(self, request, pk, objType):
 
         contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
