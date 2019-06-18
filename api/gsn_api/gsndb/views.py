@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
 from gsndb.filterSecurity import FilterSecurity
 from django.utils import timezone
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseRedirect
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
@@ -87,21 +87,6 @@ class BookmarkList(generics.ListCreateAPIView):
 
 #Detail views
 
-def parse_POST_into_note_data(request, pk, annotated_model, user):
-    """
-    annotated_model must be a lower case string: "district" for example. user
-    must be the get_user() method of FilterSecurity.
-    """
-    text = request.data["text"]
-    output = {
-        "user": user,
-        "created": timezone.now(),
-        "text": text,
-        "content_type": ContentType.objects.get(model = annotated_model).id,
-        "object_id": pk
-    }
-    return output
-
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
 
@@ -145,13 +130,25 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         turns camelCase requests generated on the front end into snake_case in
         the back end.
         """
-        current_district = District.objects.get(pk = pk).id
-        if current_district not in user.get_accessible_districts():
-            return HttpResponseNotAllowed(["POST"])
+        current_district = District.objects.get(pk = pk)
+        accessible_districts = District.objects.filter(pk__in = self.user.get_accessible_districts())
+        if current_district not in accessible_districts:
+            return Response({"sorry": "this user does not have access to do that."})
         else:
-            parse_POST_into_note_data(request, pk, "district", user.get_user())
-
-        return Response(request.data["content_type"])
+            note_text = request.data["text"]
+            note_data = {
+                "user": self.user.get_user(),
+                "created": timezone.now(),
+                "text": note_text,
+                "content_type": ContentType.objects.get(model = "district").id,
+                "object_id": pk
+            }
+            serializer = NoteSerializer(data = note_data)
+            if serializer.is_valid():
+                serializer.save()
+                return HttpResponseRedirect(f"/{accessLevel}/gsndb/district/{pk}")
+            else:
+                Response({"error": "data parsed isn't valid for serializer"})
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
