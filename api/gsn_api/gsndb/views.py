@@ -67,17 +67,9 @@ class ProgramList(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 class NoteList(generics.ListCreateAPIView):
-    #returns all notes for anything
-    queryset = Note.objects.all()
-    serializer_class = NoteSerializer
+    user = FilterSecurity()
 
-class BookmarkList(generics.ListCreateAPIView):
-    queryset = Bookmark.objects.all()
-    serializer_class = BookmarkSerializer
-
-class NoteList(generics.ListCreateAPIView):
-    #returns all notes for anything
-    queryset = Note.objects.all()
+    queryset = Note.objects.filter(user_id = user.get_user().id)
     serializer_class = NoteSerializer
 
 class BookmarkList(generics.ListCreateAPIView):
@@ -180,6 +172,44 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
+class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
+    user = FilterSecurity()
+
+    def get(self, request, pk, access_level, format = None):
+        queryset = Note.objects.filter(user_id = self.user.get_user().id, pk = pk)
+        serializer = NoteSerializer(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, pk, access_level, format = None):
+        """
+        Note: the CamelCaseJSONParser that our backend defaults to automatically
+        turns camelCase requests generated on the front end into snake_case in
+        the back end.
+        """
+        current_note = Note.objects.get(pk = pk)
+        accessible_notes = Note.objects.filter(user_id = self.user.get_user().id)
+        if current_note not in accessible_notes:
+            return Response({"Sorry": "this user does not have access to do that."})
+        else:
+            note_text = request.data["text"]
+            note_data = {
+                "user": self.user.get_user().id,
+                "created": timezone.now(),
+                "text": note_text,
+                "content_type": ContentType.objects.get(model = "note").id,
+                "object_id": pk
+            }
+            serializer = NoteSerializer(current_note, data = note_data)
+            if serializer.is_valid():
+                serializer.save()
+                return HttpResponseRedirect(f"/gsndb/{access_level}/note/{pk}/")
+                #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
+            else:
+
+                return Response({
+                                    "Sorry": "data parsed isn't valid for serializer",
+                                    "serializer errors": serializer.errors
+                                })
 #Other
 class NoteByObject(APIView):
     """
@@ -187,13 +217,14 @@ class NoteByObject(APIView):
     - serializer.save will update a note if note called when serializer instantiated
         - NoteSerializer(existing_note)
     """
-    def get(self, request, pk, objType):
+    def get(self, request, pk, obj_type):
 
-        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
-        notes = Note.objects.filter(content_type = contType, object_id = pk)
+        cont_type = ContentType.objects.get(app_label = "gsndb", model = obj_type).id
+        notes = Note.objects.filter(content_type = cont_type, object_id = pk)
         data = NoteSerializer(notes, many = True).data
 
         return Response(data)
+
 
 class SchoolInfo(APIView):
 
