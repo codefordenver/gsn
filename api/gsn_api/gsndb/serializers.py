@@ -162,12 +162,12 @@ class GradeSerializer(serializers.ModelSerializer):
 
 #detail serializer
 class DistrictDetailSerializer(serializers.ModelSerializer):
-    self.user = FilterSecurity()
-    self.current_user = self.user.get_user()
-    self.accessible_schools = self.user.get_accessible_schools()
-    self.my_schools = self.user.get_my_schools()
-    self.accessible_students = self.user.get_accessible_students()
-    self.my_students = self.user.get_my_students()
+    user = FilterSecurity()
+    current_user = user.get_user()
+    accessible_schools = user.get_accessible_schools()
+    my_schools = user.get_my_schools()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
 
     class Meta:
         model = District
@@ -202,8 +202,8 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
 
 
 class StudentDetailSerializer(serializers.ModelSerializer):
-    self.user = FilterSecurity()
-    self.current_user = sel.user.get_user()
+    user = FilterSecurity()
+    current_user = user.get_user()
 
     class Meta:
         model = Student
@@ -231,12 +231,12 @@ class StudentDetailSerializer(serializers.ModelSerializer):
 
 
 class SchoolDetailSerializer(serializers.ModelSerializer):
-    self.user = FilterSecurity()
-    self.current_user = self.user.get_user()
-    self.accessible_students = self.user.get_accessible_students()
-    self.my_students = self.user.get_my_students()
-    self.accessible_courses = self.user.get_accessible_courses()
-    self.my_courses = self.user.get_my_courses()
+    user = FilterSecurity()
+    current_user = user.get_user()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
+    accessible_courses = user.get_accessible_courses()
+    my_courses = user.get_my_courses()
 
     class Meta:
         model = School
@@ -272,10 +272,10 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    self.user = FilterSecurity()
-    self.current_user = self.user.get_user()
-    self.accessible_students = self.user.get_accessible_students()
-    self.my_students = self.user.get_my_students()
+    user = FilterSecurity()
+    current_user = user.get_user()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
 
     class Meta:
         model = Course
@@ -306,10 +306,10 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         return representation
 
 class ProgramDetailSerializer(serializers.ModelSerializer):
-    self.user = FilterSecurity()
-    self.current_user = self.user.get_user()
-    self.accessible_students = self.user.get_accessible_students()
-    self.my_students = self.user.get_my_students()
+    user = FilterSecurity()
+    current_user = user.get_user()
+    accessible_students = user.get_accessible_students()
+    my_students = user.get_my_students()
 
     class Meta:
         model = Program
