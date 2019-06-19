@@ -99,30 +99,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def post(self, request, pk, access_level, format = None):
         """
-        Goal: allowing for posting of notes to district object, and allow for
-        generalization to course, school, student, program.
-
-        Workflow:
-        - generate POST request containing all data needed to generate note.
-            - {
-                "text": "a very important note",
-            }
-        - extract data from POST request in view's post method.
-        - parse data to generate serializable JSON containing all fields/values for new note.
-            {
-                "user": 1,
-                "created": timezone.now(),
-                "text": "a very important note",
-                "content_type": ContentType.objects.get(model = "model_of_note").pk
-                "object_id": pk,
-            }
-        - verify that user has the right to insert new note into database
-            look into verification of user rights
-                - utilizer FilterSecurity().get_my_districts()/get_all_districts()
-        - Save new note into database
-            serializer.save
-        - refresh page to show addition of note to detail page
-        - Change NoteByObject view to handle note updates via POST request
+        Change NoteByObject view to handle note updates via POST request
         """
         """
         Note: the CamelCaseJSONParser that our backend defaults to automatically
@@ -130,13 +107,13 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         the back end.
         """
         current_district = District.objects.get(pk = pk)
-        accessible_districts = District.objects.filter(pk__in = self.user.get_accessible_districts())
+        accessible_districts = self.user.get_accessible_districts()
         if current_district not in accessible_districts:
-            return Response({"sorry": "this user does not have access to do that."})
+            return Response({"Sorry": "this user does not have access to do that."})
         else:
             note_text = request.data["text"]
             note_data = {
-                "user": self.user.get_user(),
+                "user": self.user.get_user().id,
                 "created": timezone.now(),
                 "text": note_text,
                 "content_type": ContentType.objects.get(model = "district").id,
@@ -145,9 +122,14 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
             serializer = NoteSerializer(data = note_data)
             if serializer.is_valid():
                 serializer.save()
-                return HttpResponseRedirect(f"/{accessLevel}/gsndb/district/{pk}")
+                return HttpResponseRedirect(f"/gsndb/{access_level}/district/{pk}/")
+                #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
             else:
-                Response({"error": "data parsed isn't valid for serializer"})
+
+                return Response({
+                                    "Sorry": "data parsed isn't valid for serializer",
+                                    "serializer errors": serializer.errors
+                                })
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
     user = FilterSecurity()
