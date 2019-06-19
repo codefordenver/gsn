@@ -181,7 +181,6 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
         representation["districtName"] = district_obj.name
         representation["state"] = district_obj.state
         representation["city"] = district_obj.city
-        representation["querypath"] = get_child_queryset(district_obj, Grade)
         representation["code"] = district_obj.code
 
         representation["noteSet"] = NoteSerializer(district_obj.notes.filter(user=self.current_user), many = True).data
@@ -263,7 +262,7 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
         elif access_level == self.user.get_my_access():
             representation["gradeSet"] = GradeSerializer(Grade.objects.filter(student_id__in = self.my_students.values("id"), course__school_id = school_obj.id), many = True, read_only = True).data
             representation["attendanceSet"] = AttendanceSerializer(school_obj.attendance_set.filter(student_id__in = self.my_students.values("id")), many = True, read_only = True).data
-            representation["behaviorSet"] = BehaviorSerializer(school_obj.attendance_set.filter(student_id__in = self.my_students.values("id")), many = True, read_only = True).data
+            representation["behaviorSet"] = BehaviorSerializer(school_obj.behavior_set.filter(student_id__in = self.my_students.values("id")), many = True, read_only = True).data
             representation["studentSet"] = StudentSerializer(self.my_students.filter(current_school_id = school_obj.id), many = True, read_only = True).data
             representation["courseSet"] = CourseSerializer(self.my_courses.filter(school_id = school_obj.id), many = True, read_only = True).data
 
