@@ -7,11 +7,27 @@ from gsndb.filter_security import FilterSecurity
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ("user",
+        fields = (
+            "id",
+            "user",
             "created",
             "text",
             "content_type",
-            "object_id")
+            "object_id",
+            )
+
+    def to_representation(self, note_obj):
+        representation = super().to_representation(note_obj)
+
+        representation["noteId"] = representation.pop("id")
+        representation["user"] = note_obj.user.id
+        representation["createdUpdated"] = representation.pop("created")
+        representation["text"] = note_obj.text
+        representation["contentType"] = note_obj.content_type.id
+        representation["objectId"] = note_obj.object_id
+
+        return representation
+
 
 # all table serializer
 '''These serializers throw errors when it doesn't have Meta in it.
@@ -27,7 +43,7 @@ class DistrictSerializer(serializers.ModelSerializer):
     def to_representation(self, district_obj):
         representation = super().to_representation(district_obj)
 
-        representation["districtId"] = representation.pop("id")
+        representation["districtIdlol"] = representation.pop("id")
         representation["districtName"] = district_obj.name
         representation["state"] = district_obj.state
         representation["city"] = district_obj.city
