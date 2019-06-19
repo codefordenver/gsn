@@ -2,7 +2,7 @@ from rest_framework import serializers
 from gsndb.models import Note, District, School, Calendar, Referral, Bookmark, Program, Student, Course, Behavior, Grade, Attendance
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
-from gsndb.filterSecurity import FilterSecurity
+from gsndb.filter_security import FilterSecurity
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -160,6 +160,107 @@ class GradeSerializer(serializers.ModelSerializer):
 
         return representation
 
+"""
+Goal: refactor the querysets of nested serializers in Detail Serializers. The
+querysets are subject to access_level and their relationship to the parent
+instance of the detail view.
+
+Ex. 1:
+school_set = self.accessible_schools.filter(district = district_obj.id)
+Ex. 2:
+grade_set = Grade.objects.filter(
+    student_id__in = self.accessible_students.values('id'),
+    course__school__district_id = district_obj.id,
+    )
+
+Workflow:
+
+- main independent variables:
+    student_object: (
+        FilterSecurity.accessible_students(),
+        FilterSecurity.my_students(),
+        )
+    child_model,
+    parent_instance
+- everything flows through a FilterSecurity student_object, if given.
+- two filter flows to map:
+    1. from child_model to parent_instance_id
+        - contingencies:
+            a. child_model to parent_instance a many-to-one spanning multiple relationships
+                - follow foreign keys, ex: ChildModel.objects.filter(fk_field__parent_fk_field_id = parent_obj.id)
+            b. child_model to parent_instance a many-to-one
+                - follow foreign keys, ex: ChildModel.objects.filter(parent_fk_field_id = parent_obj.id)
+        - build for contingencies a and b:
+            - find foreign key relationship possible spanning multiple relationships:
+                - look into find_foreign_key() method of ChildSetSerializer.
+                - Use **kwargs to build filter: automate building fk_field__parent_fk_field_id = parent_obj.id
+    2. from child_model to student_object
+        - contingencies:
+            a. child_model to student_object a one to many (ex: district_set for program_obj), possibly spanning multiple relationships
+                - ChildModel.objects.filter(pk__in = student.current_school.district.id)
+            b. child_model to student_object a one to many (ex: school_set for district_obj)
+                - ChildModel.objects.filter(pk__in = student.current_school.id
+            c. child_model to student a many to one, spanning multiple relationships
+            d. child model to student a many to one
+        - build for contingencies c and d:
+            - use build from 1, alter: .filter(fk_field_parent_fk_field_id__in = student_obj.values("id"))
+        - build for contingenvies a and b:
+            - follow foreign key via student.current_school.district.id for student in student_obj
+            - automate construction of student.current_school.district.id
+
+
+"""
+#DetailSerilializer helper functions
+def get_child_queryset(parent_instance, ChildModel):
+    instance_name = parent_instance.__class__.__name__.lower()
+    possible_filter_paths = []
+    connection_found = False
+    models_to_explore = [ChildModel,]
+    test_a = []
+    for Model in models_to_explore:
+        fields = Model._meta.fields
+        test_a.append(Model.__name__.lower())
+        for field in fields:
+            field_type = field.__class__
+            if field_type == ForeignKey:
+                field_name = field.__dict__["name"]
+                if len(possible_filter_paths) == 0:
+                    possible_filter_paths.append(field_name)
+                elif all([field_name not in path for path in possible_filter_paths]):
+                    possible_filter_paths.append(field_name)
+                for index, path in enumerate(possible_filter_paths):
+                    if path.endswith(Model.__name__.lower()):
+                        new_path = possible_filter_paths.pop(index)
+                        new_path += f"__{field_name}"
+                        possible_filter_paths.append(new_path)
+                if field_name == instance_name:
+                    for path in possible_filter_paths:
+                        if path.endswith(instance_name):
+                            filter_path = path
+                            connection_found = True
+                            break
+                else:
+                    related_model = field.__dict__["related_model"]
+                    models_to_explore.append(related_model)
+        if connection_found:
+            break
+        else:
+            models_to_explore.remove(Model)
+    #filter_path += "_id"
+    return {
+        "possible paths": possible_filter_paths,
+        "test_a": test_a,
+        }
+
+
+
+
+
+
+
+def filter_against_relation_to(queryset, filter_security_queryset):
+    pass
+
 
 #detail serializer
 class DistrictDetailSerializer(serializers.ModelSerializer):
@@ -177,21 +278,54 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, district_obj):
         access_level = self.context.get("access", False)
         representation = super().to_representation(district_obj)
-        
+
         representation["districtId"] = representation.pop("id")
         representation["districtName"] = district_obj.name
         representation["state"] = district_obj.state
         representation["city"] = district_obj.city
+        representation["querypath"] = get_child_queryset(district_obj, Grade)
         representation["code"] = district_obj.code
 
-        representation["noteSet"] = NoteSerializer(district_obj.notes.filter(user=self.current_user), many = True).data
+        representation["noteSet"] = NoteSerializer(
+            district_obj.notes.filter(user=self.current_user),
+            many = True,
+            ).data
 
         if access_level == self.user.get_all_access():
-            representation["schoolSet"] = SchoolSerializer(district_obj.school_set.filter(pk__in=self.accessible_schools), many = True, read_only = True).data
-            representation["studentSet"] = StudentSerializer(Student.objects.filter(pk__in=self.accessible_students, current_school__district_id = district_obj.id), many = True, read_only = True).data
-            representation["gradeSet"] = GradeSerializer(Grade.objects.filter(student_id__in = self.accessible_students, course__school__district_id = district_obj.id), many = True, read_only = True).data
-            representation["attendanceSet"] = AttendanceSerializer(Attendance.objects.filter(student_id__in = self.accessible_students, school__district_id = district_obj.id), many = True, read_only = True).data
-            representation["behaviorSet"] = BehaviorSerializer(Behavior.objects.filter(student_id__in = self.accessible_students, school__district_id = district_obj.id), many = True, read_only = True).data
+            representation["schoolSet"] = SchoolSerializer(
+                self.accessible_schools.filter(district = district_obj.id),
+                many = True,
+                read_only = True
+                ).data
+            representation["studentSet"] = StudentSerializer(
+                self.accessible_students.filter(current_school__district_id = district_obj.id),
+                many = True,
+                read_only = True,
+                ).data
+            representation["gradeSet"] = GradeSerializer(
+                Grade.objects.filter(
+                    student_id__in = self.accessible_students.values('id'),
+                    course__school__district_id = district_obj.id,
+                    ),
+                many = True,
+                read_only = True,
+                ).data
+            representation["attendanceSet"] = AttendanceSerializer(
+                Attendance.objects.filter(
+                    student_id__in = self.accessible_students.values('id'),
+                    school__district_id = district_obj.id,
+                    ),
+                many = True,
+                read_only = True,
+                ).data
+            representation["behaviorSet"] = BehaviorSerializer(
+                Behavior.objects.filter(
+                    student_id__in = self.accessible_students,
+                    school__district_id = district_obj.id,
+                    ),
+                many = True,
+                read_only = True,
+                ).data
         elif access_level == self.user.get_my_access():
             representation["schoolSet"] = SchoolSerializer(district_obj.school_set.filter(pk__in=self.my_schools), many = True, read_only = True).data
             representation["studentSet"] = StudentSerializer(Student.objects.filter(pk__in=self.my_students, current_school__district_id = district_obj.id), many = True, read_only = True).data
@@ -450,7 +584,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         model = Bookmark
         fields = ('id','user','url','created','json_request_data','notes')
 
-class Child_setSerializer(serializers.BaseSerializer):
+class RelatedSetSerializer(serializers.BaseSerializer):
     """This class serializes an instance of a model and specified sets of data
     from child models. For example, it can serialize an instance of the student
     model and the set of grade data associated with it. This class functions
@@ -478,6 +612,7 @@ class Child_setSerializer(serializers.BaseSerializer):
         }
 
     def find_foreign_key_field_connection(self, instance, child_model):
+        #look up and down to find relationship without iterating through all relationships
         instance_model_name = instance.__class__.__name__
         child_fields = child_model._meta.fields
         for field in child_fields:
