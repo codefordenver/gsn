@@ -247,6 +247,21 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
                                     "Sorry": "data parsed isn't valid for serializer",
                                     "serializer errors": serializer.errors
                                 })
+
+    def delete(self, request, pk, access_level, format = None):
+        """
+        This method allows individual notes to be deleted.
+
+        interact via: DELETE <host>/gsndb/<accessLevel>/note/<note_id>
+        """
+        current_note = Note.objects.get(pk = pk)
+        accessible_notes = Note.objects.filter(user_id = user.get_user().id)
+        if current_note not in accessible_notes:
+            return Response({"Sorry": "this user does not have access to do that."})
+        else:
+            current_note.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/note/")
+            
 #Other
 class NoteByObject(APIView):
     """
