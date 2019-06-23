@@ -43,7 +43,7 @@ class DistrictSerializer(serializers.ModelSerializer):
     def to_representation(self, district_obj):
         representation = super().to_representation(district_obj)
 
-        representation["districtIdlol"] = representation.pop("id")
+        representation["districtId"] = representation.pop("id")
         representation["districtName"] = district_obj.name
         representation["state"] = district_obj.state
         representation["city"] = district_obj.city
