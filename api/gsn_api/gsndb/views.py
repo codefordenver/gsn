@@ -14,12 +14,12 @@ user = FilterSecurity()
 def post_note(request, Model, pk, access_level):
     """
     This method allows notes to be posted to any object referenced in this
-    function's dictionary: access_dict. It should only be called in the POST 
+    function's dictionary: access_dict. It should only be called in the POST
     methods of views displaying these models.
 
-    Note: the CamelCaseJSONParser that our backend defaults to automatically
-    turns camelCase requests generated on the front end into snake_case in
-    the back end.
+    The body of the post request this method handles should be in JSON format:
+
+    {"text": "note text here"}
     """
     access_dict = {
         "Program": user.get_accessible_programs(),
@@ -53,10 +53,10 @@ def post_note(request, Model, pk, access_level):
         ),
         "Bookmark": Bookmark.objects.filter(user_id = user.get_user()),
     }
-    DetailInstance = Model.objects.get(pk = pk)
-    detail_name = DetailInstance.__class__.__name__
-    accessible_instances = access_dict[detail_name]
-    if DetailInstance not in accessible_instances:
+    ModelInstance = Model.objects.get(pk = pk)
+    model_name = ModelInstance.__class__.__name__
+    accessible_instances = access_dict[model_name]
+    if ModelInstance not in accessible_instances:
         return Response({"Sorry": "this user does not have access to do that."})
     else:
         note_text = request.data["text"]
@@ -64,13 +64,16 @@ def post_note(request, Model, pk, access_level):
             "user": user.get_user().id,
             "created": timezone.now(),
             "text": note_text,
-            "content_type": ContentType.objects.get(model = detail_name.lower()).id,
+            "content_type": ContentType.objects.get(model = model_name.lower()).id,
             "object_id": pk
         }
         serializer = NoteSerializer(data = note_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/{detail_name.lower()}/{pk}/")
+            if Model in [Program, District, School, Course, Student]:
+                return HttpResponseRedirect(f"/gsndb/{access_level}/{model_name.lower()}/{pk}/")
+            else:
+                return HttpResponseRedirect(f"/gsndb/{access_level}/note/{model_name.lower()}/{pk}/")
             #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
         else:
 
@@ -394,6 +397,9 @@ class NoteByObject(APIView):
         instance being displayed. Note that obj_type will be a lowercase string.
 
         Interact via: POST <host>/gsndb/<access_level>/note/<str:obj_type>/<int:pk>/ body = {"text": "My note text"}
+
+        Note: We override the response given by the post_note() method here
+        and instead explicitly redirect.
         """
         model_dict = {
             "program": Program,
@@ -408,7 +414,7 @@ class NoteByObject(APIView):
             "attendance": Attendance,
             "bookmark": Bookmark,
         }
-        Model = model_dict[object_type]
+        Model = model_dict[obj_type]
         response = post_note(request, Model, pk, access_level)
         return response
 
