@@ -1,14 +1,83 @@
 from rest_framework.response import Response
 from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
-from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer
+from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
 
 user = FilterSecurity()
+
+def post_note(request, Model, pk, access_level):
+    """
+    This method allows notes to be posted to any object referenced in this
+    function's dictionary: access_dict. It should only be called in the POST 
+    methods of views displaying these models.
+
+    Note: the CamelCaseJSONParser that our backend defaults to automatically
+    turns camelCase requests generated on the front end into snake_case in
+    the back end.
+    """
+    access_dict = {
+        "Program": user.get_accessible_programs(),
+        "District": user.get_accessible_districts(),
+        "School": user.get_accessible_schools(),
+        "Course": user.get_accessible_courses(),
+        "Student": user.get_accessible_students(),
+        "Referral": Referral.objects.filter(user_id = user.get_user()),
+        "Calendar": Calendar.objects.filter(
+            Q(pk__in = Grade.objects.filter(
+                student_id__in = user.get_accessible_students().values("id")
+                ).values("calendar")
+            ) |
+            Q(pk__in = Attendance.objects.filter(
+                student_id__in = user.get_accessible_students().values("id")
+                ).values("calendar")
+            ) |
+            Q(pk__in = Behavior.objects.filter(
+                student_id__in = user.get_accessible_students().values("id")
+                ).values("calendar")
+            )
+        ),
+        "Behavior": Behavior.objects.filter(
+            student_id__in = user.get_accessible_students().values("id")
+        ),
+        "Grade": Grade.objects.filter(
+            student_id__in = user.get_accessible_students().values("id")
+        ),
+        "Attendance": Attendance.objects.filter(
+            student_id__in = user.get_accessible_students().values("id")
+        ),
+        "Bookmark": Bookmark.objects.filter(user_id = user.get_user()),
+    }
+    DetailInstance = Model.objects.get(pk = pk)
+    detail_name = DetailInstance.__class__.__name__
+    accessible_instances = access_dict[detail_name]
+    if DetailInstance not in accessible_instances:
+        return Response({"Sorry": "this user does not have access to do that."})
+    else:
+        note_text = request.data["text"]
+        note_data = {
+            "user": user.get_user().id,
+            "created": timezone.now(),
+            "text": note_text,
+            "content_type": ContentType.objects.get(model = detail_name.lower()).id,
+            "object_id": pk
+        }
+        serializer = NoteSerializer(data = note_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/{detail_name.lower()}/{pk}/")
+            #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                            })
 
 #Table views
 class StudentList(generics.ListCreateAPIView):
@@ -72,50 +141,94 @@ class BookmarkList(generics.ListCreateAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
+class ReferralList(generics.ListCreateAPIView):
+
+    def get(self, request, access_level, format = None):
+        queryset = Referral.objects.filter(user = user.get_user())
+        serializer = ReferralSerializer(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, access_level, format = None):
+        """
+        This method allows new referrals to be posted to the database. It
+        redirects to the selfsame ReferralList view, allowing the user to
+        see the new referral they created among their list of referrals.
+        """
+        json = request.data
+        student = Student.objects.get(pk = json["student"])
+        if student not in user.get_accessible_students():
+            return Response({"Sorry": "this user does not have access to add a referral for this student."})
+        else:
+            note_data = {
+                "user": user.get_user().id,
+                "student": json["student"],
+                "program": json["program"],
+                "type": json["type"],
+                "date_given": json["date_given"],
+                "reference_name": json["reference_name"],
+                "reference_phone": json["reference_phone"],
+                "reference_address": json["reference_address"],
+                "reason": json["reason"],
+                "notes": [],
+            }
+            serializer = ReferralSerializer(data = note_data)
+            if serializer.is_valid():
+                serializer.save()
+                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
+            else:
+
+                return Response({
+                                    "Sorry": "The serializer denied saving this note.",
+                                    "The serializer raised the following errors": serializer.errors
+                                })
+
+
 #Detail views
 
-def post_note_to_detail(request, Model, pk, access_level):
-    """
-    This method allows notes to be posted to our five detail views: Program,
-    District, School, Course, and Student. It should only be called in the post
-    methods of Detail views.
 
-    Note: the CamelCaseJSONParser that our backend defaults to automatically
-    turns camelCase requests generated on the front end into snake_case in
-    the back end.
-    """
-    access_dict = {
-        "Program": user.get_accessible_programs(),
-        "District": user.get_accessible_districts(),
-        "School": user.get_accessible_schools(),
-        "Course": user.get_accessible_courses(),
-        "Student": user.get_accessible_students(),
-    }
-    DetailInstance = Model.objects.get(pk = pk)
-    detail_name = DetailInstance.__class__.__name__
-    accessible_instances = access_dict[detail_name]
-    if DetailInstance not in accessible_instances:
-        return Response({"Sorry": "this user does not have access to do that."})
-    else:
-        note_text = request.data["text"]
-        note_data = {
-            "user": user.get_user().id,
-            "created": timezone.now(),
-            "text": note_text,
-            "content_type": ContentType.objects.get(model = detail_name.lower()).id,
-            "object_id": pk
-        }
-        serializer = NoteSerializer(data = note_data)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/{detail_name.lower()}/{pk}/")
-            #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
+class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
+
+    def get(self, request, pk, access_level, format = None):
+        queryset = Referral.objects.filter(pk = pk, )
+        serializer = ReferralDetailSerializer(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, pk, access_level, format = None):
+        response = post_note(request, Referral, pk, access_level)
+        return response
+
+    def put(self, request, pk, access_level, format = None):
+        """
+        This method allows a user to update an existing referral via a PUT request.
+        """
+        referral_obj = Referral.objects.get(pk = pk)
+        json = request.data
+        student = Student.objects.get(pk = json["student"])
+        if student not in user.get_accessible_students():
+            return Response({"Sorry": "this user does not have access to edit this referral for this student."})
         else:
+            note_data = {
+                "user": user.get_user().id,
+                "student": json["student"],
+                "program": json["program"],
+                "type": json["type"],
+                "date_given": json["date_given"],
+                "reference_name": json["reference_name"],
+                "reference_phone": json["reference_phone"],
+                "reference_address": json["reference_address"],
+                "reason": json["reason"],
+            }
+            serializer = ReferralSerializer(referral_obj, data = note_data)
+            if serializer.is_valid():
+                serializer.save()
+                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
+            else:
 
-            return Response({
-                                "Sorry": "The serializer denied saving this note.",
-                                "The serializer raised the following errors": serializer.errors
-                            })
+                return Response({
+                                    "Sorry": "The serializer denied saving this note.",
+                                    "The serializer raised the following errors": serializer.errors
+                                })
+
 
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
@@ -131,7 +244,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/district/<pk> body = {"text": "My note text"}
         """
-        response = post_note_to_detail(request, District, pk, access_level)
+        response = post_note(request, District, pk, access_level)
         return response
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -148,7 +261,7 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/student/<pk> body = {"text": "My note text"}
         """
-        response = post_note_to_detail(request, Student, pk, access_level)
+        response = post_note(request, Student, pk, access_level)
         return response
 
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -165,7 +278,7 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/School/<pk> body = {"text": "My note text"}
         """
-        response = post_note_to_detail(request, School, pk, access_level)
+        response = post_note(request, School, pk, access_level)
         return response
 
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -182,7 +295,7 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/course/<pk> body = {"text": "My note text"}
         """
-        response = post_note_to_detail(request, Course, pk, access_level)
+        response = post_note(request, Course, pk, access_level)
         return response
 
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -199,7 +312,7 @@ class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/program/<pk> body = {"text": "My note text"}
         """
-        response = post_note_to_detail(request, Program, pk, access_level)
+        response = post_note(request, Program, pk, access_level)
         return response
 
 class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -213,11 +326,11 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
         serializer = NoteSerializer(queryset, many = True)
         return Response(serializer.data)
 
-    def post(self, request, pk, access_level, format = None):
+    def put(self, request, pk, access_level, format = None):
         """
         This method allows individual notes to be updated.
 
-        interact via: http POST <host>/gsndb/<accessLevel>/note/<note_id> {"text": "My note text here."}
+        interact via: http PUT <host>/gsndb/<accessLevel>/note/<note_id> {"text": "My note text here."}
 
         Note: the CamelCaseJSONParser that our backend defaults to automatically
         turns camelCase requests generated on the front end into snake_case in
@@ -261,22 +374,43 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
         else:
             current_note.delete()
             return HttpResponseRedirect(f"/gsndb/{access_level}/note/")
-            
+
 #Other
 class NoteByObject(APIView):
-    """
-    - check if updating a new note
-    - serializer.save will update a note if note called when serializer instantiated
-        - NoteSerializer(existing_note)
-    """
-    def get(self, request, pk, obj_type):
 
+    def get(self, request, pk, access_level, obj_type):
         cont_type = ContentType.objects.get(app_label = "gsndb", model = obj_type).id
-        notes = Note.objects.filter(content_type = cont_type, object_id = pk)
+        notes = Note.objects.filter(
+            user_id = user.get_user(),
+            content_type = cont_type,
+            object_id = pk,
+        )
         data = NoteSerializer(notes, many = True).data
-
         return Response(data)
 
+    def post(self, request, pk, access_level, obj_type):
+        """
+        Allows users to post a new note to the list of notes for a model
+        instance being displayed. Note that obj_type will be a lowercase string.
+
+        Interact via: POST <host>/gsndb/<access_level>/note/<str:obj_type>/<int:pk>/ body = {"text": "My note text"}
+        """
+        model_dict = {
+            "program": Program,
+            "district": District,
+            "school": School,
+            "course": Course,
+            "student": Student,
+            "referral": Referral,
+            "calendar": Calendar,
+            "behavior": Behavior,
+            "grade": Grade,
+            "attendance": Attendance,
+            "bookmark": Bookmark,
+        }
+        Model = model_dict[object_type]
+        response = post_note(request, Model, pk, access_level)
+        return response
 
 class SchoolInfo(APIView):
 
