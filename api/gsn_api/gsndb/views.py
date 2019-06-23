@@ -232,6 +232,20 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
                                     "The serializer raised the following errors": serializer.errors
                                 })
 
+    def delete(self, request, pk, access_level, format = None):
+        """
+        This method allows individual referrals to be deleted.
+
+        interact via: DELETE <host>/gsndb/<accessLevel>/referral/<note_id>
+        """
+        current_referral = Referral.objects.get(pk = pk)
+        accessible_referrals = Referral.objects.filter(user_id = user.get_user().id)
+        if current_referral not in accessible_referrals:
+            return Response({"Sorry": "this user does not have access to do that."})
+        else:
+            current_referral.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/referral/")
+
 
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
