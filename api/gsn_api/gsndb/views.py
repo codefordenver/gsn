@@ -74,7 +74,6 @@ def post_note(request, Model, pk, access_level):
                 return HttpResponseRedirect(f"/gsndb/{access_level}/{model_name.lower()}/{pk}/")
             else:
                 return HttpResponseRedirect(f"/gsndb/{access_level}/note/{model_name.lower()}/{pk}/")
-            #return HttpResponseRedirect(redirect_to = f"/{accessLevel}/gsndb/district/{pk}")
         else:
 
             return Response({
@@ -162,7 +161,7 @@ class ReferralList(generics.ListCreateAPIView):
         if student not in user.get_accessible_students():
             return Response({"Sorry": "this user does not have access to add a referral for this student."})
         else:
-            note_data = {
+            referral_data = {
                 "user": user.get_user().id,
                 "student": json["student"],
                 "program": json["program"],
@@ -174,7 +173,7 @@ class ReferralList(generics.ListCreateAPIView):
                 "reason": json["reason"],
                 "notes": [],
             }
-            serializer = ReferralSerializer(data = note_data)
+            serializer = ReferralSerializer(data = referral_data)
             if serializer.is_valid():
                 serializer.save()
                 return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
@@ -210,7 +209,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
         if student not in user.get_accessible_students():
             return Response({"Sorry": "this user does not have access to edit this referral for this student."})
         else:
-            note_data = {
+            referral_data = {
                 "user": user.get_user().id,
                 "student": json["student"],
                 "program": json["program"],
@@ -221,7 +220,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
                 "reference_address": json["reference_address"],
                 "reason": json["reason"],
             }
-            serializer = ReferralSerializer(referral_obj, data = note_data)
+            serializer = ReferralSerializer(referral_obj, data = referral_data)
             if serializer.is_valid():
                 serializer.save()
                 return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
