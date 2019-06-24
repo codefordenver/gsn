@@ -1,7 +1,9 @@
+import json
+import pandas as pd
+import numpy as np
+
 class CSVToJsonParser():
-    import json
-    import pandas as pd
-    import numpy as np
+
     def __init__(self, string_file_obj, school_of_csv_origin):
         #self.string_file_obj = string_file_obj
         self.school_of_csv_origin = school_of_csv_origin
@@ -15,13 +17,6 @@ class CSVToJsonParser():
             "studentBirthday": "2018-03-23",
             "studentStateID": 542796,
             "studentGradeYear": 9,
-            "studentReasonInProgram": "behavior",
-            "programName": "Eargo",
-            "districtName": "Jeffco",
-            "districtState": "PA",
-            "districtCity": "Wakulla",
-            "districtCode": "H382",
-            "schoolName": "Carmody",
             "courses": [
                 {
                 "courseName": "Algebra",
@@ -69,10 +64,10 @@ class CSVToJsonParser():
         self.datatypes_dict = {
             #datatypes are NumPy dtypes, and 'object' for strings.
             #Note: django appears to want datetimes as strings, not np.datetime64
-            'int': self.np.int64,
+            'int': np.int64,
             'str': object,
-            'bool': self.np.bool_,
-            'float': self.np.float64,
+            'bool': np.bool_,
+            'float': np.float64,
         }
 
         target_field_datatypes = {}
@@ -90,6 +85,7 @@ class CSVToJsonParser():
         self.target_field_datatypes = target_field_datatypes
 
         self.master_field_dict = {
+            #Keys: json fields. Values: csv fields.
             "Trivial": {
                 'studentFirstName': 'studentFirstName',
                 'studentLastName': 'studentLastName',
@@ -98,13 +94,6 @@ class CSVToJsonParser():
                 'studentBirthday': "studentBirthday",
                 'studentStateID': "studentStateID",
                 'studentGradeYear': "studentGradeYear",
-                'studentReasonInProgram': "studentReasonInProgram",
-                'programName': "programName",
-                'districtName': "districtName",
-                'districtState': "districtState",
-                'districtCity': "districtCity",
-                'districtCode': "districtCode",
-                'schoolName': "schoolName",
                 'courseName': "courseName",
                 'courseCode': "courseCode",
                 'courseSubject': "courseSubject",
@@ -122,23 +111,41 @@ class CSVToJsonParser():
                 'behaviorPeriod': "behaviorPeriod",
                 'behaviorIncidentDate': "behaviorIncidentDate",
                 'behaviorContext': "behaviorContext",
-                'behaviorIncidentTypeProgram': "behaviorIncidentTypeProgram",
-                'behaviorIncidentResultProgram': "behaviorIncidentResultProgram",
                 'behaviorIncidentTypeSchool': "behaviorIncidentTypeSchool",
                 'behaviorIncidentResultSchool': "behaviorIncidentResultSchool",
-                },
+            },
+            "Weld Central Middle School": {
+                'studentFirstName': 'student.firstName',
+                'studentLastName': 'student.lastName',
+                "studentMiddleName": 'student.middleName',
+                "studentGender": 'student.gender',
+                "studentBirthday": 'student.birthdate',
+                "studentStateID": 'student.stateID',
+                "studentGradeYear": 'student.grade',
+                'studentNumber': 'student.studentNumber',
+                "courseName": 'grading.courseName',
+                "courseCode": 'grading.courseNumber',
+                "gradePeriod": 'grading.periodName',
+                "grade": 'grading.percent',
+                "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
+                'attendanceTotalTardies': "attExactDailyTermCount.tardies",
+                'behaviorIncidentDate': "behaviorDetail.incidentDate",
+                'behaviorContext': "behaviorDetail.details",
+                'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
+                'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
+            }
         }
 
     def get_csv_datatypes(self):
-        csv_to_json_field_dict = self.master_field_dict[self.school_of_csv_origin]
+        json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
         csv_datatypes = {}
-        for csv_field, json_field in csv_to_json_field_dict.items():
+        for json_field, csv_field in json_to_csv_field_dict.items():
             datatype = self.target_field_datatypes[json_field]
             csv_datatypes[csv_field] = datatype
         return csv_datatypes
 
     def get_dataframe(self, csv_datatypes):
-        csv_df = self.pd.read_csv(self.string_file_obj, dtype = csv_datatypes)
+        csv_df = pd.read_csv(self.string_file_obj, dtype = csv_datatypes)
         return csv_df
 
     def get_json_array(self, csv_df, id_field):
