@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from gsndb.filter_security import FilterSecurity
+from gsndb.filter_security import FilterSecurity, FilterSecurityFake
 
 user = FilterSecurity()
 
@@ -97,7 +97,9 @@ class StudentList(generics.ListCreateAPIView):
 class DistrictList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurityFake(request)
         if access_level == user.get_my_access():
+            # print(request.user)
             queryset = user.get_my_districts()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_districts()
