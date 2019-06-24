@@ -139,9 +139,11 @@ class ProgramList(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 class NoteList(generics.ListCreateAPIView):
-
-    queryset = Note.objects.filter(user_id = user.get_user().id)
-    serializer_class = NoteSerializer
+    def get(self, request):
+        user = FilterSecurity(request)
+        queryset = Note.objects.filter(user_id = user.get_user().id)
+        serializer = NoteSerializer(queryset, many = True)
+        return Response(serializer.data)
 
 class BookmarkList(generics.ListCreateAPIView):
     queryset = Bookmark.objects.all()
