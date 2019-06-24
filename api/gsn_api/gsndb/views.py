@@ -2,7 +2,7 @@ import hashlib, io
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA
@@ -219,18 +219,15 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BookmarkSerializer
 
 class CSVParser(APIView):
-    def __init__(self):
-        self.fileName = ""
-        self.hash = ""
-        self.hasFileAlreadyUploaded = False
-
-    renderer_classes = (
-        TemplateHTMLRenderer,
-        )
 
     parser_classes = (
         MultiPartParser,
     )
+
+    def __init__(self):
+        self.file_name = ""
+        self.hash = ""
+        self.has_file_already_uploaded = False
 
     def hash_handler(self, byte_file_obj):
         """A hash function that identifies gives a csv file a hash that uniquely
@@ -242,7 +239,7 @@ class CSVParser(APIView):
         blocksize = 65536
         hasher = hashlib.sha1()
         content = ""
-        self.fileName = byte_file_obj.name
+        self.file_name = byte_file_obj.name
         buf = byte_file_obj.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
@@ -253,54 +250,40 @@ class CSVParser(APIView):
 
 
     def has_file_already_been_uploaded(self):
-        self.hasFileAlreadyUploaded = FileSHA.objects.filter(hasher = self.hash).exists()
-        if(not self.hasFileAlreadyUploaded):
-            FileSHA.objects.create(hasher = self.hash, filePath = self.fileName)
+        self.has_file_already_uploaded = FileSHA.objects.filter(hasher = self.hash).exists()
+        if(not self.has_file_already_uploaded):
+            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
-    def get(self, request):
-        """Displays html template with basic file upload functionality.
-
-        Interact with: http GET <host>/gsndb/uploadcsv/
-
-        or visit <host>/gsndb/uploadcsv in browser.
-        """
-        return Response(template_name = "backend_dev_simple_upload.html")
-
-    def post(self, request):
+    def post(self, request, access_level):
         """Takes a file and turns it into an instance of Django's UploadedFile
         class. The response generated renders an html template offering some
         meta information.
 
-        Note: it seems UploadedFile objects cannot be accessed by python's open()
-        function.
-
         Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
         """
-        byte_file_obj = request.data["mycsv"]
+        byte_file_obj = request.data["csv"]
+        school_of_origin = request.data["school_of_origin"]
         content = self.hash_handler(byte_file_obj)
         self.has_file_already_been_uploaded()
 
-        if(self.hasFileAlreadyUploaded):
+        if(self.has_file_already_uploaded):
             return Response(
                 {
-                    "file_name": self.fileName,
+                    "Error": f"{self.file_name} has already been uploaded.",
                     "content": content,
-                },
-                    template_name = "backend_dev_unsuccessful_hash_upload.html",
-                )
+                }
+            )
         else:
             string_io_obj = io.StringIO(content)
-            school_of_csv_origin = "Trivial"
-            parser = CSVToJsonParser(string_io_obj, school_of_csv_origin)
+            parser = CSVToJsonParser(string_io_obj, school_of_origin)
             dtypes = parser.get_csv_datatypes()
             csv_df = parser.get_dataframe(dtypes)
             identifying_column = "studentStateID"
             json_array = parser.get_json_array(csv_df, identifying_column)
-            parse_json_into_db(json_array)
+            #parse_json_into_db(json_array)
             return Response(
                 {
-                    "file_name": self.fileName,
+                    "file_name": self.file_name,
                     "content": json_array,
-                },
-                    template_name = "backend_dev_successful_upload.html",
-                )
+                }
+            )
