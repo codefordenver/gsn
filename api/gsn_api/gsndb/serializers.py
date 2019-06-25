@@ -7,11 +7,27 @@ from gsndb.filter_security import FilterSecurity
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ("user",
+        fields = (
+            "id",
+            "user",
             "created",
             "text",
             "content_type",
-            "object_id")
+            "object_id",
+            )
+
+    def to_representation(self, note_obj):
+        representation = super().to_representation(note_obj)
+
+        representation["noteId"] = representation.pop("id")
+        representation["user"] = note_obj.user.id
+        representation["createdUpdated"] = representation.pop("created")
+        representation["text"] = note_obj.text
+        representation["contentType"] = note_obj.content_type.id
+        representation["objectId"] = note_obj.object_id
+
+        return representation
+
 
 # all table serializer
 '''These serializers throw errors when it doesn't have Meta in it.
@@ -157,6 +173,38 @@ class GradeSerializer(serializers.ModelSerializer):
         representation["grade"] = grade_obj.grade
         representation["finalGradeForTerm"] = grade_obj.term_final_value
 
+
+        return representation
+
+class ReferralSerializer(serializers.ModelSerializer):
+    user = FilterSecurity()
+
+    notes = NoteSerializer(many=True, read_only = True)
+    class Meta:
+        model = Referral
+        fields = (
+            "id",
+            "user",
+            "student",
+            "program",
+            "type",
+            "date_given",
+            "reference_name",
+            "reference_phone",
+            "reference_address",
+            "reason",
+            "notes",
+        )
+
+    def to_representation(self, referral_obj):
+        representation = super().to_representation(referral_obj)
+
+        representation["referralId"] = representation.pop("id")
+        representation["user"] = referral_obj.user.id
+        representation["student"] = referral_obj.student.id
+        representation["program"] = referral_obj.program.id
+        representation["type"] = referral_obj.type
+        representation["dateGiven"] = referral_obj.date_given
 
         return representation
 
@@ -337,7 +385,29 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
 
         return representation
 
+class ReferralDetailSerializer(serializers.ModelSerializer):
+    user = FilterSecurity()
 
+    class Meta:
+        model = Referral
+        fields = ("id",)
+
+    def to_representation(self, referral_obj):
+        representation = super().to_representation(referral_obj)
+
+        representation["referralId"] = representation.pop("id")
+        representation["user"] = referral_obj.user.id
+        representation["student"] = referral_obj.student.id
+        representation["program"] = referral_obj.program.id
+        representation["type"] = referral_obj.type
+        representation["dateGiven"] = referral_obj.date_given
+        representation["referenceName"] = referral_obj.reference_name
+        representation["referencePhone"] = referral_obj.reference_phone
+        representation["referenceAddress"] = referral_obj.reference_address
+        representation["reason"] = referral_obj.reason
+        representation["notes"] = NoteSerializer(referral_obj.notes.filter(user = self.user.get_user()), many = True).data
+
+        return representation
 
 
 
@@ -374,45 +444,6 @@ class CalendarSerializer(serializers.ModelSerializer):
 
 
 
-'''
-#can we delete this
-# class GradeForStudentSerializer(serializers.BaseSerializer):
-
-    def to_representation(self, student_obj):
-        grade = GradeSerializer(student_obj.grade_set, many = True)
-        grade_json = grade.data
-        note = NoteSerializer(student_obj.notes, many = True)
-        note_json = note.data
-        return {
-            "First Name": student_obj.first_name,
-            "Last Name": student_obj.last_name,
-            "Grades": grade_json,
-            "Note": note_json,
-
-        }
-
-'''
-
-
-class ReferralSerializer(serializers.ModelSerializer):
-    notes = NoteSerializer(many=True)
-    class Meta:
-        model = Referral
-        fields = (
-            "id",
-            "user",
-            "student",
-            "program",
-            "type",
-            "date_given",
-            "reference_name",
-            "reference_phone",
-            "reference_address",
-            "reason",
-            "notes",
-        )
-
-'''
 class ParedGrade2Serializer(serializers.ModelSerializer):
     #can we get rid of this?
     grade = serializers.CharField()
@@ -429,7 +460,7 @@ class StudentGradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ('grade_set', 'birthday','notes')
-'''
+
 
 
 class BookmarkSerializer(serializers.ModelSerializer):

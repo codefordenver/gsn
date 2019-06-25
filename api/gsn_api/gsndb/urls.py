@@ -15,6 +15,9 @@ urlpatterns = [
     path('bookmark/', views.BookmarkList.as_view()),
     path('bookmark/<int:pk>/', views.BookmarkDetail.as_view()),
     path('note/', views.NoteList.as_view()),
-    path('note/<str:objType>/<int:pk>/', views.NoteByObject.as_view()),
+    path('note/<int:pk>/', views.NoteDetail.as_view()),
+    path('note/<str:obj_type>/<int:pk>/', views.NoteByObject.as_view()),
+    path('referral/', views.ReferralList.as_view()),
+    path('referral/<int:pk>/', views.ReferralDetail.as_view()),
     path('uploadcsv/', views.CSVParser.as_view()),
   ]
