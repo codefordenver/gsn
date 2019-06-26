@@ -270,6 +270,7 @@ class Behavior(models.Model):
         max_length = 50,
         blank = True,
     )
+    behavior_SISID = models.BigIntegerField()
     notes = GenericRelation(Note)
 
 class Grade(models.Model):
@@ -399,3 +400,14 @@ class MyStudents(models.Model):
         "StudentUserHasAccess",
         on_delete = models.PROTECT,
     )
+
+class HistoricalStudentID(models.Model):
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.PROTECT,
+    )
+    school = models.ForeignKey(
+        "School",
+        on_delete = models.PROTECT,
+    )
+    student_SISID = models.BigIntegerField()
