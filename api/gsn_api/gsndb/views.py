@@ -14,8 +14,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
-from .services.csv_to_json_parser import CSVToJsonParser
-from .services.json_parser import parse_json_into_db
+from .services.parser import CSVParser
 
 user = FilterSecurity()
 
@@ -108,7 +107,7 @@ class DistrictList(generics.ListCreateAPIView):
             queryset = user.get_my_districts()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_districts()
-        serializer = DistrictSerializer(queryset , many = True)
+        serializer = DistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
 class SchoolList(generics.ListCreateAPIView):
@@ -118,7 +117,7 @@ class SchoolList(generics.ListCreateAPIView):
             queryset = user.get_my_schools()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_schools()
-        serializer = SchoolSerializer(queryset , many = True)
+        serializer = SchoolSerializer(queryset, many = True)
         return Response(serializer.data)
 
 class CourseList(generics.ListCreateAPIView):
@@ -566,7 +565,6 @@ class CSVParser(APIView):
             csv_df = parser.get_dataframe(dtypes)
             identifying_column = "studentStateID"
             json_array = parser.get_json_array(csv_df, identifying_column)
-            #parse_json_into_db(json_array)
             return Response(
                 {
                     "file_name": self.file_name,
