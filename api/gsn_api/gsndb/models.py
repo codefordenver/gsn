@@ -299,6 +299,10 @@ class Grade(models.Model):
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField(null = True)
+    task = models.CharField(
+        max_length = 100,
+        null = True
+        )
     term_final_value = models.BooleanField(default = False)
     notes = GenericRelation(Note)
 
@@ -324,6 +328,7 @@ class Attendance(models.Model):
         on_delete = models.PROTECT,
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
+    total_abs = models.IntegerField(null = True)
     total_unexabs = models.IntegerField(null = True)
     total_exabs = models.IntegerField(null = True)
     total_tardies = models.IntegerField(null = True)
