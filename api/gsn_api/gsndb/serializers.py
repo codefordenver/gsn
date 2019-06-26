@@ -75,7 +75,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, student_obj):
         representation = super().to_representation(student_obj)
-
         representation["studentId"] = representation.pop("id")
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["schoolName"] = student_obj.current_school.name
@@ -263,7 +262,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["gender"] = student_obj.gender
         representation["schoolId"] = student_obj.current_school.id
-        representation["schoolId"] = student_obj.current_school.name
+        representation["schoolName"] = student_obj.current_school.name
         representation["birthdate"] = student_obj.birth_date
         representation["stateId"] = student_obj.state_id
         representation["studentYear"] = student_obj.grade_year
