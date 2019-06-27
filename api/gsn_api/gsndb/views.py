@@ -544,7 +544,7 @@ class CSVParser(APIView):
         class. The response generated renders an html template offering some
         meta information.
 
-        Interact with: http --form POST <host>/gsndb/uploadcsv/ mycsv@<abs path to file>
+        Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_origin": <school_name>, "final_value" = <boolean>, "csv": <csv_file>}
         """
         byte_file_obj = request.data["csv"]
         school_of_origin = request.data["school_of_origin"]
