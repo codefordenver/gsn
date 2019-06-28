@@ -18,5 +18,7 @@ urlpatterns = [
     path('note/<int:pk>/', views.NoteDetail.as_view()),
     path('note/<str:obj_type>/<int:pk>/', views.NoteByObject.as_view()),
     path('referral/', views.ReferralList.as_view()),
-    path('referral/<int:pk>/', views.ReferralDetail.as_view())
+    path('referral/<int:pk>/', views.ReferralDetail.as_view()),
+    path('create-school/', views.SchoolPostList.as_view()),
+    path('create-district/', views.DistrictPostList.as_view())
   ]
