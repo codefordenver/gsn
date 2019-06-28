@@ -302,7 +302,7 @@ class Grade(models.Model):
     task = models.CharField(
         max_length = 100,
         null = True
-        )
+    )
     term_final_value = models.BooleanField(default = False)
     notes = GenericRelation(Note)
 

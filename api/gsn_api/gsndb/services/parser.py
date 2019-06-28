@@ -4,52 +4,78 @@ import numpy as np
 
 class CSVParser():
 
-    def __init__(self, string_file_obj, school_of_csv_origin):
+    def __init__(self, string_file_obj, school_of_csv_origin, term_final_value = False):
         #self.string_file_obj = string_file_obj
         self.school_of_csv_origin = school_of_csv_origin
         self.string_file_obj = string_file_obj
+        self.term_final_value = term_final_value
         self.target_json_format = [
             {
-                "studentFirstName": "Fuller",
-                "studentLastName": "Hahn",
-                "studentMiddleName": "Rodgers",
-                "studentGender": "M",
-                "studentBirthday": "2018-03-23",
-                "studentStateID": 542796,
-                "studentGradeYear": 9,
-                "studentReasonInProgram": "behavior",
-                "studentSISID": 298347928374,
                 "programName": "Eargo",
                 "districtName": "Jeffco",
                 "districtState": "PA",
                 "districtCity": "Wakulla",
                 "districtCode": "H382",
                 "schoolName": "Carmody",
-                "courses": [
-                  {
-                    "courseName": "Algebra",
-                    "courseCode": "G7384",
-                    "courseSubject": "ENG",
-                    "courseCalendarYear": 2004,
-                    "courseCalendarTerm": "SMR",
-                    "gradePeriod": 6,
-                    "grade": 0.8091,
-                    "gradeTermFinalValue": True,
-                    "attendanceEntryDate": "2016-03-24",
-                    "attendanceTotalUnexcusedAbsence": 28,
-                    "attendancetotalExcusedAbsence": 26,
-                    "attendanceTotalTardies": 11,
-                    "attendanceAverageDailyAttendance": 27,
-                    "attendanceTermFinalValue": True,
-                    "behaviorPeriod": 2,
-                    "behaviorIncidentDate": "2014-06-26",
-                    "behaviorContext": "H372",
-                    "behaviorSISID": 293847923874,
-                    "behaviorIncidentTypeProgram": "Small",
-                    "behaviorIncidentResultProgram": "Bad",
-                    "behaviorIncidentTypeSchool": "Medium",
-                    "behaviorIncidentResultSchool": "Medium"
-                },
+                "Student": [
+                    {
+                        "studentFirstName": "Fuller",
+                        "studentLastName": "Hahn",
+                        "studentMiddleName": "Rodgers",
+                        "studentGender": "M",
+                        "studentBirthday": "2018-03-23",
+                        "studentStateID": 542796,
+                        "studentGradeYear": 9,
+                        "studentReasonInProgram": "behavior",
+                        "studentSISID": 298347928374,
+                    },
+                ],
+                "Course": [
+                    {
+                        "courseSchool": "link_to_school",
+                        "courseName": "Algebra",
+                        "courseCode": "G7384",
+                        "courseSubject": "ENG",
+                    },
+                ],
+                "Grade": [
+                    {
+
+                        "gradeCalendarYear": 2004,
+                        "gradeCalendarTerm": "SMR",
+                        "gradePeriod": 6,
+                        "grade": 0.8091,
+                        "gradeTask": "Semester Grade",
+                        "gradeTermFinalValue": True,
+                        "gradeEntryDate": "2016-03-24",
+                    },
+                ],
+                "Attendance": [
+                    {
+                        "attendanceCalendarYear": 2004,
+                        "attendanceCalendarTerm": "SMR",
+                        "attendanceEntryDate": "2016-03-24",
+                        "attendanceTotalUnexcusedAbsence": 28,
+                        "attendancetotalExcusedAbsence": 26,
+                        "attendanceTotalAbsence": 54,
+                        "attendanceTotalTardies": 11,
+                        "attendanceAverageDailyAttendance": 27,
+                        "attendanceTermFinalValue": True,
+                    },
+                ],
+                "Behavior": [
+                    {
+                        "behaviorPeriod": 2,
+                        "behaviorCalendarTerm": "SMR",
+                        "behaviorCalendarYear": 2004,
+                        "behaviorIncidentDate": "2014-06-26",
+                        "behaviorContext": "H372",
+                        "behaviorSISID": 293847923874,
+                        "behaviorIncidentTypeProgram": "Small",
+                        "behaviorIncidentResultProgram": "Bad",
+                        "behaviorIncidentTypeSchool": "Medium",
+                        "behaviorIncidentResultSchool": "Medium",
+                    },
                 ],
             },
             ]
@@ -128,25 +154,72 @@ class CSVParser():
                 'behaviorIncidentResultSchool': "behaviorIncidentResultSchool",
             },
             "Weld Central Middle School": {
-                'studentFirstName': 'student.firstName',
-                'studentLastName': 'student.lastName',
-                "studentMiddleName": 'student.middleName',
-                "studentGender": 'student.gender',
-                "studentBirthday": 'student.birthdate',
-                "studentStateID": 'student.stateID',
-                "studentGradeYear": 'student.grade',
-                'studentSISID': 'student.studentNumber',
-                "courseName": 'grading.courseName',
-                "courseCode": 'grading.courseNumber',
-                "gradePeriod": 'grading.periodName',
-                "grade": 'grading.percent',
-                "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
-                'attendanceTotalTardies': "attExactDailyTermCount.tardies",
-                'behaviorIncidentDate': "behaviorDetail.incidentDate",
-                'behaviorContext': "behaviorDetail.details",
-                'behaviorSISID': "behaviorDetail.incidentID",
-                'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
-                'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
+                "direct": {
+                    'studentFirstName': 'student.firstName',
+                    'studentLastName': 'student.lastName',
+                    "studentMiddleName": 'student.middleName',
+                    "studentGender": 'student.gender',
+                    "studentStateID": 'student.stateID',
+                    'studentSISID': 'student.studentNumber',
+                    "courseName": 'grading.courseName',
+                    "courseCode": 'grading.courseNumber',
+                    "gradePeriod": 'grading.periodName',
+                    "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
+                    'attendanceTotalTardies': "attExactDailyTermCount.tardies",
+                    'behaviorContext': "behaviorDetail.details",
+                    'behaviorSISID': "behaviorDetail.incidentID",
+                    'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
+                    'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
+                },
+                "parse": {
+                    "studentGradeYear": 'student.grade',
+                    "studentBirthday": 'student.birthdate',
+                    'behaviorIncidentDate': "behaviorDetail.incidentDate",
+                    'gradeEntryDate': 'grading.date',
+                    "programName": self.school_of_csv_origin,
+                    "districtName": self.school_of_csv_origin,
+                    "districtState": self.school_of_csv_origin,
+                    "districtCity": self.school_of_csv_origin,
+                    "districtCode": self.school_of_csv_origin,
+                    "schoolName": self.school_of_csv_origin,
+                    "courseSubject": "grading.courseName",
+                    "gradeCalendarYear": [
+                        "cal.endYear",
+                        "grading.termName",
+                    ],
+                    "gradeCalendarTerm": [
+                        "cal.endYear",
+                        "grading.termName",
+                    ],
+                    "attendanceCalendarYear": [
+                        "cal.endYear",
+                        "attExactDailyTermCount.termName",
+                    ],
+                    "attendanceCalendarTerm": [
+                        "cal.endYear",
+                        "attExactDailyTermCount.termName",
+                    ],
+                    "grade": [
+                        'grading.percent',
+                        'grading.task',
+                    ],
+                    "gradeTermFinalValue": self.term_final_value,
+                    "attendanceTermFinalValue": self.term_final_value,
+                    "attendanceEntryDate": timezone.now(),
+                    "attendanceTotalExcusedAbsence": [
+                        "attExactDailyTermCount.unexcusedAbsentDays",
+                        "attExactDailyTermCount.absentDays",
+                    ],
+                    "behaviorIncidentTypeProgram": "behaviorDetail.eventName",
+                    "behaviorIncidentResultProgram": "behaviorDetail.resolutionName",
+                },
+                "blank": [
+                    "studentReasonInProgram",
+                    "attendanceAverageDailyAttendance",
+                    "behaviorPeriod",
+                    "behaviorCalendarTerm",
+                    "behaviorCalendarYear",
+                ]
             }
         }
 
@@ -196,3 +269,12 @@ class CSVParser():
                         child_array.append(output)
                 parent_element[housing_field] = child_array
         return json_array
+
+    def parse_json():
+        """
+        - use district = District(field = value) to instantiate and check, then save.
+        - follow heirarchy through student, bring in course and calendar for grade/attendance.
+        - use get or create like hannah, but allow for blanks
+        - filter students first via HistoricalStudentID
+        """
+        pass

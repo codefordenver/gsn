@@ -13,6 +13,7 @@ def create_test_json_array():
     return jsonData
 
 def parse_json_into_db(json_array):
+    #follow model heirarchy
     jsonData = json_array
     for i in range(0,len(jsonData)-1):
         newDistrict= District.objects.get_or_create(
