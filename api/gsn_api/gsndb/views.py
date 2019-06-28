@@ -176,13 +176,71 @@ class ReferralList(generics.ListCreateAPIView):
             serializer = ReferralSerializer(data = referral_data)
             if serializer.is_valid():
                 serializer.save()
-                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
+                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{referral_data.student}")
             else:
 
                 return Response({
                                     "Sorry": "The serializer denied saving this note.",
                                     "The serializer raised the following errors": serializer.errors
                                 })
+
+class SchoolPostList(generics.ListCreateAPIView):
+
+    def get(self, request, access_level, format = None):
+        queryset = School.objects.all()
+        serializer = SchoolSerializer(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, access_level, format = None):
+        """
+        This method allows new schools to be posted to the database.
+        """
+
+        json = request.data
+        school_data = {
+            "school_name": json["school_name"],
+            "district_id": json["district_id"]
+        }
+        serializer = SchoolSerializer(data = school_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/school/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                            })
+
+class DistrictPostList(generics.ListCreateAPIView):
+
+    def get(self, request, access_level, format = None):
+        queryset = District.objects.all()
+        serializer = DistrictSerializer(queryset, many = True)
+        return Response(serializer.data)
+
+    def post(self, request, access_level, format = None):
+        """
+        This method allows new schools to be posted to the database.
+        """
+
+        json = request.data
+        district_data = {
+            "district_name": json["district_name"],
+            "city": json["city"],
+            "state": json["state"],
+            "code": json["code"]
+        }
+        serializer = DistrictSerializer(data = district_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/district/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                            })
 
 
 #Detail views
@@ -245,7 +303,6 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
             current_referral.delete()
             return HttpResponseRedirect(f"/gsndb/{access_level}/referral/")
 
-
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
@@ -262,6 +319,38 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         response = post_note(request, District, pk, access_level)
         return response
+
+    def put(self, request, pk, access_level, format = None):
+        """
+        This method allows a user to update an existing district via a PUT request.
+        """
+        district_obj = District.objects.get(pk = pk)
+        json = request.data
+        district_data = {
+            "district_name": json["district_name"],
+            "city": json["city"],
+            "state": json["state"],
+            "code": json["code"]
+        }
+        serializer = DistrictSerializer(district_obj, data = district_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/district/{pk}/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                                })
+
+    def delete(self, request, pk, access_level, format = None):
+        """
+        This method allows individual schools to be deleted.
+
+        """
+        current_district = District.objects.get(pk = pk)
+        current_district.delete()
+        return HttpResponseRedirect(f"/gsndb/{access_level}/district/")
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 
@@ -280,6 +369,8 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, Student, pk, access_level)
         return response
 
+    
+
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
@@ -297,6 +388,37 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, School, pk, access_level)
         return response
 
+    def put(self, request, pk, access_level, format = None):
+        """
+        This method allows a user to update an existing school via a PUT request.
+        """
+        school_obj = School.objects.get(pk = pk)
+        json = request.data
+        school_data = {
+            "school_name": json["school_name"],
+            "program": json["program"],
+            "district_id": json["district_id"]
+        }
+        serializer = SchoolSerializer(school_obj, data = school_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/school/{pk}/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                                })
+
+    def delete(self, request, pk, access_level, format = None):
+        """
+        This method allows individual schools to be deleted.
+
+        """
+        current_school = School.objects.get(pk = pk)
+        current_school.delete()
+        return HttpResponseRedirect(f"/gsndb/{access_level}/school/")
+
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
@@ -313,6 +435,7 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         response = post_note(request, Course, pk, access_level)
         return response
+
 
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
 
