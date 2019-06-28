@@ -176,7 +176,7 @@ class ReferralList(generics.ListCreateAPIView):
             serializer = ReferralSerializer(data = referral_data)
             if serializer.is_valid():
                 serializer.save()
-                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{referral_data.student}")
+                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}")
             else:
 
                 return Response({
@@ -198,13 +198,13 @@ class SchoolPostList(generics.ListCreateAPIView):
 
         json = request.data
         school_data = {
-            "school_name": json["school_name"],
-            "district_id": json["district_id"]
+            "name": json["school_name"],
+            "district": json["district_id"]
         }
         serializer = SchoolSerializer(data = school_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/school/")
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
 
             return Response({
@@ -226,7 +226,7 @@ class DistrictPostList(generics.ListCreateAPIView):
 
         json = request.data
         district_data = {
-            "district_name": json["district_name"],
+            "name": json["district_name"],
             "city": json["city"],
             "state": json["state"],
             "code": json["code"]
@@ -234,7 +234,7 @@ class DistrictPostList(generics.ListCreateAPIView):
         serializer = DistrictSerializer(data = district_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/district/")
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
 
             return Response({
@@ -327,7 +327,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         district_obj = District.objects.get(pk = pk)
         json = request.data
         district_data = {
-            "district_name": json["district_name"],
+            "name": json["district_name"],
             "city": json["city"],
             "state": json["state"],
             "code": json["code"]
@@ -369,7 +369,7 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, Student, pk, access_level)
         return response
 
-    
+
 
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
 
@@ -395,9 +395,8 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         school_obj = School.objects.get(pk = pk)
         json = request.data
         school_data = {
-            "school_name": json["school_name"],
-            "program": json["program"],
-            "district_id": json["district_id"]
+            "name": json["school_name"],
+            "district": json["district_id"]
         }
         serializer = SchoolSerializer(school_obj, data = school_data)
         if serializer.is_valid():
