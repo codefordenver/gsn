@@ -345,12 +345,27 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, pk, access_level, format = None):
         """
-        This method allows individual schools to be deleted.
+        This method allows individual districts to be deleted.
 
+        interact via: DELETE <host>/gsndb/<access_level>/district/<pk>
         """
         current_district = District.objects.get(pk = pk)
-        current_district.delete()
-        return HttpResponseRedirect(f"/gsndb/{access_level}/district/")
+        connected_schools = False
+        all_schools = School.objects.all()
+        for school in all_schools:
+            if school.district.id == pk:
+                connected_schools = True
+                break
+        if connected_schools == False:
+            current_district.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+        else:
+            return Response(
+                {
+                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
+                    "schools": SchoolSerializer(current_district.school_set, many = True).data
+                }
+            )
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 
@@ -413,10 +428,24 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         This method allows individual schools to be deleted.
 
+        interact via: DELETE <host>/gsndb/<access_level>/school/<pk>
         """
         current_school = School.objects.get(pk = pk)
-        current_school.delete()
-        return HttpResponseRedirect(f"/gsndb/{access_level}/school/")
+        connected_students = False
+        all_students = Student.objects.all()
+        for student in all_students:
+            if student.current_school.id == pk:
+                connected_students = True
+                break
+        if connected_students == False:
+            current_school.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+        else:
+            return Response(
+                {
+                    "Sorry": "You cannot delete a student with students already connected to it.",
+                }
+            )
 
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
