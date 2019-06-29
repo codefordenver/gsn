@@ -85,7 +85,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, student_obj):
         representation = super().to_representation(student_obj)
-
         representation["studentId"] = representation.pop("id")
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["schoolName"] = student_obj.current_school.name
@@ -287,6 +286,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["gradeSet"] = GradeSerializer(student_obj.grade_set, many = True, read_only = True).data
         representation["attendanceSet"] = AttendanceSerializer(student_obj.attendance_set, many = True, read_only = True).data
         representation["behaviorSet"] = BehaviorSerializer(student_obj.behavior_set, many = True, read_only = True).data
+        representation["referralSet"] = ReferralDetailSerializer(student_obj.referral_set, many = True, read_only = True).data
 
         return representation
 
@@ -419,7 +419,7 @@ class ReferralDetailSerializer(serializers.ModelSerializer):
         representation["referencePhone"] = referral_obj.reference_phone
         representation["referenceAddress"] = referral_obj.reference_address
         representation["reason"] = referral_obj.reason
-        representation["notes"] = NoteSerializer(referral_obj.notes.filter(user = self.user.get_user()), many = True).data
+        # representation["notes"] = NoteSerializer(referral_obj.notes.filter(user = self.user.get_user()), many = True).data
 
         return representation
 
