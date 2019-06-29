@@ -38,16 +38,22 @@ including some nested serializers.'''
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = District
-        fields = ("id",)
+        fields = (
+            "id",
+            "state",
+            "city",
+            "code",
+            "name",
+        )
 
     def to_representation(self, district_obj):
         representation = super().to_representation(district_obj)
 
         representation["districtId"] = representation.pop("id")
-        representation["districtName"] = district_obj.name
-        representation["state"] = district_obj.state
-        representation["city"] = district_obj.city
-        representation["code"] = district_obj.code
+        representation["districtName"] = representation.pop("name")
+        representation["state"] = representation.pop("state")
+        representation["city"] = representation.pop("city")
+        representation["code"] = representation.pop("code")
 
         return representation
 
@@ -55,14 +61,18 @@ class DistrictSerializer(serializers.ModelSerializer):
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ("id",)
+        fields = (
+            "id",
+            "name",
+            "district",
+        )
 
     def to_representation(self, school_obj):
         representation = super().to_representation(school_obj)
 
         representation["schoolId"] = representation.pop("id")
-        representation["schoolName"] = school_obj.name
-        representation["districtId"] = school_obj.district.id
+        representation["schoolName"] = representation.pop("name")
+        representation["districtId"] = representation.pop("district")
         representation["districtName"] = school_obj.district.name
 
         return representation
@@ -262,6 +272,10 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["gender"] = student_obj.gender
         representation["schoolId"] = student_obj.current_school.id
+
+        program = Program.objects.get(student=representation["studentId"]).id
+
+        representation["programId"] = program
         representation["schoolName"] = student_obj.current_school.name
         representation["birthdate"] = student_obj.birth_date
         representation["stateId"] = student_obj.state_id
