@@ -1,11 +1,11 @@
 import json
 import pandas as pd
 import numpy as np
+from django.utils import timezone
 
 class CSVParser():
 
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value = False):
-        #self.string_file_obj = string_file_obj
         self.school_of_csv_origin = school_of_csv_origin
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
@@ -32,7 +32,6 @@ class CSVParser():
                 ],
                 "Course": [
                     {
-                        "courseSchool": "link_to_school",
                         "courseName": "Algebra",
                         "courseCode": "G7384",
                         "courseSubject": "ENG",
@@ -40,7 +39,8 @@ class CSVParser():
                 ],
                 "Grade": [
                     {
-
+                        "gradeStudentSISID": 19283192837,
+                        "gradeCourseCode": "HG3848",
                         "gradeCalendarYear": 2004,
                         "gradeCalendarTerm": "SMR",
                         "gradePeriod": 6,
@@ -52,6 +52,7 @@ class CSVParser():
                 ],
                 "Attendance": [
                     {
+                        "attendanceStudentSISID": 19283192837,
                         "attendanceCalendarYear": 2004,
                         "attendanceCalendarTerm": "SMR",
                         "attendanceEntryDate": "2016-03-24",
@@ -65,6 +66,8 @@ class CSVParser():
                 ],
                 "Behavior": [
                     {
+                        "behaviorStudentSISID": 19283192837,
+                        "behaviorCourseCode": "HG838",
                         "behaviorPeriod": 2,
                         "behaviorCalendarTerm": "SMR",
                         "behaviorCalendarYear": 2004,
@@ -81,18 +84,20 @@ class CSVParser():
             ]
         #find target parent and housing fields
         #housing fields are parent fields that house child fields
-        parent_fields = list(self.target_json_format[0].keys())
+        target_fields = list(self.target_json_format[0].keys())
+        parent_fields = []
         housing_fields = []
-        for field in parent_fields:
+        for field in target_fields:
             if self.target_json_format[0][field].__class__ == list:
                 housing_fields.append(field)
-                parent_fields.remove(field)
+            else:
+                parent_fields.append(field)
         self.target_parent_fields = parent_fields
         self.target_housing_fields = housing_fields
 
         #find target child fields, child fields are housed in housing fields
         child_fields = {}
-        for field in housing_fields:
+        for field in self.target_housing_fields:
             output = list(self.target_json_format[0][field][0].keys())
             child_fields[field] = output
         self.target_child_fields = child_fields
@@ -105,20 +110,17 @@ class CSVParser():
             'bool': np.bool_,
             'float': np.float64,
         }
-
         #find target field datatypes
         target_field_datatypes = {}
         for field in self.target_parent_fields:
             field_datatype = self.target_json_format[0][field].__class__.__name__
-            if field_datatype not in list(target_field_datatypes.keys()):
-                pandas_datatype = self.datatypes_dict[field_datatype]
-                target_field_datatypes[field] = pandas_datatype
+            pandas_datatype = self.datatypes_dict[field_datatype]
+            target_field_datatypes[field] = pandas_datatype
         for housing_field in list(self.target_child_fields.keys()):
             for child_field in self.target_child_fields[housing_field]:
                 field_datatype = self.target_json_format[0][housing_field][0][child_field].__class__.__name__
-                if field_datatype not in list(target_field_datatypes.keys()):
-                    pandas_datatype = self.datatypes_dict[field_datatype]
-                    target_field_datatypes[child_field] = pandas_datatype
+                pandas_datatype = self.datatypes_dict[field_datatype]
+                target_field_datatypes[child_field] = pandas_datatype
         self.target_field_datatypes = target_field_datatypes
 
         #a dictionary of dictionaries linking target json fields to associated

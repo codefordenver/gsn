@@ -503,7 +503,7 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
-class CSVParser(APIView):
+class UploadCSV(APIView):
 
     parser_classes = (
         MultiPartParser,
@@ -539,6 +539,21 @@ class CSVParser(APIView):
         if(not self.has_file_already_uploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
+    def get(self, request, access_level):
+        string_file_obj = io.StringIO("lol")
+        parser = CSVParser(string_file_obj, "Trivial", False)
+        dtypes = {}
+        for key, value in parser.target_field_datatypes.items():
+            dtypes[key] = value.__name__
+        return Response(
+            {
+                "parent": parser.target_parent_fields,
+                "housing": parser.target_housing_fields,
+                "child": parser.target_child_fields,
+                "dtypes": dtypes,
+            }
+        )
+
     def post(self, request, access_level):
         """Takes a file and turns it into an instance of Django's UploadedFile
         class. The response generated renders an html template offering some
@@ -560,7 +575,7 @@ class CSVParser(APIView):
             )
         else:
             string_io_obj = io.StringIO(content)
-            parser = CSVToJsonParser(string_io_obj, school_of_origin)
+            parser = CSVParser(string_io_obj, school_of_origin, False)
             dtypes = parser.get_csv_datatypes()
             csv_df = parser.get_dataframe(dtypes)
             identifying_column = "studentStateID"
