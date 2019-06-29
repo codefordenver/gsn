@@ -7,6 +7,7 @@ class CSVParser():
 
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value = False):
         self.school_of_csv_origin = school_of_csv_origin
+        self.School = School.objects.get(name = self.school_of_csv_origin)
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
         self.target_json_format = [
@@ -43,7 +44,7 @@ class CSVParser():
                         "gradeCourseCode": "HG3848",
                         "gradeCalendarYear": 2004,
                         "gradeCalendarTerm": "SMR",
-                        "gradePeriod": 6,
+                        "gradePeriod": "6",
                         "grade": 0.8091,
                         "gradeTask": "Semester Grade",
                         "gradeTermFinalValue": True,
@@ -57,7 +58,7 @@ class CSVParser():
                         "attendanceCalendarTerm": "SMR",
                         "attendanceEntryDate": "2016-03-24",
                         "attendanceTotalUnexcusedAbsence": 28,
-                        "attendancetotalExcusedAbsence": 26,
+                        "attendanceTotalExcusedAbsence": 26,
                         "attendanceTotalAbsence": 54,
                         "attendanceTotalTardies": 11,
                         "attendanceAverageDailyAttendance": 27,
@@ -68,7 +69,7 @@ class CSVParser():
                     {
                         "behaviorStudentSISID": 19283192837,
                         "behaviorCourseCode": "HG838",
-                        "behaviorPeriod": 2,
+                        "behaviorPeriod": "2",
                         "behaviorCalendarTerm": "SMR",
                         "behaviorCalendarYear": 2004,
                         "behaviorIncidentDate": "2014-06-26",
@@ -125,6 +126,8 @@ class CSVParser():
 
         #a dictionary of dictionaries linking target json fields to associated
         # csv fields based on school of origin.
+
+
         self.master_field_dict = {
             #Keys: json fields. Values: csv fields.
             "Trivial": {
@@ -163,10 +166,14 @@ class CSVParser():
                     "studentGender": 'student.gender',
                     "studentStateID": 'student.stateID',
                     'studentSISID': 'student.studentNumber',
+                    'studentGradeYear': 'student.grade',
                     "courseName": 'grading.courseName',
                     "courseCode": 'grading.courseNumber',
                     "gradePeriod": 'grading.periodName',
+                    "gradeTask":'grading.task',
+                    "grade": 'grading.percent',
                     "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
+                    "attendanceTotalAbsence": 'attExactDailyTermCount.absentDays',
                     'attendanceTotalTardies': "attExactDailyTermCount.tardies",
                     'behaviorContext': "behaviorDetail.details",
                     'behaviorSISID': "behaviorDetail.incidentID",
@@ -174,43 +181,82 @@ class CSVParser():
                     'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
                 },
                 "parse": {
-                    "studentGradeYear": 'student.grade',
-                    "studentBirthday": 'student.birthdate',
-                    'behaviorIncidentDate': "behaviorDetail.incidentDate",
-                    'gradeEntryDate': 'grading.date',
-                    "programName": self.school_of_csv_origin,
-                    "districtName": self.school_of_csv_origin,
-                    "districtState": self.school_of_csv_origin,
-                    "districtCity": self.school_of_csv_origin,
-                    "districtCode": self.school_of_csv_origin,
-                    "schoolName": self.school_of_csv_origin,
-                    "courseSubject": "grading.courseName",
+                    """
+                    Format:
+                    {
+                        target json field name: [
+                            "csv field or method to parse json field from",
+                            parsing function,
+                        ]
+                    }
+                    """
+                    "studentBirthday": [
+                        'student.birthdate',
+                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                    ],
+                    'behaviorIncidentDate': [
+                        "behaviorDetail.incidentDate",
+                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                    ],
+                    'gradeEntryDate': [
+                        'grading.date',
+                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                    ],
+                    "programName": [
+                        "manual",
+                        'Expelled and At-Risk Student Services Program',
+                    ],
+                    "districtName": [
+                        "manual",
+                        self.School.district.name,
+                    ],
+                    "districtState": [
+                        "manual",
+                        self.School.district.state,
+                    ],
+                    "districtCity": [
+                        "manual",
+                        self.School.district.city,
+                    ],
+                    "districtCode": [
+                        "manual",
+                        self.School.district.code,
+                    ],
+                    "schoolName": [
+                        "manual",
+                        self.School.name,
+                    ],
                     "gradeCalendarYear": [
                         "cal.endYear",
-                        "grading.termName",
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2",
                     ],
                     "gradeCalendarTerm": [
-                        "cal.endYear",
                         "grading.termName",
+                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2",
                     ],
                     "attendanceCalendarYear": [
                         "cal.endYear",
-                        "attExactDailyTermCount.termName",
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2",
                     ],
                     "attendanceCalendarTerm": [
-                        "cal.endYear",
                         "attExactDailyTermCount.termName",
+                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2",
                     ],
-                    "grade": [
-                        'grading.percent',
-                        'grading.task',
+                    "gradeTermFinalValue": [
+                        "manual",
+                        self.term_final_value,
                     ],
-                    "gradeTermFinalValue": self.term_final_value,
-                    "attendanceTermFinalValue": self.term_final_value,
-                    "attendanceEntryDate": timezone.now(),
+                    "attendanceTermFinalValue": [
+                        "manual",
+                        self.term_final_value,
+                    ],
+                    "attendanceEntryDate": [
+                        "manual",
+                        timezone.now(),
+                    ],
                     "attendanceTotalExcusedAbsence": [
                         "attExactDailyTermCount.unexcusedAbsentDays",
-                        "attExactDailyTermCount.absentDays",
+                        lambda dataframe: dataframe['attExactDailyTermCount.absentDays'] - dataframe["attExactDailyTermCount.unexcusedAbsentDays"],
                     ],
                     "behaviorIncidentTypeProgram": "behaviorDetail.eventName",
                     "behaviorIncidentResultProgram": "behaviorDetail.resolutionName",
@@ -221,6 +267,7 @@ class CSVParser():
                     "behaviorPeriod",
                     "behaviorCalendarTerm",
                     "behaviorCalendarYear",
+                    "courseSubject",
                 ]
             }
         }
@@ -232,9 +279,14 @@ class CSVParser():
         """
         json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
         csv_datatypes = {}
-        for json_field, csv_field in json_to_csv_field_dict.items():
+        for json_field, csv_field in json_to_csv_field_dict["direct"].items():
             datatype = self.target_field_datatypes[json_field]
             csv_datatypes[csv_field] = datatype
+        for json_field, parsing_pair in json_to_csv_field_dict["parse"].items():
+            csv_field = parsing_pair[0]
+            if csv_field not "manual":
+                datatype = self.target_field_datatypes[json_field]
+                csv_datatypes[csv_field] = datatype
         return csv_datatypes
 
     def get_dataframe(self, csv_datatypes):
@@ -248,6 +300,7 @@ class CSVParser():
     def get_json_array(self, csv_df, id_field):
         #id_field is the name of a parent field from self.target_parent_fields
         #that uniquely identifies to what student data belongs to.
+        #only parse grade elements with task == "Semester Grade"
         json_array = []
         parent_df = csv_df[self.target_parent_fields]
         parent_df = parent_df.drop_duplicates()
@@ -278,5 +331,6 @@ class CSVParser():
         - follow heirarchy through student, bring in course and calendar for grade/attendance.
         - use get or create like hannah, but allow for blanks
         - filter students first via HistoricalStudentID
+        - only parse grade elements with task == "Semester Grade"
         """
         pass

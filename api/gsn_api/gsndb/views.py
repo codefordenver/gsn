@@ -541,15 +541,12 @@ class UploadCSV(APIView):
 
     def get(self, request, access_level):
         string_file_obj = io.StringIO("lol")
-        parser = CSVParser(string_file_obj, "Trivial", False)
+        parser = CSVParser(string_file_obj, "Weld Central Middle School", False)
         dtypes = {}
-        for key, value in parser.target_field_datatypes.items():
+        for key, value in parser.get_csv_datatypes().items():
             dtypes[key] = value.__name__
         return Response(
             {
-                "parent": parser.target_parent_fields,
-                "housing": parser.target_housing_fields,
-                "child": parser.target_child_fields,
                 "dtypes": dtypes,
             }
         )
