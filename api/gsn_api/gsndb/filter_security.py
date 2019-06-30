@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from gsndb.models import StudentUserHasAccess, MyStudents, Student, School, District, Program, Course
 
+
 class FilterSecurity():
     all_access = "all"
     my_access = "my"
@@ -9,11 +10,9 @@ class FilterSecurity():
         if request.user.is_authenticated:
             self.user =  request.user 
         else:
-            '''
-            I'm leaving this in for now so we can still see data when we are 
+            '''I'm leaving this in for now so we can still see data when we are 
             just playing with the backend. When we push this up this needs to be
-            removed
-            '''
+            removed'''
             self.user = User.objects.first()
 
     def get_all_access(self):
