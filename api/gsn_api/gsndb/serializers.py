@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 from gsndb.filter_security import FilterSecurity
 from rest_framework.fields import CurrentUserDefault
 
+'''
+For the following serializers we are frequently overwriting the to_representation.
+We then assign various fields from the model to a specific name of the representation.
+'''
+
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
