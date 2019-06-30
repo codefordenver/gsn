@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 from django.utils import timezone
+from gsndb.models import School, Student
 
 class CSVParser():
 
@@ -125,9 +126,7 @@ class CSVParser():
         self.target_field_datatypes = target_field_datatypes
 
         #a dictionary of dictionaries linking target json fields to associated
-        # csv fields based on school of origin.
-
-
+        #csv fields based on school of origin.
         self.master_field_dict = {
             #Keys: json fields. Values: csv fields.
             "Trivial": {
@@ -181,15 +180,6 @@ class CSVParser():
                     'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
                 },
                 "parse": {
-                    """
-                    Format:
-                    {
-                        target json field name: [
-                            "csv field or method to parse json field from",
-                            parsing function,
-                        ]
-                    }
-                    """
                     "studentBirthday": [
                         'student.birthdate',
                         lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
@@ -203,65 +193,65 @@ class CSVParser():
                         lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
                     ],
                     "programName": [
-                        "manual",
+                        "django",
                         'Expelled and At-Risk Student Services Program',
                     ],
                     "districtName": [
-                        "manual",
+                        "django",
                         self.School.district.name,
                     ],
                     "districtState": [
-                        "manual",
+                        "django",
                         self.School.district.state,
                     ],
                     "districtCity": [
-                        "manual",
+                        "django",
                         self.School.district.city,
                     ],
                     "districtCode": [
-                        "manual",
+                        "django",
                         self.School.district.code,
                     ],
                     "schoolName": [
-                        "manual",
+                        "django",
                         self.School.name,
                     ],
                     "gradeCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2",
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2" else False,
                     ],
                     "gradeCalendarTerm": [
                         "grading.termName",
-                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2",
+                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2" else False,
                     ],
                     "attendanceCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2",
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2" else False,
                     ],
                     "attendanceCalendarTerm": [
                         "attExactDailyTermCount.termName",
-                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2",
+                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2" else False,
                     ],
                     "gradeTermFinalValue": [
-                        "manual",
+                        "django",
                         self.term_final_value,
                     ],
                     "attendanceTermFinalValue": [
-                        "manual",
+                        "django",
                         self.term_final_value,
                     ],
                     "attendanceEntryDate": [
-                        "manual",
+                        "django",
                         timezone.now(),
                     ],
                     "attendanceTotalExcusedAbsence": [
                         "attExactDailyTermCount.unexcusedAbsentDays",
                         lambda dataframe: dataframe['attExactDailyTermCount.absentDays'] - dataframe["attExactDailyTermCount.unexcusedAbsentDays"],
                     ],
-                    "behaviorIncidentTypeProgram": "behaviorDetail.eventName",
-                    "behaviorIncidentResultProgram": "behaviorDetail.resolutionName",
                 },
                 "blank": [
+                    "behaviorIncidentTypeProgram",
+                    "behaviorIncidentResultProgram",
                     "studentReasonInProgram",
                     "attendanceAverageDailyAttendance",
                     "behaviorPeriod",
@@ -275,7 +265,7 @@ class CSVParser():
     def get_csv_datatypes(self):
         """
         returns dictionary mapping the datatypes that should be applied to the
-        dataframe the csv file is turned into.
+        dataframe created from the csv file.
         """
         json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
         csv_datatypes = {}
@@ -284,7 +274,7 @@ class CSVParser():
             csv_datatypes[csv_field] = datatype
         for json_field, parsing_pair in json_to_csv_field_dict["parse"].items():
             csv_field = parsing_pair[0]
-            if csv_field not "manual":
+            if csv_field != "django":
                 datatype = self.target_field_datatypes[json_field]
                 csv_datatypes[csv_field] = datatype
         return csv_datatypes

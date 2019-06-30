@@ -559,10 +559,20 @@ class UploadCSV(APIView):
         Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_origin": <school_name>, "final_value" = <boolean>, "csv": <csv_file>}
         """
         byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_origin"]
+        school_of_origin = request.data["school_of_csv_origin"]
+        term_final_value = request.data["term_final_value"]
         content = self.hash_handler(byte_file_obj)
         self.has_file_already_been_uploaded()
-
+        string_io_obj = io.StringIO(content)
+        parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
+        dtypes = parser.get_csv_datatypes()
+        csv_df = parser.get_dataframe(dtypes)
+        return Response(
+            {
+                "dataframe": csv_df,
+            }
+        )
+        """
         if(self.has_file_already_uploaded):
             return Response(
                 {
@@ -583,3 +593,4 @@ class UploadCSV(APIView):
                     "content": json_array,
                 }
             )
+        """
