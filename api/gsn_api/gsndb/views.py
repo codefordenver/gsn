@@ -170,7 +170,7 @@ class ReferralList(generics.ListCreateAPIView):
         if student not in user.get_accessible_students():
             return Response({"Sorry": "this user does not have access to add a referral for this student."})
         else:
-            note_data = {
+            referral_data = {
                 "user": user.get_user().id,
                 "student": json["student"],
                 "program": json["program"],
@@ -180,16 +180,15 @@ class ReferralList(generics.ListCreateAPIView):
                 "reference_phone": json["reference_phone"],
                 "reference_address": json["reference_address"],
                 "reason": json["reason"],
-                "notes": [],
             }
-            serializer = ReferralSerializer(data = note_data)
+            serializer = ReferralSerializer(data = referral_data)
             if serializer.is_valid():
                 serializer.save()
-                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
+                return HttpResponseRedirect(f"/gsndb/{access_level}/student/{serializer.data['student']}/")
             else:
 
                 return Response({
-                                    "Sorry": "The serializer denied saving this note.",
+                                    "Sorry": "The serializer denied saving this referral.",
                                     "The serializer raised the following errors": serializer.errors
                                 })
 
@@ -221,7 +220,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
         if student not in user.get_accessible_students():
             return Response({"Sorry": "this user does not have access to edit this referral for this student."})
         else:
-            note_data = {
+            referral_data = {
                 "user": user.get_user().id,
                 "student": json["student"],
                 "program": json["program"],
@@ -232,7 +231,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
                 "reference_address": json["reference_address"],
                 "reason": json["reason"],
             }
-            serializer = ReferralSerializer(referral_obj, data = note_data)
+            serializer = ReferralSerializer(referral_obj, data = referral_data)
             if serializer.is_valid():
                 serializer.save()
                 return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}/")
