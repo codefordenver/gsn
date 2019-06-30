@@ -131,6 +131,7 @@ class CourseList(generics.ListCreateAPIView):
 class ProgramList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_programs()
         elif access_level == user.get_all_access():
