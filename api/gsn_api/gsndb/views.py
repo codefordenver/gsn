@@ -9,8 +9,6 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
 
-user = FilterSecurity()
-
 def post_note(request, Model, pk, access_level):
     """
     This method allows notes to be posted to any object referenced in this
@@ -21,6 +19,7 @@ def post_note(request, Model, pk, access_level):
 
     {"text": "note text here"}
     """
+    user = FilterSecurity(request)
     access_dict = {
         "Program": user.get_accessible_programs(),
         "District": user.get_accessible_districts(),
@@ -85,6 +84,7 @@ def post_note(request, Model, pk, access_level):
 class StudentList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_students()
         elif access_level == user.get_all_access():
@@ -96,6 +96,7 @@ class StudentList(generics.ListCreateAPIView):
 class DistrictList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_districts()
         elif access_level == user.get_all_access():
@@ -106,6 +107,7 @@ class DistrictList(generics.ListCreateAPIView):
 class SchoolList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_schools()
         elif access_level == user.get_all_access():
@@ -116,6 +118,7 @@ class SchoolList(generics.ListCreateAPIView):
 class CourseList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_courses()
         elif access_level == user.get_all_access():
@@ -127,6 +130,7 @@ class CourseList(generics.ListCreateAPIView):
 class ProgramList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_programs()
         elif access_level == user.get_all_access():
@@ -135,9 +139,11 @@ class ProgramList(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 class NoteList(generics.ListCreateAPIView):
-
-    queryset = Note.objects.filter(user_id = user.get_user().id)
-    serializer_class = NoteSerializer
+    def get(self, request):
+        user = FilterSecurity(request)
+        queryset = Note.objects.filter(user_id = user.get_user().id)
+        serializer = NoteSerializer(queryset, many = True)
+        return Response(serializer.data)
 
 class BookmarkList(generics.ListCreateAPIView):
     queryset = Bookmark.objects.all()
@@ -146,6 +152,7 @@ class BookmarkList(generics.ListCreateAPIView):
 class ReferralList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
         queryset = Referral.objects.filter(user = user.get_user())
         serializer = ReferralSerializer(queryset, many = True)
         return Response(serializer.data)
@@ -156,6 +163,7 @@ class ReferralList(generics.ListCreateAPIView):
         redirects to the selfsame ReferralList view, allowing the user to
         see the new referral they created among their list of referrals.
         """
+        user = FilterSecurity(request)
         json = request.data
         student = Student.objects.get(pk = json["student"])
         if student not in user.get_accessible_students():
@@ -171,16 +179,15 @@ class ReferralList(generics.ListCreateAPIView):
                 "reference_phone": json["reference_phone"],
                 "reference_address": json["reference_address"],
                 "reason": json["reason"],
-                "notes": [],
             }
             serializer = ReferralSerializer(data = referral_data)
             if serializer.is_valid():
                 serializer.save()
-                return HttpResponseRedirect(f"/gsndb/{access_level}/referral/{serializer.data['referralId']}")
+                return HttpResponseRedirect(f"/gsndb/{access_level}/student/{serializer.data['student']}/")
             else:
-
+                                            
                 return Response({
-                                    "Sorry": "The serializer denied saving this note.",
+                                    "Sorry": "The serializer denied saving this referral.",
                                     "The serializer raised the following errors": serializer.errors
                                 })
 
@@ -249,15 +256,18 @@ class DistrictPostList(generics.ListCreateAPIView):
 class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         queryset = Referral.objects.filter(pk = pk, )
         serializer = ReferralDetailSerializer(queryset, many = True)
         return Response(serializer.data)
 
     def post(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         response = post_note(request, Referral, pk, access_level)
         return response
 
     def put(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         """
         This method allows a user to update an existing referral via a PUT request.
         """
@@ -295,6 +305,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
 
         interact via: DELETE <host>/gsndb/<accessLevel>/referral/<note_id>
         """
+        user = FilterSecurity(request)
         current_referral = Referral.objects.get(pk = pk)
         accessible_referrals = Referral.objects.filter(user_id = user.get_user().id)
         if current_referral not in accessible_referrals:
@@ -306,6 +317,7 @@ class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
 class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_districts().filter(pk = pk)
         elif access_level == user.get_all_access():
@@ -370,6 +382,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_students().filter(pk = pk)
         elif access_level == user.get_all_access():
@@ -381,6 +394,7 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/student/<pk> body = {"text": "My note text"}
         """
+        user = FilterSecurity(request)
         response = post_note(request, Student, pk, access_level)
         return response
 
@@ -389,6 +403,7 @@ class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_schools().filter(pk = pk)
         elif access_level == user.get_all_access():
@@ -400,6 +415,7 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/School/<pk> body = {"text": "My note text"}
         """
+        user = FilterSecurity(request)
         response = post_note(request, School, pk, access_level)
         return response
 
@@ -450,6 +466,7 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_courses().filter(pk = pk)
         elif access_level == user.get_all_access():
@@ -461,6 +478,7 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Interact via: POST <host>/gsndb/<access_level>/course/<pk> body = {"text": "My note text"}
         """
+        user = FilterSecurity(request)
         response = post_note(request, Course, pk, access_level)
         return response
 
@@ -468,6 +486,7 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 class ProgramDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_programs().filter(pk = pk)
         elif access_level == user.get_all_access():
@@ -489,6 +508,7 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
+        user = FilterSecurity(request)
         queryset = Note.objects.filter(user_id = user.get_user().id, pk = pk)
         serializer = NoteSerializer(queryset, many = True)
         return Response(serializer.data)
@@ -503,6 +523,7 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
         turns camelCase requests generated on the front end into snake_case in
         the back end.
         """
+        user = FilterSecurity(request)
         current_note = Note.objects.get(pk = pk)
         accessible_notes = Note.objects.filter(user_id = user.get_user().id)
         if current_note not in accessible_notes:
@@ -534,6 +555,7 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
 
         interact via: DELETE <host>/gsndb/<accessLevel>/note/<note_id>
         """
+        user = FilterSecurity(request)
         current_note = Note.objects.get(pk = pk)
         accessible_notes = Note.objects.filter(user_id = user.get_user().id)
         if current_note not in accessible_notes:

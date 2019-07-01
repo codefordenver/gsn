@@ -3,6 +3,12 @@ from gsndb.models import Note, District, School, Calendar, Referral, Bookmark, P
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
 from gsndb.filter_security import FilterSecurity
+from rest_framework.fields import CurrentUserDefault
+
+'''
+For the following serializers we are frequently overwriting the to_representation.
+We then assign various fields from the model to a specific name of the representation.
+'''
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -186,7 +192,6 @@ class GradeSerializer(serializers.ModelSerializer):
         return representation
 
 class ReferralSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
 
     notes = NoteSerializer(many=True, read_only = True)
     class Meta:
@@ -207,6 +212,7 @@ class ReferralSerializer(serializers.ModelSerializer):
 
     def to_representation(self, referral_obj):
         representation = super().to_representation(referral_obj)
+        user = FilterSecurity(self.context.get('request'))
 
         representation["referralId"] = representation.pop("id")
         representation["user"] = referral_obj.user.id
@@ -219,18 +225,22 @@ class ReferralSerializer(serializers.ModelSerializer):
 
 #detail serializer
 class DistrictDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
-    current_user = user.get_user()
-    accessible_schools = user.get_accessible_schools()
-    my_schools = user.get_my_schools()
-    accessible_students = user.get_accessible_students()
-    my_students = user.get_my_students()
+
+    
 
     class Meta:
         model = District
         fields = ("id",)
 
     def to_representation(self, district_obj):
+        user = FilterSecurity(self.context.get('request'))
+        current_user = user.get_user()
+        accessible_schools = user.get_accessible_schools()
+        my_schools = user.get_my_schools()
+        accessible_students = user.get_accessible_students()
+        my_students = user.get_my_students()
+
+        
         access_level = self.context.get("access", False)
         representation = super().to_representation(district_obj)
 
@@ -258,14 +268,16 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
 
 
 class StudentDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
-    current_user = user.get_user()
+    
 
     class Meta:
         model = Student
         fields = ("id",)
 
     def to_representation(self, student_obj):
+        user = FilterSecurity(self.context.get('request'))
+        current_user = user.get_user()
+
         representation = super().to_representation(student_obj)
 
         representation["studentId"] = representation.pop("id")
@@ -292,18 +304,20 @@ class StudentDetailSerializer(serializers.ModelSerializer):
 
 
 class SchoolDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
-    current_user = user.get_user()
-    accessible_students = user.get_accessible_students()
-    my_students = user.get_my_students()
-    accessible_courses = user.get_accessible_courses()
-    my_courses = user.get_my_courses()
+    
 
     class Meta:
         model = School
         fields = ("id",)
 
     def to_representation(self, school_obj):
+        user = FilterSecurity(self.context.get('request'))
+        current_user = user.get_user()
+        accessible_students = user.get_accessible_students()
+        my_students = user.get_my_students()
+        accessible_courses = user.get_accessible_courses()
+        my_courses = user.get_my_courses()
+
         access_level = self.context.get("access", False)
 
         representation = super().to_representation(school_obj)
@@ -333,16 +347,17 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
-    current_user = user.get_user()
-    accessible_students = user.get_accessible_students()
-    my_students = user.get_my_students()
+    
 
     class Meta:
         model = Course
         fields = ("id",)
 
     def to_representation(self, course_obj):
+        user = FilterSecurity(self.context.get('request'))
+        current_user = user.get_user()
+        accessible_students = user.get_accessible_students()
+        my_students = user.get_my_students()
         access_level = self.context.get("access", False)
 
         representation = super().to_representation(course_obj)
@@ -367,16 +382,18 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         return representation
 
 class ProgramDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
-    current_user = user.get_user()
-    accessible_students = user.get_accessible_students()
-    my_students = user.get_my_students()
+    
 
     class Meta:
         model = Program
         fields = ("id",)
 
     def to_representation(self, program_obj):
+        user = FilterSecurity(self.context.get('request'))
+        current_user = user.get_user()
+        accessible_students = user.get_accessible_students()
+        my_students = user.get_my_students()
+
         access_level = self.context.get("access", False)
 
         representation = super().to_representation(program_obj)
@@ -400,13 +417,13 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
         return representation
 
 class ReferralDetailSerializer(serializers.ModelSerializer):
-    user = FilterSecurity()
 
     class Meta:
         model = Referral
         fields = ("id",)
 
     def to_representation(self, referral_obj):
+        user = FilterSecurity(self.context.get('request'))
         representation = super().to_representation(referral_obj)
 
         representation["referralId"] = representation.pop("id")
