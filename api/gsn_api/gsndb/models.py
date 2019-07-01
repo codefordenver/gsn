@@ -354,7 +354,7 @@ class Referral(models.Model):
     If this is ever changed, it needs to be changed on the frontend as well
     '''
     REFERRAL_TYPE = (
-       
+
         ("MTL", "Mental Health"),
         ("DAC", "Drug & Alcohol/Addictions Counseling"),
         ("DHS", "Social Services (Department of Human Services)"),
@@ -420,3 +420,6 @@ class HistoricalStudentID(models.Model):
         on_delete = models.PROTECT,
     )
     student_SISID = models.BigIntegerField()
+
+    class Meta:
+        unique_together = ('student', 'school', 'student_SISID')
