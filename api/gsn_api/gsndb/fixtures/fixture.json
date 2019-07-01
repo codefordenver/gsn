@@ -496,6 +496,114 @@
         }
     },
     {
+        "model": "gsndb.historicalstudentid",
+        "pk": 1,
+        "fields": {
+            "student": 1,
+            "school": 1,
+            "student_SISID": 1
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 2,
+        "fields": {
+            "student": 2,
+            "school": 1,
+            "student_SISID": 2
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 3,
+        "fields": {
+            "student": 3,
+            "school": 1,
+            "student_SISID": 3
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 4,
+        "fields": {
+            "student": 3,
+            "school": 2,
+            "student_SISID": 3
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 5,
+        "fields": {
+            "student": 4,
+            "school": 1,
+            "student_SISID": 4
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 6,
+        "fields": {
+            "student": 4,
+            "school": 2,
+            "student_SISID": 4
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 7,
+        "fields": {
+            "student": 5,
+            "school": 2,
+            "student_SISID": 5
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 8,
+        "fields": {
+            "student": 6,
+            "school": 2,
+            "student_SISID": 6
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 9,
+        "fields": {
+            "student": 7,
+            "school": 1,
+            "student_SISID": 7
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 10,
+        "fields": {
+            "student": 7,
+            "school": 2,
+            "student_SISID": 7
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 11,
+        "fields": {
+            "student": 8,
+            "school": 1,
+            "student_SISID": 8
+        }
+    },
+    {
+        "model": "gsndb.historicalstudentid",
+        "pk": 12,
+        "fields": {
+            "student": 8,
+            "school": 2,
+            "student_SISID": 8
+        }
+    },
+    {
         "model": "gsndb.grade",
         "pk": 1,
         "fields": {
@@ -3577,6 +3685,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 1,
             "incident_datetime": "2018-10-11 4:05:06",
             "context": "tried to beat up classmate who won game.",
             "incident_type_program": "fighting",
@@ -3595,6 +3704,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 2,
             "incident_datetime": "2018-04-12 4:05:06",
             "context": "used a racial slur.",
             "incident_type_program": "improper language",
@@ -3613,6 +3723,7 @@
             "program": 2,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 3,
             "incident_datetime": "2018-09-01 4:05:06",
             "context": "running with scissors",
             "incident_type_program": "dangerous behavior",
@@ -3631,6 +3742,7 @@
             "program": 1,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 4,
             "incident_datetime": "2018-03-19 4:05:06",
             "context": "ate lunch during math class.",
             "incident_type_program": "disobeying class rules",
@@ -3649,6 +3761,7 @@
             "program": 2,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 5,
             "incident_datetime": "2018-11-30 4:05:06",
             "context": "wrestled with John.",
             "incident_type_program": "fighting",
@@ -3667,6 +3780,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 6,
             "incident_datetime": "2018-03-03 4:05:06",
             "context": "chewing gum in class",
             "incident_type_program": "disobeying class rules",
@@ -3685,6 +3799,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 7,
             "incident_datetime": "2018-12-10 4:05:06",
             "context": "caught cheating",
             "incident_type_program": "disobeying class rules",
@@ -3703,6 +3818,7 @@
             "program": 1,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 8,
             "incident_datetime": "2018-01-13 4:05:06",
             "context": "punched classmate",
             "incident_type_program": "fighting",
@@ -3721,6 +3837,7 @@
             "program": 2,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 9,
             "incident_datetime": "2018-09-20 4:05:06",
             "context": "scream curse words on playground",
             "incident_type_program": "improper language",
@@ -3739,6 +3856,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 10,
             "incident_datetime": "2018-05-05 4:05:06",
             "context": "told teacher to shut up",
             "incident_type_program": "disrespecting authority figure",
@@ -3757,6 +3875,7 @@
             "program": 2,
             "course": 7,
             "period": 1,
+            "behavior_SISID": 11,
             "incident_datetime": "2018-12-25 4:05:06",
             "context": "smoking cigarrettes",
             "incident_type_program": "substance abuse",
@@ -3775,6 +3894,7 @@
             "program": 1,
             "course": 1,
             "period": 1,
+            "behavior_SISID": 12,
             "incident_datetime": "2018-05-01 4:05:06",
             "context": "jumped from rooftop",
             "incident_type_program": "dangerous behavior",
