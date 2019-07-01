@@ -44,16 +44,22 @@ including some nested serializers.'''
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = District
-        fields = ("id",)
+        fields = (
+            "id",
+            "state",
+            "city",
+            "code",
+            "name",
+        )
 
     def to_representation(self, district_obj):
         representation = super().to_representation(district_obj)
 
         representation["districtId"] = representation.pop("id")
-        representation["districtName"] = district_obj.name
-        representation["state"] = district_obj.state
-        representation["city"] = district_obj.city
-        representation["code"] = district_obj.code
+        representation["districtName"] = representation.pop("name")
+        representation["state"] = representation.pop("state")
+        representation["city"] = representation.pop("city")
+        representation["code"] = representation.pop("code")
 
         return representation
 
@@ -61,14 +67,18 @@ class DistrictSerializer(serializers.ModelSerializer):
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ("id",)
+        fields = (
+            "id",
+            "name",
+            "district",
+        )
 
     def to_representation(self, school_obj):
         representation = super().to_representation(school_obj)
 
         representation["schoolId"] = representation.pop("id")
-        representation["schoolName"] = school_obj.name
-        representation["districtId"] = school_obj.district.id
+        representation["schoolName"] = representation.pop("name")
+        representation["districtId"] = representation.pop("district")
         representation["districtName"] = school_obj.district.name
 
         return representation
@@ -81,7 +91,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, student_obj):
         representation = super().to_representation(student_obj)
-
         representation["studentId"] = representation.pop("id")
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["schoolName"] = student_obj.current_school.name
@@ -275,7 +284,11 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["studentName"] = student_obj.first_name + " " + student_obj.middle_name + " " + student_obj.last_name
         representation["gender"] = student_obj.gender
         representation["schoolId"] = student_obj.current_school.id
-        representation["schoolId"] = student_obj.current_school.name
+
+        program = Program.objects.get(student=representation["studentId"]).id
+
+        representation["programId"] = program
+        representation["schoolName"] = student_obj.current_school.name
         representation["birthdate"] = student_obj.birth_date
         representation["stateId"] = student_obj.state_id
         representation["studentYear"] = student_obj.grade_year
@@ -285,6 +298,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
         representation["gradeSet"] = GradeSerializer(student_obj.grade_set, many = True, read_only = True).data
         representation["attendanceSet"] = AttendanceSerializer(student_obj.attendance_set, many = True, read_only = True).data
         representation["behaviorSet"] = BehaviorSerializer(student_obj.behavior_set, many = True, read_only = True).data
+        representation["referralSet"] = ReferralDetailSerializer(student_obj.referral_set, many = True, read_only = True).data
 
         return representation
 
@@ -422,7 +436,7 @@ class ReferralDetailSerializer(serializers.ModelSerializer):
         representation["referencePhone"] = referral_obj.reference_phone
         representation["referenceAddress"] = referral_obj.reference_address
         representation["reason"] = referral_obj.reason
-        representation["notes"] = NoteSerializer(referral_obj.notes.filter(user = self.user.get_user()), many = True).data
+        # representation["notes"] = NoteSerializer(referral_obj.notes.filter(user = self.user.get_user()), many = True).data
 
         return representation
 
