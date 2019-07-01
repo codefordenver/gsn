@@ -11,86 +11,84 @@ class CSVParser():
         self.School = School.objects.get(name = self.school_of_csv_origin)
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
-        self.target_json_format = [
-            {
-                "programName": "Eargo",
-                "districtName": "Jeffco",
-                "districtState": "PA",
-                "districtCity": "Wakulla",
-                "districtCode": "H382",
-                "schoolName": "Carmody",
-                "Student": [
-                    {
-                        "studentFirstName": "Fuller",
-                        "studentLastName": "Hahn",
-                        "studentMiddleName": "Rodgers",
-                        "studentGender": "M",
-                        "studentBirthday": "2018-03-23",
-                        "studentStateID": 542796,
-                        "studentGradeYear": 9,
-                        "studentReasonInProgram": "behavior",
-                        "studentSISID": 298347928374,
-                    },
-                ],
-                "Course": [
-                    {
-                        "courseName": "Algebra",
-                        "courseCode": "G7384",
-                        "courseSubject": "ENG",
-                    },
-                ],
-                "Grade": [
-                    {
-                        "gradeStudentSISID": 19283192837,
-                        "gradeCourseCode": "HG3848",
-                        "gradeCalendarYear": 2004,
-                        "gradeCalendarTerm": "SMR",
-                        "gradePeriod": "6",
-                        "grade": 0.8091,
-                        "gradeTask": "Semester Grade",
-                        "gradeTermFinalValue": True,
-                        "gradeEntryDate": "2016-03-24",
-                    },
-                ],
-                "Attendance": [
-                    {
-                        "attendanceStudentSISID": 19283192837,
-                        "attendanceCalendarYear": 2004,
-                        "attendanceCalendarTerm": "SMR",
-                        "attendanceEntryDate": "2016-03-24",
-                        "attendanceTotalUnexcusedAbsence": 29.0,
-                        "attendanceTotalExcusedAbsence": 26.0,
-                        "attendanceTotalAbsence": 54.0,
-                        "attendanceTotalTardies": 11,
-                        "attendanceAverageDailyAttendance": .98,
-                        "attendanceTermFinalValue": True,
-                    },
-                ],
-                "Behavior": [
-                    {
-                        "behaviorStudentSISID": 19283192837,
-                        "behaviorCourseCode": "HG838",
-                        "behaviorPeriod": "2",
-                        "behaviorCalendarTerm": "SMR",
-                        "behaviorCalendarYear": 2004,
-                        "behaviorIncidentDate": "2014-06-26",
-                        "behaviorContext": "H372",
-                        "behaviorSISID": 293847923874,
-                        "behaviorIncidentTypeProgram": "Small",
-                        "behaviorIncidentResultProgram": "Bad",
-                        "behaviorIncidentTypeSchool": "Medium",
-                        "behaviorIncidentResultSchool": "Medium",
-                    },
-                ],
-            },
-            ]
+        self.target_json_format = {
+            "programName": "Eargo",
+            "districtName": "Jeffco",
+            "districtState": "PA",
+            "districtCity": "Wakulla",
+            "districtCode": "H382",
+            "schoolName": "Carmody",
+            "Student": [
+                {
+                    "studentFirstName": "Fuller",
+                    "studentLastName": "Hahn",
+                    "studentMiddleName": "Rodgers",
+                    "studentGender": "M",
+                    "studentBirthday": "2018-03-23",
+                    "studentStateID": 542796,
+                    "studentGradeYear": 9,
+                    "studentReasonInProgram": "behavior",
+                    "studentSISID": 298347928374,
+                },
+            ],
+            "Course": [
+                {
+                    "courseName": "Algebra",
+                    "courseCode": "G7384",
+                    "courseSubject": "ENG",
+                },
+            ],
+            "Grade": [
+                {
+                    "gradeStudentSISID": 19283192837,
+                    "gradeCourseCode": "HG3848",
+                    "gradeCalendarYear": 2004,
+                    "gradeCalendarTerm": "SMR",
+                    "gradePeriod": "6",
+                    "grade": 0.8091,
+                    "gradeTask": "Semester Grade",
+                    "gradeTermFinalValue": True,
+                    "gradeEntryDate": "2016-03-24",
+                },
+            ],
+            "Attendance": [
+                {
+                    "attendanceStudentSISID": 19283192837,
+                    "attendanceCalendarYear": 2004,
+                    "attendanceCalendarTerm": "SMR",
+                    "attendanceEntryDate": "2016-03-24",
+                    "attendanceTotalUnexcusedAbsence": 29.0,
+                    "attendanceTotalExcusedAbsence": 26.0,
+                    "attendanceTotalAbsence": 54.0,
+                    "attendanceTotalTardies": 11,
+                    "attendanceAverageDailyAttendance": .98,
+                    "attendanceTermFinalValue": True,
+                },
+            ],
+            "Behavior": [
+                {
+                    "behaviorStudentSISID": 19283192837,
+                    "behaviorCourseCode": "HG838",
+                    "behaviorPeriod": "2",
+                    "behaviorCalendarTerm": "SMR",
+                    "behaviorCalendarYear": 2004,
+                    "behaviorIncidentDate": "2014-06-26",
+                    "behaviorContext": "H372",
+                    "behaviorSISID": 293847923874,
+                    "behaviorIncidentTypeProgram": "Small",
+                    "behaviorIncidentResultProgram": "Bad",
+                    "behaviorIncidentTypeSchool": "Medium",
+                    "behaviorIncidentResultSchool": "Medium",
+                },
+            ],
+        }
         #find target parent and housing fields
         #housing fields are parent fields that house child fields
-        target_fields = list(self.target_json_format[0].keys())
+        target_fields = list(self.target_json_format.keys())
         parent_fields = []
         housing_fields = []
         for field in target_fields:
-            if self.target_json_format[0][field].__class__ == list:
+            if self.target_json_format[field].__class__ == list:
                 housing_fields.append(field)
             else:
                 parent_fields.append(field)
@@ -100,7 +98,7 @@ class CSVParser():
         #find target child fields, child fields are housed in housing fields
         child_fields = {}
         for field in self.target_housing_fields:
-            output = list(self.target_json_format[0][field][0].keys())
+            output = list(self.target_json_format[field][0].keys())
             child_fields[field] = output
         self.target_child_fields = child_fields
 
@@ -115,12 +113,12 @@ class CSVParser():
         #find target field datatypes
         target_field_datatypes = {}
         for field in self.target_parent_fields:
-            field_datatype = self.target_json_format[0][field].__class__.__name__
+            field_datatype = self.target_json_format[field].__class__.__name__
             pandas_datatype = self.datatypes_dict[field_datatype]
             target_field_datatypes[field] = pandas_datatype
         for housing_field in list(self.target_child_fields.keys()):
             for child_field in self.target_child_fields[housing_field]:
-                field_datatype = self.target_json_format[0][housing_field][0][child_field].__class__.__name__
+                field_datatype = self.target_json_format[housing_field][0][child_field].__class__.__name__
                 pandas_datatype = self.datatypes_dict[field_datatype]
                 target_field_datatypes[child_field] = pandas_datatype
         self.target_field_datatypes = target_field_datatypes
@@ -218,19 +216,19 @@ class CSVParser():
                     ],
                     "gradeCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2" else False,
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2" else None,
                     ],
                     "gradeCalendarTerm": [
                         "grading.termName",
-                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2" else False,
+                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2" else None,
                     ],
                     "attendanceCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2" else False,
+                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2" else None,
                     ],
                     "attendanceCalendarTerm": [
                         "attExactDailyTermCount.termName",
-                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2" else False,
+                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2" else None,
                     ],
                     "gradeTermFinalValue": [
                         "django",
@@ -288,9 +286,9 @@ class CSVParser():
         return csv_df
 
     def get_json_array(self, csv_df, id_field):
-        #id_field is the name of a parent field from self.target_parent_fields
-        #that uniquely identifies to what student data belongs to.
         #only parse grade elements with task == "Semester Grade"
+        pass
+        """
         json_array = []
         parent_df = csv_df[self.target_parent_fields]
         parent_df = parent_df.drop_duplicates()
@@ -314,7 +312,7 @@ class CSVParser():
                         child_array.append(output)
                 parent_element[housing_field] = child_array
         return json_array
-
+        """
     def parse_json():
         """
         - use district = District(field = value) to instantiate and check, then save.
