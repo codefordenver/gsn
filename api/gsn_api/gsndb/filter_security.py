@@ -2,13 +2,18 @@ from django.contrib.auth.models import User
 from gsndb.models import StudentUserHasAccess, MyStudents, Student, School, District, Program, Course
 
 
-
 class FilterSecurity():
     all_access = "all"
     my_access = "my"
 
-    def __init__(self):
-        self.user = User.objects.first()
+    def __init__(self,request):
+        if request.user.is_authenticated:
+            self.user =  request.user 
+        else:
+            '''I'm leaving this in for now so we can still see data when we are 
+            just playing with the backend. When we push this up this needs to be
+            removed'''
+            self.user = User.objects.first()
 
     def get_all_access(self):
         return self.all_access
