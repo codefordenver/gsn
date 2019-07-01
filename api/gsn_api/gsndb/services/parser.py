@@ -58,11 +58,11 @@ class CSVParser():
                         "attendanceCalendarYear": 2004,
                         "attendanceCalendarTerm": "SMR",
                         "attendanceEntryDate": "2016-03-24",
-                        "attendanceTotalUnexcusedAbsence": 28,
-                        "attendanceTotalExcusedAbsence": 26,
-                        "attendanceTotalAbsence": 54,
+                        "attendanceTotalUnexcusedAbsence": 29.0,
+                        "attendanceTotalExcusedAbsence": 26.0,
+                        "attendanceTotalAbsence": 54.0,
                         "attendanceTotalTardies": 11,
-                        "attendanceAverageDailyAttendance": 27,
+                        "attendanceAverageDailyAttendance": .98,
                         "attendanceTermFinalValue": True,
                     },
                 ],
@@ -174,7 +174,7 @@ class CSVParser():
                     "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
                     "attendanceTotalAbsence": 'attExactDailyTermCount.absentDays',
                     'attendanceTotalTardies': "attExactDailyTermCount.tardies",
-                    'behaviorContext': "behaviorDetail.details",
+                    'behaviorContext': "behaviorDetail.contextDescription",
                     'behaviorSISID': "behaviorDetail.incidentID",
                     'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
                     'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
@@ -284,7 +284,7 @@ class CSVParser():
         creates dataframe from csv file, using datatypes found with get_csv_datatypes()
         for the datatype of each column.
         """
-        csv_df = pd.read_csv(self.string_file_obj, dtype = csv_datatypes)
+        csv_df = pd.read_csv(self.string_file_obj, dtype = csv_datatypes, sep = ',')
         return csv_df
 
     def get_json_array(self, csv_df, id_field):

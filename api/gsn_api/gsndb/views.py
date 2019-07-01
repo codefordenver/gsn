@@ -539,28 +539,19 @@ class UploadCSV(APIView):
         if(not self.has_file_already_uploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
-    def get(self, request, access_level):
-        string_file_obj = io.StringIO("lol")
-        parser = CSVParser(string_file_obj, "Weld Central Middle School", False)
-        dtypes = {}
-        for key, value in parser.get_csv_datatypes().items():
-            dtypes[key] = value.__name__
-        return Response(
-            {
-                "dtypes": dtypes,
-            }
-        )
-
     def post(self, request, access_level):
         """Takes a file and turns it into an instance of Django's UploadedFile
         class. The response generated renders an html template offering some
         meta information.
 
-        Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_origin": <school_name>, "final_value" = <boolean>, "csv": <csv_file>}
+        Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
         """
         byte_file_obj = request.data["csv"]
         school_of_origin = request.data["school_of_csv_origin"]
-        term_final_value = request.data["term_final_value"]
+        if request.data["term_final_value"] == "True":
+            term_final_value = True
+        else:
+            term_final_value = False
         content = self.hash_handler(byte_file_obj)
         self.has_file_already_been_uploaded()
         string_io_obj = io.StringIO(content)
@@ -569,7 +560,7 @@ class UploadCSV(APIView):
         csv_df = parser.get_dataframe(dtypes)
         return Response(
             {
-                "dataframe": csv_df,
+                "dataframe": csv_df.shape,
             }
         )
         """
