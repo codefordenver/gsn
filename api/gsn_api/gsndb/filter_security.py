@@ -5,6 +5,7 @@ from gsndb.models import StudentUserHasAccess, MyStudents, Student, School, Dist
 class FilterSecurity():
     all_access = "all"
     my_access = "my"
+    not_my_accesss = "notmy"
 
     def __init__(self,request):
         if request.user.is_authenticated:
@@ -20,6 +21,9 @@ class FilterSecurity():
 
     def get_my_access(self):
         return self.my_access
+
+    def get_not_my_access(self):
+        return self.not_my_access
 
     def get_user(self):
         return self.user
@@ -38,6 +42,16 @@ class FilterSecurity():
             )
         queryset = Student.objects.filter(
             pk__in = my_accessible.values('student'),
+            )
+        return queryset
+
+    def get_not_my_students(self):
+        not_my_accessible = StudentUserHasAccess.objects.filter(
+            user = self.user).exclude(
+            pk__in = MyStudents.objects.values('student_user_has_access'),
+            )
+        queryset = Student.objects.filter(
+            pk__in = not_my_accessible.values('student'),
             )
         return queryset
 
