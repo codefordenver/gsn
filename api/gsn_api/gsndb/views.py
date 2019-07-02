@@ -94,6 +94,8 @@ class StudentList(generics.ListCreateAPIView):
         user = FilterSecurity(request)
         if access_level == user.get_my_access():
             queryset = user.get_my_students()
+        elif access_level == user.get_not_my_access():
+            queryset = user.get_not_my_students()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_students()
         serializer = StudentSerializer(queryset , many = True)
