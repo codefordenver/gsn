@@ -5,7 +5,7 @@ from gsndb.models import StudentUserHasAccess, MyStudents, Student, School, Dist
 class FilterSecurity():
     all_access = "all"
     my_access = "my"
-    not_my_accesss = "notmy"
+    not_my_access = "notmy"
 
     def __init__(self,request):
         if request.user.is_authenticated:
