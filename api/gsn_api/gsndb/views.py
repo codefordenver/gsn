@@ -192,7 +192,7 @@ class ReferralList(generics.ListCreateAPIView):
                 serializer.save()
                 return HttpResponseRedirect(f"/gsndb/{access_level}/student/{serializer.data['student']}/")
             else:
-                                            
+
                 return Response({
                                     "Sorry": "The serializer denied saving this referral.",
                                     "The serializer raised the following errors": serializer.errors
@@ -731,11 +731,8 @@ class UploadCSV(APIView):
         parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
         dtypes = parser.get_csv_datatypes()
         csv_df = parser.get_dataframe(dtypes)
-        return Response(
-            {
-                "dataframe": csv_df.shape,
-            }
-        )
+        json_object = parser.build_json(csv_df)
+        return Response(json_object)
         """
         if(self.has_file_already_uploaded):
             return Response(

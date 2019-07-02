@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 import pandas as pd
 import numpy as np
 from django.utils import timezone
@@ -57,8 +58,8 @@ class CSVParser():
                     "attendanceCalendarYear": 2004,
                     "attendanceCalendarTerm": "SMR",
                     "attendanceEntryDate": "2016-03-24",
-                    "attendanceTotalUnexcusedAbsence": 29.0,
-                    "attendanceTotalExcusedAbsence": 26.0,
+                    "attendanceTotalUnexcusedAbsence": 9.0,
+                    "attendanceTotalExcusedAbsence": 6.0,
                     "attendanceTotalAbsence": 54.0,
                     "attendanceTotalTardies": 11,
                     "attendanceAverageDailyAttendance": .98,
@@ -82,7 +83,7 @@ class CSVParser():
                 },
             ],
         }
-        #find target parent and housing fields
+        #find target parent and housing fields, returns lists
         #housing fields are parent fields that house child fields
         target_fields = list(self.target_json_format.keys())
         parent_fields = []
@@ -96,6 +97,7 @@ class CSVParser():
         self.target_housing_fields = housing_fields
 
         #find target child fields, child fields are housed in housing fields
+        #returns dictionary of housing field as keys and lists of child fields as values.
         child_fields = {}
         for field in self.target_housing_fields:
             output = list(self.target_json_format[field][0].keys())
@@ -157,7 +159,7 @@ class CSVParser():
             },
             "Weld Central Middle School": {
                 "direct": {
-                    'studentFirstName': 'student.firstName',
+                    'studentFirstName': "student.firstName",
                     'studentLastName': 'student.lastName',
                     "studentMiddleName": 'student.middleName',
                     "studentGender": 'student.gender',
@@ -166,29 +168,34 @@ class CSVParser():
                     'studentGradeYear': 'student.grade',
                     "courseName": 'grading.courseName',
                     "courseCode": 'grading.courseNumber',
+                    'gradeCourseCode': 'grading.courseNumber',
                     "gradePeriod": 'grading.periodName',
                     "gradeTask":'grading.task',
                     "grade": 'grading.percent',
+                    "gradeStudentSISID": 'student.studentNumber',
+                    "attendanceStudentSISID": 'student.studentNumber',
                     "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
                     "attendanceTotalAbsence": 'attExactDailyTermCount.absentDays',
                     'attendanceTotalTardies': "attExactDailyTermCount.tardies",
+                    "attendanceStudentSISID": 'student.studentNumber',
                     'behaviorContext': "behaviorDetail.contextDescription",
                     'behaviorSISID': "behaviorDetail.incidentID",
                     'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
                     'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
+                    "behaviorStudentSISID": 'student.studentNumber',
                 },
                 "parse": {
                     "studentBirthday": [
                         'student.birthdate',
-                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                        lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y")),
                     ],
                     'behaviorIncidentDate': [
                         "behaviorDetail.incidentDate",
-                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                        lambda dataframe_row: str(datetime.strptime(dataframe_row['behaviorDetail.incidentDate'], "%m/%d/%Y")),
                     ],
                     'gradeEntryDate': [
                         'grading.date',
-                        lambda dataframe: str(datetime.strptime(dataframe['student.birthdate'], "%m/%d/%Y")),
+                        lambda dataframe_row: str(datetime.strptime(dataframe_row['grading.date'], "%m/%d/%Y")),
                     ],
                     "programName": [
                         "django",
@@ -216,19 +223,19 @@ class CSVParser():
                     ],
                     "gradeCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["grading.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["grading.termName"] == "S2" else None,
+                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else "null",
                     ],
                     "gradeCalendarTerm": [
                         "grading.termName",
-                        lambda dataframe: "FLL" if dataframe["grading.termName"] == "S1" else "SPR" if dataframe["grading.termName"] == "S2" else None,
+                        lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else "null",
                     ],
                     "attendanceCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe: dataframe["cal.endYear"] - 1 if dataframe["attExactDailyTermCount.termName"] == "S1" else dataframe["cal.endYear"] if dataframe["attExactDailyTermCount.termName"] == "S2" else None,
+                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else "null",
                     ],
                     "attendanceCalendarTerm": [
                         "attExactDailyTermCount.termName",
-                        lambda dataframe: "FLL" if dataframe["attExactDailyTermCount.termName"] == "S1" else "SPR" if dataframe["attExactDailyTermCount.termName"] == "S2" else None,
+                        lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else "null",
                     ],
                     "gradeTermFinalValue": [
                         "django",
@@ -240,16 +247,17 @@ class CSVParser():
                     ],
                     "attendanceEntryDate": [
                         "django",
-                        timezone.now(),
+                        str(timezone.now()),
                     ],
                     "attendanceTotalExcusedAbsence": [
                         "attExactDailyTermCount.unexcusedAbsentDays",
-                        lambda dataframe: dataframe['attExactDailyTermCount.absentDays'] - dataframe["attExactDailyTermCount.unexcusedAbsentDays"],
+                        lambda dataframe_row: dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'],
                     ],
                 },
                 "blank": [
                     "behaviorIncidentTypeProgram",
                     "behaviorIncidentResultProgram",
+                    "behaviorCourseCode",
                     "studentReasonInProgram",
                     "attendanceAverageDailyAttendance",
                     "behaviorPeriod",
@@ -285,34 +293,67 @@ class CSVParser():
         csv_df = pd.read_csv(self.string_file_obj, dtype = csv_datatypes, sep = ',')
         return csv_df
 
-    def get_json_array(self, csv_df, id_field):
-        #only parse grade elements with task == "Semester Grade"
-        pass
-        """
-        json_array = []
-        parent_df = csv_df[self.target_parent_fields]
-        parent_df = parent_df.drop_duplicates()
-        for row in parent_df.itertuples():
-            output = {}
-            for field in self.target_parent_fields:
-                output[field] = getattr(row, field)
-            json_array.append(output)
-        for housing_field in self.target_child_fields.keys():
-            child_df_fields = self.target_child_fields[housing_field][:]
-            child_df_fields.append(id_field)
-            child_df = csv_df[child_df_fields]
-            child_df.drop_duplicates()
-            for parent_element in json_array:
-                child_array = []
-                for row in child_df.itertuples():
-                    if getattr(row, id_field) == parent_element[id_field]:
-                        output = {}
-                        for field in self.target_child_fields[housing_field]:
-                            output[field] = getattr(row, field)
-                        child_array.append(output)
-                parent_element[housing_field] = child_array
-        return json_array
-        """
+    def build_json(self, csv_df):
+        json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
+
+        direct_dict = json_to_csv_field_dict["direct"]
+        direct_fields = list(direct_dict.keys())
+
+        parse_dict = json_to_csv_field_dict["parse"]
+        parse_fields = list(parse_dict.keys())
+
+        blank_fields = json_to_csv_field_dict["blank"]
+
+        output = {}
+
+        for field in self.target_parent_fields:
+            csv_field = parse_dict[field][0]
+            value = parse_dict[field][1]
+            output[field] = value
+
+        for housing_field, child_fields in self.target_child_fields.items():
+
+            #get subset dataframe of csv dataframe that corresponds to the housing field.
+            subset_fields = []
+            for child_field in child_fields:
+                if child_field in direct_fields:
+                    csv_field = direct_dict[child_field]
+                    subset_fields.append(csv_field)
+                elif child_field in parse_fields:
+                    csv_field = parse_dict[child_field][0]
+                    if csv_field == "django":
+                        continue
+                    else:
+                        subset_fields.append(csv_field)
+                elif child_field in blank_fields:
+                    continue
+            subset_fields = set(subset_fields)
+            child_df = csv_df[subset_fields]
+            child_df.drop_duplicates(inplace = True)
+
+            #turn rows of subset dataframe into json elements
+            housing_output = []
+
+            for index, row in child_df.iterrows():
+                child_output = {}
+                for child_field in child_fields:
+                    if child_field in direct_fields:
+                        csv_field = direct_dict[child_field]
+                        value = row[csv_field]
+                    elif child_field in parse_fields:
+                        csv_field = parse_dict[child_field][0]
+                        if csv_field == "django":
+                            value = parse_dict[child_field][1]
+                        else:
+                            lambda_parser = parse_dict[child_field][1]
+                            value = lambda_parser(row)
+                    elif child_field in blank_fields:
+                        value = 'null'
+                    child_output[child_field] = value
+                housing_output.append(child_output)
+            output[housing_field] = housing_output
+        return output
+
     def parse_json():
         """
         - use district = District(field = value) to instantiate and check, then save.
