@@ -26,12 +26,12 @@ class Note(models.Model):
     )
     created = models.DateTimeField(default = timezone.now)
     text = models.TextField()
-    
+
     # Below the mandatory fields for generic relation
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type','object_id')
-    
+
 
 class District(models.Model):
     """establish state choices"""
@@ -105,7 +105,13 @@ class School(models.Model):
         on_delete=models.PROTECT,
     )
     notes = GenericRelation(Note)
-    
+
+
+class FileSHA(models.Model):
+    filePath = models.CharField(max_length = 200)
+    hasher = models.TextField()
+    created = models.DateTimeField(default = timezone.now)
+
 class Program(models.Model):
     notes = GenericRelation(Note)
     name = models.CharField(max_length=50)
@@ -202,7 +208,7 @@ class Course(models.Model):
     notes = GenericRelation(Note)
 
 class Calendar(models.Model):
-    year = models. IntegerField(null=True)
+    year = models.IntegerField(null=True)
     """establish choices for term"""
     TERM_CHOICES = (
         ("SPR", "Spring"),
@@ -264,6 +270,7 @@ class Behavior(models.Model):
         max_length = 50,
         blank = True,
     )
+    behavior_SISID = models.BigIntegerField()
     notes = GenericRelation(Note)
 
 class Grade(models.Model):
@@ -292,6 +299,10 @@ class Grade(models.Model):
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
     grade = models.FloatField(null = True)
+    task = models.CharField(
+        max_length = 100,
+        null = True
+    )
     term_final_value = models.BooleanField(default = False)
     notes = GenericRelation(Note)
 
@@ -317,8 +328,9 @@ class Attendance(models.Model):
         on_delete = models.PROTECT,
     )
     entry_datetime = models.DateTimeField(default = timezone.now)
-    total_unexabs = models.IntegerField(null = True)
-    total_exabs = models.IntegerField(null = True)
+    total_abs = models.FloatField(null = True)
+    total_unexabs = models.FloatField(null = True)
+    total_exabs = models.FloatField(null = True)
     total_tardies = models.IntegerField(null = True)
     avg_daily_attendance = models.FloatField(null = True)
     term_final_value = models.BooleanField(default = False)
@@ -342,7 +354,7 @@ class Referral(models.Model):
     If this is ever changed, it needs to be changed on the frontend as well
     '''
     REFERRAL_TYPE = (
-       
+
         ("MTL", "Mental Health"),
         ("DAC", "Drug & Alcohol/Addictions Counseling"),
         ("DHS", "Social Services (Department of Human Services)"),
@@ -397,3 +409,17 @@ class MyStudents(models.Model):
         "StudentUserHasAccess",
         on_delete = models.PROTECT,
     )
+
+class HistoricalStudentID(models.Model):
+    student = models.ForeignKey(
+        "Student",
+        on_delete = models.PROTECT,
+    )
+    school = models.ForeignKey(
+        "School",
+        on_delete = models.PROTECT,
+    )
+    student_SISID = models.BigIntegerField()
+
+    class Meta:
+        unique_together = ('student', 'school', 'student_SISID')

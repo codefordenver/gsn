@@ -1,5 +1,11 @@
+import hashlib, io
+from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
-from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, Program
+from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA
 from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -8,6 +14,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
+from .services.parser import CSVParser
 
 def post_note(request, Model, pk, access_level):
     """
@@ -101,7 +108,7 @@ class DistrictList(generics.ListCreateAPIView):
             queryset = user.get_my_districts()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_districts()
-        serializer = DistrictSerializer(queryset , many = True)
+        serializer = DistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
 class SchoolList(generics.ListCreateAPIView):
@@ -112,7 +119,7 @@ class SchoolList(generics.ListCreateAPIView):
             queryset = user.get_my_schools()
         elif access_level == user.get_all_access():
             queryset = user.get_accessible_schools()
-        serializer = SchoolSerializer(queryset , many = True)
+        serializer = SchoolSerializer(queryset, many = True)
         return Response(serializer.data)
 
 class CourseList(generics.ListCreateAPIView):
@@ -185,7 +192,7 @@ class ReferralList(generics.ListCreateAPIView):
                 serializer.save()
                 return HttpResponseRedirect(f"/gsndb/{access_level}/student/{serializer.data['student']}/")
             else:
-                                            
+
                 return Response({
                                     "Sorry": "The serializer denied saving this referral.",
                                     "The serializer raised the following errors": serializer.errors
@@ -652,3 +659,99 @@ class ProgramInfo(APIView):
             serializer = NestedProgramSerializer(program_obj, many = True, context = {"getCourse": True})
 
         return Response(serializer.data)
+
+
+class NoteByObject(APIView):
+
+    def get(self, request, pk, objType):
+
+        contType = ContentType.objects.get(app_label = "gsndb", model = objType).id
+        notes = Note.objects.filter(content_type = contType, object_id = pk)
+        data = NoteSerializer(notes, many = True).data
+
+        return Response(data)
+
+
+class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Bookmark.objects.all()
+    serializer_class = BookmarkSerializer
+
+class UploadCSV(APIView):
+
+    parser_classes = (
+        MultiPartParser,
+    )
+
+    def __init__(self):
+        self.file_name = ""
+        self.hash = ""
+        self.has_file_already_uploaded = False
+
+    def hash_handler(self, byte_file_obj):
+        """A hash function that identifies gives a csv file a hash that uniquely
+        identifies it against other csv files.
+
+        Note: the .read() method reads entire file to memory, so large
+        files may cause your machine to crash. Use .chunks() for larger files.
+        """
+        blocksize = 65536
+        hasher = hashlib.sha1()
+        content = ""
+        self.file_name = byte_file_obj.name
+        buf = byte_file_obj.read(blocksize)
+        while len(buf) > 0:
+            hasher.update(buf)
+            content += buf.decode('utf-8')
+            buf = byte_file_obj.read(blocksize)
+        self.hash = hasher.hexdigest()
+        return content
+
+
+    def has_file_already_been_uploaded(self):
+        self.has_file_already_uploaded = FileSHA.objects.filter(hasher = self.hash).exists()
+        if(not self.has_file_already_uploaded):
+            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
+
+    def post(self, request, access_level):
+        """Takes a file and turns it into an instance of Django's UploadedFile
+        class. The response generated renders an html template offering some
+        meta information.
+
+        Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
+        """
+        byte_file_obj = request.data["csv"]
+        school_of_origin = request.data["school_of_csv_origin"]
+        if request.data["term_final_value"] == "True":
+            term_final_value = True
+        else:
+            term_final_value = False
+        content = self.hash_handler(byte_file_obj)
+        self.has_file_already_been_uploaded()
+        string_io_obj = io.StringIO(content)
+        parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
+        dtypes = parser.get_csv_datatypes()
+        csv_df = parser.get_dataframe(dtypes)
+        json_object = parser.build_json(csv_df)
+        return Response(json_object)
+        """
+        if(self.has_file_already_uploaded):
+            return Response(
+                {
+                    "Error": f"{self.file_name} has already been uploaded.",
+                    "content": content,
+                }
+            )
+        else:
+            string_io_obj = io.StringIO(content)
+            parser = CSVParser(string_io_obj, school_of_origin, False)
+            dtypes = parser.get_csv_datatypes()
+            csv_df = parser.get_dataframe(dtypes)
+            identifying_column = "studentStateID"
+            json_array = parser.get_json_array(csv_df, identifying_column)
+            return Response(
+                {
+                    "file_name": self.file_name,
+                    "content": json_array,
+                }
+            )
+        """
