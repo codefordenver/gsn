@@ -352,7 +352,8 @@ class CSVParser():
                     child_output[child_field] = value
                 housing_output.append(child_output)
             output[housing_field] = housing_output
-        return output
+            json_obj = json.dumps(output)
+        return json_obj
 
     def parse_json():
         """
