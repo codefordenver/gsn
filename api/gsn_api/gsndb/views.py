@@ -220,7 +220,7 @@ class SchoolPostList(generics.ListCreateAPIView):
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new schools to be posted to the database. 
+        This method allows new schools to be posted to the database.
 
         The body of the post request this method handles should be in JSON format:
 
@@ -254,7 +254,7 @@ class DistrictPostList(generics.ListCreateAPIView):
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new districts to be posted to the database. 
+        This method allows new districts to be posted to the database.
 
         The body of the post request this method handles should be in JSON format:
 
@@ -289,15 +289,22 @@ class ModifyMyStudentList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         user = FilterSecurity(request)
         if access_level == user.get_my_access():
-            queryset = user.get_my_students()
-        serializer = StudentSerializer(queryset , many = True)
-        return Response(serializer.data)
+            my_queryset = user.get_my_students()
+            accessible_queryset = user.get_accessible_students()
+        my_serializer = StudentSerializer(my_queryset , many = True)
+        accessible_serializer = StudentSerializer(accessible_queryset, many = True)
+        return Response(
+            {
+                "my_students": my_serializer.data,
+                "accessible_students": accessible_serializer.data
+            }
+        )
 
     def post(self, request, access_level, format = None):
         """
-        This method allows a user to select what students they want to be counted in the "my student" 
+        This method allows a user to select what students they want to be counted in the "my student"
         list. This post allows users to both add a student to the list and remove a student to the list
-        depending on the value of remove. If remove is true then it will remove student from my student. 
+        depending on the value of remove. If remove is true then it will remove student from my student.
         If remove is false it will add the student to my student. This will take in more than one student
         at a time.
 
@@ -313,8 +320,8 @@ class ModifyMyStudentList(generics.ListCreateAPIView):
             ...,
             {"student_id": "student id",
                 "remove": true/false
-            } 
-        ]  
+            }
+        ]
         """
         user = FilterSecurity(request)
         current_user = user.get_user().id
@@ -330,15 +337,15 @@ class ModifyMyStudentList(generics.ListCreateAPIView):
 
                 student_instance = Student.objects.get(pk=student_data["student_id"])
                 accessible_student_instance = StudentUserHasAccess.objects.get(user=user_instance, student=student_instance)
-                if(student_data["remove"]): 
+                if(student_data["remove"]):
                     MyStudents.objects.get(student_user_has_access=accessible_student_instance).delete()
                 else:
                     MyStudents.objects.create(student_user_has_access=accessible_student_instance)
             return HttpResponseRedirect(f"/gsndb/{access_level}/modify-my-students/")
         except Exception as e:
             return Response({
-                                "Sorry": "The serializer denied modifying these students.",
-                                "The model raised the following errors": str(e)
+                                "Sorry": "The model denied modifying these students.",
+                                "The model raised the following errors": str(e),
                             })
 
 
