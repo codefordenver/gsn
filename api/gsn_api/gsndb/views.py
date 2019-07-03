@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
-from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents
+from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents, HistoricalStudentID
 from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer, CreateDistrictSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -292,13 +292,13 @@ class ModifyMyStudentList(generics.ListCreateAPIView):
         user = FilterSecurity(request)
         if access_level == user.get_my_access():
             my_queryset = user.get_my_students()
-            accessible_queryset = user.get_accessible_students()
+            notmy_queryset = user.get_not_my_students()
         my_serializer = StudentSerializer(my_queryset , many = True)
-        accessible_serializer = StudentSerializer(accessible_queryset, many = True)
+        notmy_serializer = StudentSerializer(notmy_queryset, many = True)
         return Response(
             {
                 "my_students": my_serializer.data,
-                "accessible_students": accessible_serializer.data
+                "notmy_students": notmy_serializer.data
             }
         )
 
@@ -546,13 +546,13 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         interact via: DELETE <host>/gsndb/<access_level>/school/<pk>
         """
         current_school = School.objects.get(pk = pk)
-        connected_students = False
-        all_students = Student.objects.all()
-        for student in all_students:
-            if student.current_school.id == pk:
-                connected_students = True
+        is_connected = False
+        all_historical_student_id = HistoricalStudentID.objects.all()
+        for instance in all_historical_student_id:
+            if instance.school.id == pk:
+                is_connected = True
                 break
-        if connected_students == False:
+        if is_connected == False:
             current_school.delete()
             return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
