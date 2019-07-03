@@ -5,8 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
-from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA
-from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer
+from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents
+from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer, CreateDistrictSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
 from .services.parser import CSVParser
+from django.contrib.auth.models import User
 
 def post_note(request, Model, pk, access_level):
     """
@@ -171,6 +172,18 @@ class ReferralList(generics.ListCreateAPIView):
         This method allows new referrals to be posted to the database. It
         redirects to the selfsame ReferralList view, allowing the user to
         see the new referral they created among their list of referrals.
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"student": "student id here",
+        "program": "program pk",
+        "type": "list of types that can be found in referral model",
+        "date_given": "YYYY-MM-DD",
+        "reference_name": "the name of the person who referred whatever",
+        "reference_phone": integer goes here,
+        "reference_address": "an address goes here",
+        "reason": "reason..."
+        }
         """
         user = FilterSecurity(request)
         json = request.data
@@ -210,6 +223,12 @@ class SchoolPostList(generics.ListCreateAPIView):
     def post(self, request, access_level, format = None):
         """
         This method allows new schools to be posted to the database.
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"school_name": "new school name",
+        "district_id": "district pk"
+        }
         """
 
         json = request.data
@@ -232,12 +251,20 @@ class DistrictPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
         queryset = District.objects.all()
-        serializer = DistrictSerializer(queryset, many = True)
+        serializer = CreateDistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new schools to be posted to the database.
+        This method allows new districts to be posted to the database.
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"district_name": "new district name",
+        "city": "the city",
+        "state": "two digit state",
+        "code": "district code"
+        }
         """
 
         json = request.data
@@ -259,9 +286,72 @@ class DistrictPostList(generics.ListCreateAPIView):
                             })
 
 
+class ModifyMyStudentList(generics.ListCreateAPIView):
+
+    def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
+        if access_level == user.get_my_access():
+            my_queryset = user.get_my_students()
+            accessible_queryset = user.get_accessible_students()
+        my_serializer = StudentSerializer(my_queryset , many = True)
+        accessible_serializer = StudentSerializer(accessible_queryset, many = True)
+        return Response(
+            {
+                "my_students": my_serializer.data,
+                "accessible_students": accessible_serializer.data
+            }
+        )
+
+    def post(self, request, access_level, format = None):
+        """
+        This method allows a user to select what students they want to be counted in the "my student"
+        list. This post allows users to both add a student to the list and remove a student to the list
+        depending on the value of remove. If remove is true then it will remove student from my student.
+        If remove is false it will add the student to my student. This will take in more than one student
+        at a time.
+
+        The body of the post request this method handles should be in JSON format:
+
+        [
+            {"student_id": "student id",
+                "remove": true/false
+            },
+            {"student_id": "student id",
+                "remove": true/false
+            },
+            ...,
+            {"student_id": "student id",
+                "remove": true/false
+            }
+        ]
+        """
+        user = FilterSecurity(request)
+        current_user = user.get_user().id
+        user_instance = User.objects.get(pk=current_user)
+
+        json = request.data
+        try:
+            for json_slice in range(0,len(json)):
+                student_data = {
+                    "student_id": json[json_slice]["student_id"],
+                    "remove": json[json_slice]["remove"]
+                }
+
+                student_instance = Student.objects.get(pk=student_data["student_id"])
+                accessible_student_instance = StudentUserHasAccess.objects.get(user=user_instance, student=student_instance)
+                if(student_data["remove"]):
+                    MyStudents.objects.get(student_user_has_access=accessible_student_instance).delete()
+                else:
+                    MyStudents.objects.create(student_user_has_access=accessible_student_instance)
+            return HttpResponseRedirect(f"/gsndb/{access_level}/modify-my-students/")
+        except Exception as e:
+            return Response({
+                                "Sorry": "The model denied modifying these students.",
+                                "The model raised the following errors": str(e),
+                            })
+
+
 #Detail views
-
-
 class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
