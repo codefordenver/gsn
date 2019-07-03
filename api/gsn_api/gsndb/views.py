@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
-from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA
+from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents
 from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
 from .services.parser import CSVParser
+from django.contrib.auth.models import User
 
 def post_note(request, Model, pk, access_level):
     """
@@ -257,9 +258,46 @@ class DistrictPostList(generics.ListCreateAPIView):
                             })
 
 
+class ModifyMyStudentList(generics.ListCreateAPIView):
+
+    def get(self, request, access_level, format = None):
+        user = FilterSecurity(request)
+        if access_level == user.get_my_access():
+            queryset = user.get_my_students()
+        serializer = StudentSerializer(queryset , many = True)
+        return Response(serializer.data)
+
+    def post(self, request, access_level, format = None):
+        """
+        This method allows new schools to be posted to the database.
+        """
+        user = FilterSecurity(request)
+        current_user = user.get_user().id
+        user_instance = User.objects.get(pk=current_user)
+
+        json = request.data
+        try:
+            for json_slice in range(0,len(json)):
+                student_data = {
+                    "student_id": json[json_slice]["student_id"],
+                    "remove": json[json_slice]["remove"]
+                }
+
+                student_instance = Student.objects.get(pk=student_data["student_id"])
+                accessible_student_instance = StudentUserHasAccess.objects.get(user=user_instance, student=student_instance)
+                if(student_data["remove"]): 
+                    MyStudents.objects.get(student_user_has_access=accessible_student_instance).delete()
+                else:
+                    MyStudents.objects.create(student_user_has_access=accessible_student_instance)
+            return HttpResponseRedirect(f"/gsndb/{access_level}/modify-my-students/")
+        except Exception as e:
+            return Response({
+                                "Sorry": "The serializer denied modifying these students.",
+                                "The model raised the following errors": str(e)
+                            })
+
+
 #Detail views
-
-
 class ReferralDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
