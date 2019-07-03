@@ -8,13 +8,6 @@ class FilterSecurity():
 
     def __init__(self,request):
         self.user = User.objects.first()
-        '''if request.user.is_authenticated:
-            self.user =  request.user 
-        else:
-            I'm leaving this in for now so we can still see data when we are 
-            just playing with the backend. When we push this up this needs to be
-            removed
-            self.user = User.objects.first()'''
 
     def get_all_access(self):
         return self.all_access
