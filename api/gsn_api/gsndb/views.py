@@ -246,13 +246,21 @@ class SchoolPostList(generics.ListCreateAPIView):
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                             })
-    
-    def put(self, request, pk, access_level, format = None):
+
+    def put(self, request, access_level, format = None):
         """
         This method allows a user to update an existing school via a PUT request.
+
+        expected format of body:
+        {
+            "school_id": 1,
+            "school_name": "legoland",
+            "district_id": 4,
+        }
         """
-        school_obj = School.objects.get(pk = pk)
         json = request.data
+        pk = json["school_id"]
+        school_obj = School.objects.get(pk = pk)
         school_data = {
             "name": json["school_name"],
             "district": json["district_id"]
@@ -260,7 +268,7 @@ class SchoolPostList(generics.ListCreateAPIView):
         serializer = SchoolSerializer(school_obj, data = school_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/school/{pk}/")
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
 
             return Response({
@@ -268,12 +276,13 @@ class SchoolPostList(generics.ListCreateAPIView):
                                 "The serializer raised the following errors": serializer.errors
                                 })
 
-    def delete(self, request, pk, access_level, format = None):
+    def delete(self, request, access_level, format = None):
         """
         This method allows individual schools to be deleted.
 
-        interact via: DELETE <host>/gsndb/<access_level>/school/<pk>
+        interact via: DELETE <host>/gsndb/<access_level>/school/<pk> body = {"id": 1}
         """
+        pk = request.data["id"]
         current_school = School.objects.get(pk = pk)
         is_connected = False
         all_historical_student_id = HistoricalStudentID.objects.all()
@@ -329,12 +338,23 @@ class DistrictPostList(generics.ListCreateAPIView):
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                             })
-    def put(self, request, pk, access_level, format = None):
+    def put(self, request, access_level, format = None):
         """
         This method allows a user to update an existing district via a PUT request.
+
+        expected format of body:
+
+        {
+            "id": 1,
+            "district_name": "namehere",
+            "city": "Chicago",
+            "state": "IL",
+            "code": "h67"
+        }
         """
-        district_obj = District.objects.get(pk = pk)
         json = request.data
+        pk = json["id"]
+        district_obj = District.objects.get(pk = pk)
         district_data = {
             "name": json["district_name"],
             "city": json["city"],
@@ -344,7 +364,7 @@ class DistrictPostList(generics.ListCreateAPIView):
         serializer = DistrictSerializer(district_obj, data = district_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/district/{pk}/")
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
 
             return Response({
@@ -352,12 +372,13 @@ class DistrictPostList(generics.ListCreateAPIView):
                                 "The serializer raised the following errors": serializer.errors
                                 })
 
-    def delete(self, request, pk, access_level, format = None):
+    def delete(self, request, access_level, format = None):
         """
         This method allows individual districts to be deleted.
 
-        interact via: DELETE <host>/gsndb/<access_level>/district/<pk>
+        interact via: DELETE <host>/gsndb/<access_level>/district/<pk> body = {"id": 1}
         """
+        pk = request.data["id"]
         current_district = District.objects.get(pk = pk)
         connected_schools = False
         all_schools = School.objects.all()
@@ -523,7 +544,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, District, pk, access_level)
         return response
 
-    
+
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
@@ -564,7 +585,7 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, School, pk, access_level)
         return response
 
-    
+
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, pk, access_level, format = None):
