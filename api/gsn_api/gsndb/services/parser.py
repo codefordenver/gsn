@@ -223,19 +223,19 @@ class CSVParser():
                     ],
                     "gradeCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else "null",
+                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else None,
                     ],
                     "gradeCalendarTerm": [
                         "grading.termName",
-                        lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else "null",
+                        lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else None,
                     ],
                     "attendanceCalendarYear": [
                         "cal.endYear",
-                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else "null",
+                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
                     "attendanceCalendarTerm": [
                         "attExactDailyTermCount.termName",
-                        lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else "null",
+                        lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
                     "gradeTermFinalValue": [
                         "django",
@@ -251,7 +251,7 @@ class CSVParser():
                     ],
                     "attendanceTotalExcusedAbsence": [
                         "attExactDailyTermCount.unexcusedAbsentDays",
-                        lambda dataframe_row: dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'],
+                        lambda dataframe_row: round(dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'], 2)
                     ],
                 },
                 "blank": [
@@ -330,6 +330,8 @@ class CSVParser():
             subset_fields = set(subset_fields)
             child_df = csv_df[subset_fields]
             child_df.drop_duplicates(inplace = True)
+            replacement_for_nan = "@ fOr RePlacIng np.NaN!!!"
+            child_df.replace(np.nan, replacement_for_nan, inplace = True)
 
             #turn rows of subset dataframe into json elements
             housing_output = []
@@ -348,14 +350,16 @@ class CSVParser():
                             lambda_parser = parse_dict[child_field][1]
                             value = lambda_parser(row)
                     elif child_field in blank_fields:
-                        value = 'null'
+                        value = None
+                    if value == replacement_for_nan:
+                        value = None
                     child_output[child_field] = value
                 housing_output.append(child_output)
             output[housing_field] = housing_output
-            json_obj = json.dumps(output)
-        return json_obj
+        return output
 
-    def parse_json():
+    def parse_json(self, json_obj):
+        return json_obj
         """
         - use district = District(field = value) to instantiate and check, then save.
         - follow heirarchy through student, bring in course and calendar for grade/attendance.
@@ -363,4 +367,3 @@ class CSVParser():
         - filter students first via HistoricalStudentID
         - only parse grade elements with task == "Semester Grade"
         """
-        pass
