@@ -247,6 +247,60 @@ class SchoolPostList(generics.ListCreateAPIView):
                                 "The serializer raised the following errors": serializer.errors
                             })
 
+    def put(self, request, access_level, format = None):
+        """
+        This method allows a user to update an existing school via a PUT request.
+
+        expected format of body:
+        {
+            "school_id": 1,
+            "school_name": "legoland",
+            "district_id": 4,
+        }
+        """
+        json = request.data
+        pk = json["school_id"]
+        school_obj = School.objects.get(pk = pk)
+        school_data = {
+            "name": json["school_name"],
+            "district": json["district_id"]
+        }
+        serializer = SchoolSerializer(school_obj, data = school_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                                })
+
+    def delete(self, request, access_level, format = None):
+        """
+        This method allows individual schools to be deleted.
+
+        interact via: DELETE <host>/gsndb/<access_level>/school/<pk> body = {"id": 1}
+        """
+        pk = request.data["id"]
+        current_school = School.objects.get(pk = pk)
+        is_connected = False
+        all_historical_student_id = HistoricalStudentID.objects.all()
+        for instance in all_historical_student_id:
+            if instance.school.id == pk:
+                is_connected = True
+                break
+        if is_connected == False:
+            current_school.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+        else:
+            return Response(
+                {
+                    "Sorry": "You cannot delete a student with students already connected to it.",
+                }
+            )
+
+
 class DistrictPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
@@ -284,6 +338,65 @@ class DistrictPostList(generics.ListCreateAPIView):
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                             })
+    def put(self, request, access_level, format = None):
+        """
+        This method allows a user to update an existing district via a PUT request.
+
+        expected format of body:
+
+        {
+            "id": 1,
+            "district_name": "namehere",
+            "city": "Chicago",
+            "state": "IL",
+            "code": "h67"
+        }
+        """
+        json = request.data
+        pk = json["id"]
+        district_obj = District.objects.get(pk = pk)
+        district_data = {
+            "name": json["district_name"],
+            "city": json["city"],
+            "state": json["state"],
+            "code": json["code"]
+        }
+        serializer = DistrictSerializer(district_obj, data = district_data)
+        if serializer.is_valid():
+            serializer.save()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+        else:
+
+            return Response({
+                                "Sorry": "The serializer denied saving this note.",
+                                "The serializer raised the following errors": serializer.errors
+                                })
+
+    def delete(self, request, access_level, format = None):
+        """
+        This method allows individual districts to be deleted.
+
+        interact via: DELETE <host>/gsndb/<access_level>/district/<pk> body = {"id": 1}
+        """
+        pk = request.data["id"]
+        current_district = District.objects.get(pk = pk)
+        connected_schools = False
+        all_schools = School.objects.all()
+        for school in all_schools:
+            if school.district.id == pk:
+                connected_schools = True
+                break
+        if connected_schools == False:
+            current_district.delete()
+            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+        else:
+            return Response(
+                {
+                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
+                    "schools": SchoolSerializer(current_district.school_set, many = True).data
+                }
+            )
+
 
 
 class ModifyMyStudentList(generics.ListCreateAPIView):
@@ -431,52 +544,6 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, District, pk, access_level)
         return response
 
-    def put(self, request, pk, access_level, format = None):
-        """
-        This method allows a user to update an existing district via a PUT request.
-        """
-        district_obj = District.objects.get(pk = pk)
-        json = request.data
-        district_data = {
-            "name": json["district_name"],
-            "city": json["city"],
-            "state": json["state"],
-            "code": json["code"]
-        }
-        serializer = DistrictSerializer(district_obj, data = district_data)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/district/{pk}/")
-        else:
-
-            return Response({
-                                "Sorry": "The serializer denied saving this note.",
-                                "The serializer raised the following errors": serializer.errors
-                                })
-
-    def delete(self, request, pk, access_level, format = None):
-        """
-        This method allows individual districts to be deleted.
-
-        interact via: DELETE <host>/gsndb/<access_level>/district/<pk>
-        """
-        current_district = District.objects.get(pk = pk)
-        connected_schools = False
-        all_schools = School.objects.all()
-        for school in all_schools:
-            if school.district.id == pk:
-                connected_schools = True
-                break
-        if connected_schools == False:
-            current_district.delete()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
-        else:
-            return Response(
-                {
-                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
-                    "schools": SchoolSerializer(current_district.school_set, many = True).data
-                }
-            )
 
 class StudentDetail(generics.RetrieveUpdateDestroyAPIView):
 
@@ -518,49 +585,6 @@ class SchoolDetail(generics.RetrieveUpdateDestroyAPIView):
         response = post_note(request, School, pk, access_level)
         return response
 
-    def put(self, request, pk, access_level, format = None):
-        """
-        This method allows a user to update an existing school via a PUT request.
-        """
-        school_obj = School.objects.get(pk = pk)
-        json = request.data
-        school_data = {
-            "name": json["school_name"],
-            "district": json["district_id"]
-        }
-        serializer = SchoolSerializer(school_obj, data = school_data)
-        if serializer.is_valid():
-            serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/school/{pk}/")
-        else:
-
-            return Response({
-                                "Sorry": "The serializer denied saving this note.",
-                                "The serializer raised the following errors": serializer.errors
-                                })
-
-    def delete(self, request, pk, access_level, format = None):
-        """
-        This method allows individual schools to be deleted.
-
-        interact via: DELETE <host>/gsndb/<access_level>/school/<pk>
-        """
-        current_school = School.objects.get(pk = pk)
-        is_connected = False
-        all_historical_student_id = HistoricalStudentID.objects.all()
-        for instance in all_historical_student_id:
-            if instance.school.id == pk:
-                is_connected = True
-                break
-        if is_connected == False:
-            current_school.delete()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
-        else:
-            return Response(
-                {
-                    "Sorry": "You cannot delete a student with students already connected to it.",
-                }
-            )
 
 class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 

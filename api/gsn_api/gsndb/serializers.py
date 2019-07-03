@@ -236,6 +236,8 @@ class CreateDistrictSerializer(serializers.ModelSerializer):
 
         representation["districtId"] = representation.pop("id")
         representation["districtName"] = representation.pop("name")
+        representation["districtCity"] = district_obj.city
+        representation["districtCode"] = district_obj.code 
         representation["schoolSet"] = SchoolSerializer(district_obj.school_set, many = True, read_only = True).data
 
         return representation
@@ -255,7 +257,7 @@ class DistrictDetailSerializer(serializers.ModelSerializer):
         accessible_students = user.get_accessible_students()
         my_students = user.get_my_students()
 
-        
+
         access_level = self.context.get("access", False)
         representation = super().to_representation(district_obj)
 
@@ -318,7 +320,7 @@ class StudentDetailSerializer(serializers.ModelSerializer):
 
 
 class SchoolDetailSerializer(serializers.ModelSerializer):
-    
+
 
     class Meta:
         model = School
@@ -361,7 +363,7 @@ class SchoolDetailSerializer(serializers.ModelSerializer):
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
-    
+
 
     class Meta:
         model = Course
@@ -396,7 +398,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         return representation
 
 class ProgramDetailSerializer(serializers.ModelSerializer):
-    
+
 
     class Meta:
         model = Program
