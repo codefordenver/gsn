@@ -9,6 +9,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username',)
 
 
+    def to_representation(self, user_obj):
+        representation = super().to_representation(user_obj)
+
+        representation["username"] = representation.pop("username")
+        representation["name"] = user_obj.first_name + " " + user_obj.last_name
+        representation["email"] = user_obj.email
+
+        return representation
+
+
 class UserSerializerWithToken(serializers.ModelSerializer):
 
     token = serializers.SerializerMethodField()
@@ -16,7 +26,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER 
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
         payload = jwt_payload_handler(obj)
         token = jwt_encode_handler(payload)

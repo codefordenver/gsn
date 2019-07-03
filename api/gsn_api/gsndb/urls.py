@@ -22,5 +22,5 @@ urlpatterns = [
     path('uploadcsv/', views.UploadCSV.as_view()),
     path('create-school/', views.SchoolPostList.as_view()),
     path('create-district/', views.DistrictPostList.as_view()),
-    path('modify-my-students/', views.ModifyMyStudentList.as_view())
+    path('modify/', views.ModifyMyOrAccessibleStudentList.as_view())
   ]

@@ -7,6 +7,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents, HistoricalStudentID
 from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer, CreateDistrictSerializer
+from user_app.serializers import UserSerializer
 from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
@@ -286,21 +287,54 @@ class DistrictPostList(generics.ListCreateAPIView):
                             })
 
 
-class ModifyMyStudentList(generics.ListCreateAPIView):
+class ModifyMyOrAccessibleStudentList(generics.ListCreateAPIView):
+
+    """
+    Goal: allow user to give access to students they have access to other users.
+
+    Workflow:
+        Get: show list of users and list of students you have access to.
+        Post: accept two lists, a list of users and a list of students, and a give boolean.
+            - if remove = false:
+                - checkout to see if user in user list already has access to student.
+                    - if true: populate already_has_access list.
+                    - if false: populate give_access list.
+                - for users in give_access list, modify user has access table to give access.
+                - Response access to <student_list> was given to <user_list>,
+                  <other_user_list> already had access to these students.
+            - if remove = true:
+                - checkout to see if user in user list already does not have access to student.
+                    - if true: populate already_has_no_access list.
+                    - if false: populate remove_access list.
+                - for users in remove_access list, modify user has access table to remove access.
+                - Response access to <student_list> was removed for <user_list>,
+                  <other_user_list> already did not have access to these students.
+    """
 
     def get(self, request, access_level, format = None):
         user = FilterSecurity(request)
         if access_level == user.get_my_access():
             my_queryset = user.get_my_students()
             notmy_queryset = user.get_not_my_students()
-        my_serializer = StudentSerializer(my_queryset , many = True)
-        notmy_serializer = StudentSerializer(notmy_queryset, many = True)
-        return Response(
-            {
-                "my_students": my_serializer.data,
-                "notmy_students": notmy_serializer.data
-            }
-        )
+            my_serializer = StudentSerializer(my_queryset , many = True)
+            notmy_serializer = StudentSerializer(notmy_queryset, many = True)
+            return Response(
+                {
+                    "my_students": my_serializer.data,
+                    "notmy_students": notmy_serializer.data
+                }
+            )
+        elif access_level == user.get_all_access():
+            accessible_queryset = user.get_accessible_students()
+            user_queryset = User.objects.all()
+            student_serializer = StudentSerializer(accessible_queryset, many = True)
+            user_serializer = UserSerializer(user_queryset, many = True)
+            return Response(
+                {
+                    "accessible_students": student_serializer.data,
+                    "users": user_serializer.data
+                }
+            )
 
     def post(self, request, access_level, format = None):
         """
