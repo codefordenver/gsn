@@ -223,6 +223,23 @@ class ReferralSerializer(serializers.ModelSerializer):
 
         return representation
 
+class CreateDistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = (
+            "id",
+            "name",
+        )
+
+    def to_representation(self, district_obj):
+        representation = super().to_representation(district_obj)
+
+        representation["districtId"] = representation.pop("id")
+        representation["districtName"] = representation.pop("name")
+        representation["schoolSet"] = SchoolSerializer(district_obj.school_set, many = True, read_only = True).data
+
+        return representation
+
 #detail serializer
 class DistrictDetailSerializer(serializers.ModelSerializer):
 
