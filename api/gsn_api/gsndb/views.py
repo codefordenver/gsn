@@ -170,6 +170,18 @@ class ReferralList(generics.ListCreateAPIView):
         This method allows new referrals to be posted to the database. It
         redirects to the selfsame ReferralList view, allowing the user to
         see the new referral they created among their list of referrals.
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"student": "student id here",
+        "program": "program pk",
+        "type": "list of types that can be found in referral model",
+        "date_given": "YYYY-MM-DD",
+        "reference_name": "the name of the person who referred whatever",
+        "reference_phone": integer goes here,
+        "reference_address": "an address goes here",
+        "reason": "reason..."
+        }
         """
         user = FilterSecurity(request)
         json = request.data
@@ -208,7 +220,13 @@ class SchoolPostList(generics.ListCreateAPIView):
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new schools to be posted to the database.
+        This method allows new schools to be posted to the database. 
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"school_name": "new school name",
+        "district_id": "district pk"
+        }
         """
 
         json = request.data
@@ -236,7 +254,15 @@ class DistrictPostList(generics.ListCreateAPIView):
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new schools to be posted to the database.
+        This method allows new districts to be posted to the database. 
+
+        The body of the post request this method handles should be in JSON format:
+
+        {"district_name": "new district name",
+        "city": "the city",
+        "state": "two digit state",
+        "code": "district code"
+        }
         """
 
         json = request.data
@@ -269,7 +295,26 @@ class ModifyMyStudentList(generics.ListCreateAPIView):
 
     def post(self, request, access_level, format = None):
         """
-        This method allows new schools to be posted to the database.
+        This method allows a user to select what students they want to be counted in the "my student" 
+        list. This post allows users to both add a student to the list and remove a student to the list
+        depending on the value of remove. If remove is true then it will remove student from my student. 
+        If remove is false it will add the student to my student. This will take in more than one student
+        at a time.
+
+        The body of the post request this method handles should be in JSON format:
+
+        [
+            {"student_id": "student id",
+                "remove": true/false
+            },
+            {"student_id": "student id",
+                "remove": true/false
+            },
+            ...,
+            {"student_id": "student id",
+                "remove": true/false
+            } 
+        ]  
         """
         user = FilterSecurity(request)
         current_user = user.get_user().id
