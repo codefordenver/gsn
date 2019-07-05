@@ -17,7 +17,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER 
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
         payload = jwt_payload_handler(obj)
         token = jwt_encode_handler(payload)
@@ -39,4 +39,8 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 class SpecialKeyLogList(serializers.ModelSerializer):
     class Meta:
         model = SpecialKeyLog
-        fields = ('special_key', 'created', 'user_that_create_request',)
+        fields = (
+            'special_key',
+            'created',
+            'user_that_create_request',
+        )

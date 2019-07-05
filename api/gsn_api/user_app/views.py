@@ -38,7 +38,7 @@ class UserList(APIView):
 
     def post(self, request, format=None):
         json = request.data
-        
+
         if "special_key" in json.keys():
             special_key = json["special_key"]
         else:
@@ -47,9 +47,9 @@ class UserList(APIView):
                             })
         current_time = timezone.now()
         hours_24_before_now = current_time - timedelta(hours = 24)
-        
+
         special_key_log = SpecialKeyLog.objects.filter(special_key = special_key, created__range=[hours_24_before_now,current_time])
-        
+
         if special_key_log.count() > 0:
             user_data = {
                 "username": json["username"],
@@ -64,7 +64,7 @@ class UserList(APIView):
             return Response({
                                 "Sorry": "The registration key has either expired or does not exist. If you believe this is an error, please try again. Otherwise, please request a registration key from an existing user."
                             })
-        
+
 
 class SpecialKey(generics.ListCreateAPIView):
 
@@ -81,9 +81,9 @@ class SpecialKey(generics.ListCreateAPIView):
         This method allows a secret key to be created by authenticated users. The secret key can then be
         used by people wanting to register within 24 hours.
         """
-        
+
         try:
-            
+
             if request.user.is_authenticated():
                 special_key = uuid4()
                 user = User.objects.get(username=request.user.username)
@@ -96,5 +96,3 @@ class SpecialKey(generics.ListCreateAPIView):
                                 "Sorry": "The database was not able to create this secret key.",
                                 "The attempt raised the following errors": str(e)
                             })
-            
-
