@@ -14,6 +14,7 @@ httpie = "*"
 django-cors-headers = "*"
 djangorestframework-camel-case2 = "*"
 pandas = "*"
+datetime = "*"
 
 [dev-packages]
 coverage = "*"
