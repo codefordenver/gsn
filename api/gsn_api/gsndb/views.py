@@ -846,7 +846,10 @@ class UploadCSV(APIView):
         string_io_obj = io.StringIO(content)
         parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
         parser.organize()
-        return Response(parser.parse_json())
+        if len(parser.exceptions["Organize"]) == 0:
+            return Response(parser.parse_json())
+        else:
+            return Response(parser.exceptions)
         """
         if(self.has_file_already_uploaded):
             return Response(

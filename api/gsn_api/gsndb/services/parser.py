@@ -10,10 +10,17 @@ class CSVParser():
 
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value = False):
         self.school_of_csv_origin = school_of_csv_origin
-        self.School = School.objects.get(name = self.school_of_csv_origin)
+        self.school = School.objects.get(name = self.school_of_csv_origin)
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
-        self.exceptions = []
+        self.exceptions = {
+            "Organize": [],
+            "Student": [],
+            "Course": [],
+            "Grade": [],
+            "Attendance": [],
+            "Behavior": [],
+        }
         self.json_object = {"Not created yet.": "run CSVParser.organize() to create."}
         self.target_json_format = {
             "program.name": "Eargo",
@@ -205,23 +212,23 @@ class CSVParser():
                     ],
                     "district.name": [
                         "django",
-                        self.School.district.name,
+                        self.school.district.name,
                     ],
                     "district.state": [
                         "django",
-                        self.School.district.state,
+                        self.school.district.state,
                     ],
                     "district.city": [
                         "django",
-                        self.School.district.city,
+                        self.school.district.city,
                     ],
                     "district.code": [
                         "django",
-                        self.School.district.code,
+                        self.school.district.code,
                     ],
                     "school.name": [
                         "django",
-                        self.School.name,
+                        self.school.name,
                     ],
                     "grade.calendar.year": [
                         "cal.endYear",
@@ -293,7 +300,27 @@ class CSVParser():
         for the datatype of each column.
         """
         csv_df = pd.read_csv(self.string_file_obj, dtype = csv_datatypes, sep = ',')
-        return csv_df
+
+        expected_columns = []
+        json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
+        for key, value in json_to_csv_field_dict["direct"].items():
+            expected_columns.append(value)
+        for key, value in json_to_csv_field_dict["parse"].items():
+            if value[0] != "django":
+                expected_columns.append(value[0])
+        expected_columns = set(expected_columns)
+        csv_columns = set(list(csv_df.columns))
+        if csv_columns == expected_columns:
+            return csv_df
+        else:
+            self.exceptions["Organize"].append(
+                {
+                    "CSV": "problem with uploaded CSV file.",
+                    "error": "The expected columns were not found in your CSV file.",
+                    "how_to_fix": "Check the configuration of your CSV file and/or data extract.",
+                }
+            )
+            return self.exceptions
 
     def build_json(self, csv_df):
         json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
@@ -365,9 +392,12 @@ class CSVParser():
         Organizes the csv file the parser was instantiated with and turns it into a single json_object.
         """
         datatypes = self.get_csv_datatypes()
-        csv_df = self.get_dataframe(datatypes)
-        self.json_object = self.build_json(csv_df)
-        return self.json_object
+        try:
+            csv_df = self.get_dataframe(datatypes)
+            self.json_object = self.build_json(csv_df)
+            return self.json_object
+        except:
+            return self.exceptions
 
     def parse_json(self):
         program = Program.objects.get(name = self.json_object["program.name"])
@@ -382,7 +412,8 @@ class CSVParser():
             name = self.json_object["school.name"],
         )
 
-        """#parse student data
+        #parse student data
+        students_added = []
         student_array = self.json_object["Student"]
         all_school_SISIDs = [object.student_SISID for object in HistoricalStudentID.objects.filter(school = school)]
         for student_element in student_array:
@@ -406,16 +437,16 @@ class CSVParser():
                     if serializer.is_valid():
                         student = serializer.save()
                     else:
-                        output = {
-                            "student": student_data_currently_in_django,
-                            "error": {
-                                "The following possible update couldn't be applied": update,
-                                "Becuase the serializer found the following errors": serializer.errors,
-                            },
-                            "how_to_fix": "Consult the errors found and check CSV document is appropriately configured."
-
-                        }
-                        self.exceptions.append(output)
+                        self.exceptions["Student"].append(
+                            {
+                                "student": student_data_currently_in_django,
+                                "error": {
+                                    "The following possible update couldn't be applied": update,
+                                    "Becuase the serializer found the following errors": serializer.errors,
+                                },
+                                "how_to_fix": "Consult the errors found and check CSV document is appropriately configured."
+                            }
+                        )
 
             elif SISID not in all_school_SISIDs:
                 if len(student_data) >= 4:
@@ -428,9 +459,10 @@ class CSVParser():
                                 school = school,
                                 student_SISID = SISID
                             )
+                            students_added.append(student)
                         else:
                             serializer = ParserStudentSerializer(duplicate_check_query, many = True)
-                            self.exceptions.append(
+                            self.exceptions["Student"].append(
                                 {
                                     "student": student_element,
                                     "error": {
@@ -450,8 +482,9 @@ class CSVParser():
                                 school = school,
                                 student_SISID = SISID
                             )
+                            students_added.append(student)
                         else:
-                            self.exceptions.append(
+                            self.exceptions["Student"].append(
                                 {
                                     "student": student_element,
                                     "error": {
@@ -461,7 +494,7 @@ class CSVParser():
                                 }
                             )
                 else:
-                    self.exceptions.append(
+                    self.exceptions["Student"].append(
                         {
                             "student": student_element,
                             "error": "There wasn't enough data provided for the following student to find them in the database",
@@ -483,7 +516,7 @@ class CSVParser():
                 if serializer.is_valid():
                     serializer.save()
                 else:
-                    self.exceptions.append(
+                    self.exceptions["Course"].append(
                         {
                             "course": course_element,
                             "error": {
@@ -493,7 +526,7 @@ class CSVParser():
                         }
                     )
             else:
-                continue"""
+                continue
 
         #parse grade data
         grade_array = self.json_object["Grade"]
@@ -508,7 +541,7 @@ class CSVParser():
                 "term": grade_element.pop("grade.calendar.term"),
             }
             if SISID == None:
-                self.exceptions.append(
+                self.exceptions["Grade"].append(
                     {
                         "grade": grade_element,
                         "error": "too little information to link grade data to a student.",
@@ -517,7 +550,7 @@ class CSVParser():
                 )
                 continue
             if None in course_data.values():
-                self.exceptions.append(
+                self.exceptions["Grade"].append(
                     {
                         "grade": grade_element,
                         "error": "too little information to link grade data to a course.",
@@ -526,7 +559,7 @@ class CSVParser():
                 )
                 continue
             if None in calendar_data.values():
-                self.exceptions.append(
+                self.exceptions["Grade"].append(
                     {
                         "grade": grade_element,
                         "error": "too little information to link grade to a year and/or term.",
@@ -543,6 +576,7 @@ class CSVParser():
                     "course": course.id,
                     "calendar": calendar.id,
                 }
+
             break
 
         return {
