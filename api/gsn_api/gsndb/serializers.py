@@ -84,10 +84,28 @@ class SchoolSerializer(serializers.ModelSerializer):
         return representation
 
 
+class ParserStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = (
+            "id",
+            "current_school",
+            "current_program",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "gender",
+            "birth_date",
+            "state_id",
+            "grade_year",
+        )
+
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ("id",)
+        fields = (
+            "id",
+        )
 
     def to_representation(self, student_obj):
         representation = super().to_representation(student_obj)
@@ -96,6 +114,7 @@ class StudentSerializer(serializers.ModelSerializer):
         representation["schoolName"] = student_obj.current_school.name
         representation["schoolId"] = student_obj.current_school.id
         representation["birthdate"] = student_obj.birth_date
+
 
         return representation
 
@@ -130,6 +149,17 @@ class CourseSerializer(serializers.ModelSerializer):
         representation["courseSubject"] = course_obj.subject
 
         return representation
+
+class ParserCourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = (
+            "id",
+            "school",
+            "name",
+            "code",
+            "subject",
+        )
 
 class BehaviorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -187,6 +217,7 @@ class GradeSerializer(serializers.ModelSerializer):
         representation["courseName"] = grade_obj.course.name
         representation["courseTermId"] = grade_obj.calendar.id
         representation["courseTerm"] = grade_obj.calendar.term + " " + str(grade_obj.calendar.year)
+        representation["gradeTask"] = grade_obj.task
         representation["grade"] = grade_obj.grade
         representation["finalGradeForTerm"] = grade_obj.term_final_value
         representation["entryDate"] = grade_obj.entry_datetime
@@ -240,7 +271,7 @@ class CreateDistrictSerializer(serializers.ModelSerializer):
         representation["districtId"] = representation.pop("id")
         representation["districtName"] = representation.pop("name")
         representation["districtCity"] = district_obj.city
-        representation["districtCode"] = district_obj.code 
+        representation["districtCode"] = district_obj.code
         representation["schoolSet"] = SchoolSerializer(district_obj.school_set, many = True, read_only = True).data
 
         return representation

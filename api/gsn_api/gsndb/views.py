@@ -825,6 +825,8 @@ class UploadCSV(APIView):
 
     def has_file_already_been_uploaded(self):
         self.has_file_already_uploaded = FileSHA.objects.filter(hasher = self.hash).exists()
+
+    def create_hash(self):
         if(not self.has_file_already_uploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
@@ -843,31 +845,44 @@ class UploadCSV(APIView):
             term_final_value = False
         content = self.hash_handler(byte_file_obj)
         self.has_file_already_been_uploaded()
-        string_io_obj = io.StringIO(content)
-        parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
-        dtypes = parser.get_csv_datatypes()
-        csv_df = parser.get_dataframe(dtypes)
-        json_object = parser.build_json(csv_df)
-        return Response(json_object)
-        """
+
         if(self.has_file_already_uploaded):
-            return Response(
+            response = Response(
                 {
-                    "Error": f"{self.file_name} has already been uploaded.",
+                    "error": f"{self.file_name} has already been uploaded.",
                     "content": content,
                 }
             )
         else:
             string_io_obj = io.StringIO(content)
-            parser = CSVParser(string_io_obj, school_of_origin, False)
-            dtypes = parser.get_csv_datatypes()
-            csv_df = parser.get_dataframe(dtypes)
-            identifying_column = "studentStateID"
-            json_array = parser.get_json_array(csv_df, identifying_column)
-            return Response(
-                {
-                    "file_name": self.file_name,
-                    "content": json_array,
-                }
-            )
-        """
+            parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
+            parser.organize()
+            if len(parser.exceptions["Organize"]) == 0:
+                parser.input()
+                for key, value in parser.exceptions.items():
+                    if len(value) > 0:
+                        
+                        response = Response(
+                            {
+                                
+                                "upload_successful": "The CSV was successfully uploaded, with the following exceptions.",
+                                "exceptions": parser.exceptions,
+                                "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
+                            }
+                        )
+                        break
+                self.create_hash()
+                response = Response(
+                    {  
+                        "upload_successful": "The CSV was successfully uploaded.",
+                        "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
+                    }
+                )
+            else:
+                response = Response(
+                    {
+                        "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
+                        "exceptions": parser.exceptions,
+                    }
+                )
+        return response

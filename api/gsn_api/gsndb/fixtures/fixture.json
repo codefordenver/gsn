@@ -56,6 +56,16 @@
         }
     },
     {
+        "model": "gsndb.district",
+        "pk": 3,
+        "fields": {
+	           "name": "Weld County",
+             "state": "CO",
+             "city": "Keenesburg",
+             "code": "RE-3J"
+        }
+    },
+    {
         "model": "gsndb.school",
         "pk": 1,
         "fields": {
@@ -69,6 +79,14 @@
         "fields": {
             "name": "Sangre de Cristo Elem/Junior High",
             "district": 2
+        }
+    },
+    {
+        "model": "gsndb.school",
+        "pk": 3,
+        "fields": {
+            "name": "Weld Central Middle School",
+            "district": 3
         }
     },
     {
