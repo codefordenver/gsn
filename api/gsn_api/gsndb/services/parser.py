@@ -3,7 +3,8 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from django.utils import timezone
-from gsndb.models import School, Student
+from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior
+from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer
 
 class CSVParser():
 
@@ -12,74 +13,77 @@ class CSVParser():
         self.School = School.objects.get(name = self.school_of_csv_origin)
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
+        self.exceptions = []
+        self.json_object = {"Not created yet.": "run CSVParser.organize() to create."}
         self.target_json_format = {
-            "programName": "Eargo",
-            "districtName": "Jeffco",
-            "districtState": "PA",
-            "districtCity": "Wakulla",
-            "districtCode": "H382",
-            "schoolName": "Carmody",
+            "program.name": "Eargo",
+            "district.name": "Jeffco",
+            "district.state": "PA",
+            "district.city": "Wakulla",
+            "district.code": "H382",
+            "school.name": "Carmody",
             "Student": [
                 {
-                    "studentFirstName": "Fuller",
-                    "studentLastName": "Hahn",
-                    "studentMiddleName": "Rodgers",
-                    "studentGender": "M",
-                    "studentBirthday": "2018-03-23",
-                    "studentStateID": 542796,
-                    "studentGradeYear": 9,
-                    "studentReasonInProgram": "behavior",
-                    "studentSISID": 298347928374,
+                    "student.first_name": "Fuller",
+                    "student.last_name": "Hahn",
+                    "student.middle_name": "Rodgers",
+                    "student.gender": "M",
+                    "student.birth_date": "2018-03-23",
+                    "student.state_id": 542796,
+                    "student.grade_year": 9,
+                    "student.reason_in_program": "behavior",
+                    "historicalstudentid.student_SISID": 298347928374,
                 },
             ],
             "Course": [
                 {
-                    "courseName": "Algebra",
-                    "courseCode": "G7384",
-                    "courseSubject": "ENG",
+                    "course.name": "Algebra",
+                    "course.code": "G7384",
+                    "course.subject": "ENG",
                 },
             ],
             "Grade": [
                 {
-                    "gradeStudentSISID": 19283192837,
-                    "gradeCourseCode": "HG3848",
-                    "gradeCalendarYear": 2004,
-                    "gradeCalendarTerm": "SMR",
-                    "gradePeriod": "6",
-                    "grade": 0.8091,
-                    "gradeTask": "Semester Grade",
-                    "gradeTermFinalValue": True,
-                    "gradeEntryDate": "2016-03-24",
+                    "historicalstudentid.student_SISID": 19283192837,
+                    "grade.course.name": "Algebra",
+                    "grade.course.code": "HG3848",
+                    "grade.calendar.year": 2004,
+                    "grade.calendar.term": "SMR",
+                    "grade.period": "6",
+                    "grade.grade": 0.8091,
+                    "grade.task": "Semester Grade",
+                    "grade.term_final_value": True,
+                    "grade.entry_datetime": "2016-03-24",
                 },
             ],
             "Attendance": [
                 {
-                    "attendanceStudentSISID": 19283192837,
-                    "attendanceCalendarYear": 2004,
-                    "attendanceCalendarTerm": "SMR",
-                    "attendanceEntryDate": "2016-03-24",
-                    "attendanceTotalUnexcusedAbsence": 9.0,
-                    "attendanceTotalExcusedAbsence": 6.0,
-                    "attendanceTotalAbsence": 54.0,
-                    "attendanceTotalTardies": 11,
-                    "attendanceAverageDailyAttendance": .98,
-                    "attendanceTermFinalValue": True,
+                    "historicalstudentid.student_SISID": 19283192837,
+                    "attendance.calendar.year": 2004,
+                    "attendance.calendar.term": "SMR",
+                    "attendance.entry_datetime": "2016-03-24",
+                    "attendance.total_unexabs": 9.0,
+                    "attendance.total_exabs": 6.0,
+                    "attendance.total_abs": 54.0,
+                    "attendance.total_tardies": 11,
+                    "attendance.avg_daily_attendance": .98,
+                    "attendance.term_final_value": True,
                 },
             ],
             "Behavior": [
                 {
-                    "behaviorStudentSISID": 19283192837,
-                    "behaviorCourseCode": "HG838",
-                    "behaviorPeriod": "2",
-                    "behaviorCalendarTerm": "SMR",
-                    "behaviorCalendarYear": 2004,
-                    "behaviorIncidentDate": "2014-06-26",
-                    "behaviorContext": "H372",
-                    "behaviorSISID": 293847923874,
-                    "behaviorIncidentTypeProgram": "Small",
-                    "behaviorIncidentResultProgram": "Bad",
-                    "behaviorIncidentTypeSchool": "Medium",
-                    "behaviorIncidentResultSchool": "Medium",
+                    "historicalstudentid.student_SISID": 19283192837,
+                    "behavior.course.code": "HG838",
+                    "behavior.period": "2",
+                    "behavior.calendar.term": "SMR",
+                    "behavior.calendar.year": 2004,
+                    "behavior.incident_datetime": "2014-06-26",
+                    "behavior.context": "H372",
+                    "behavior.behavior_SISID": 293847923874,
+                    "behavior.incident_type_program": "Small",
+                    "behavior.incident_result_program": "Bad",
+                    "behavior.incident_type_school": "Medium",
+                    "behavior.incident_result_school": "Medium",
                 },
             ],
         }
@@ -130,6 +134,7 @@ class CSVParser():
         self.master_field_dict = {
             #Keys: json fields. Values: csv fields.
             "Trivial": {
+                #out of date.
                 'studentFirstName': 'studentFirstName',
                 'studentLastName': 'studentLastName',
                 'studentMiddleName': "studentMiddleName",
@@ -142,128 +147,125 @@ class CSVParser():
                 'courseSubject': "courseSubject",
                 'courseCalendarYear': "courseCalendarYear",
                 'courseCalendarTerm': "courseCalendarTerm",
-                'gradePeriod': "gradePeriod",
-                'grade': "grade",
-                'gradeTermFinalValue': "gradeTermFinalValue",
-                'attendanceEntryDate': "attendanceEntryDate",
-                'attendanceTotalUnexcusedAbsence': "attendanceTotalUnexcusedAbsence",
-                'attendancetotalExcusedAbsence': "attendancetotalExcusedAbsence",
-                'attendanceTotalTardies': "attendanceTotalTardies",
-                'attendanceAverageDailyAttendance': "attendanceAverageDailyAttendance",
-                'attendanceTermFinalValue': "attendanceTermFinalValue",
-                'behaviorPeriod': "behaviorPeriod",
-                'behaviorIncidentDate': "behaviorIncidentDate",
-                'behaviorContext': "behaviorContext",
-                'behaviorIncidentTypeSchool': "behaviorIncidentTypeSchool",
-                'behaviorIncidentResultSchool': "behaviorIncidentResultSchool",
+                'grade.period': "grade.period",
+                'grae.grade': "grade",
+                'grade.term_final_value': "grade.term_final_value",
+                'attendance.entry_datetime': "attendance.entry_datetime",
+                'attendance.total_unexabs': "attendance.total_unexabs",
+                'attendance.total_exabs': "attendance.total_exabs",
+                'attendance.total_tardies': "attendance.total_tardies",
+                'attendance.avg_daily_attendance': "attendance.avg_daily_attendance",
+                'attendance.term_final_value': "attendance.term_final_value",
+                'behavior.period': "behavior.period",
+                'behavior.incident_datetime': "behavior.incident_datetime",
+                'behavior.context': "behavior.context",
+                'behavior.incident_type_school': "behavior.incident_type_school",
+                'behavior.incident_result_school': "behavior.incident_result_school",
             },
             "Weld Central Middle School": {
                 "direct": {
-                    'studentFirstName': "student.firstName",
-                    'studentLastName': 'student.lastName',
-                    "studentMiddleName": 'student.middleName',
-                    "studentGender": 'student.gender',
-                    "studentStateID": 'student.stateID',
-                    'studentSISID': 'student.studentNumber',
-                    'studentGradeYear': 'student.grade',
-                    "courseName": 'grading.courseName',
-                    "courseCode": 'grading.courseNumber',
-                    'gradeCourseCode': 'grading.courseNumber',
-                    "gradePeriod": 'grading.periodName',
-                    "gradeTask":'grading.task',
-                    "grade": 'grading.percent',
-                    "gradeStudentSISID": 'student.studentNumber',
-                    "attendanceStudentSISID": 'student.studentNumber',
-                    "attendanceTotalUnexcusedAbsence": 'attExactDailyTermCount.unexcusedAbsentDays',
-                    "attendanceTotalAbsence": 'attExactDailyTermCount.absentDays',
-                    'attendanceTotalTardies': "attExactDailyTermCount.tardies",
-                    "attendanceStudentSISID": 'student.studentNumber',
-                    'behaviorContext': "behaviorDetail.contextDescription",
-                    'behaviorSISID': "behaviorDetail.incidentID",
-                    'behaviorIncidentTypeSchool': "behaviorDetail.eventName",
-                    'behaviorIncidentResultSchool': "behaviorDetail.resolutionName",
-                    "behaviorStudentSISID": 'student.studentNumber',
+                    'student.first_name': "student.firstName",
+                    'student.last_name': 'student.lastName',
+                    "student.middle_name": 'student.middleName',
+                    "student.gender": 'student.gender',
+                    "student.state_id": 'student.stateID',
+                    'historicalstudentid.student_SISID': 'student.studentNumber',
+                    'student.grade_year': 'student.grade',
+                    "course.name": 'grading.courseName',
+                    "course.code": 'grading.courseNumber',
+                    'grade.course.code': 'grading.courseNumber',
+                    "grade.period": 'grading.periodName',
+                    "grade.task":'grading.task',
+                    "grade.grade": 'grading.percent',
+                    "grade.course.name": "grading.courseName",
+                    "attendance.total_unexabs": 'attExactDailyTermCount.unexcusedAbsentDays',
+                    "attendance.total_abs": 'attExactDailyTermCount.absentDays',
+                    'attendance.total_tardies': "attExactDailyTermCount.tardies",
+                    'behavior.context': "behaviorDetail.contextDescription",
+                    'behavior.behavior_SISID': "behaviorDetail.incidentID",
+                    'behavior.incident_type_school': "behaviorDetail.eventName",
+                    'behavior.incident_result_school': "behaviorDetail.resolutionName",
                 },
                 "parse": {
-                    "studentBirthday": [
+                    "student.birth_date": [
                         'student.birthdate',
-                        lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y")),
+                        lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y").strftime('%Y-%m-%d')),
                     ],
-                    'behaviorIncidentDate': [
+                    'behavior.incident_datetime': [
                         "behaviorDetail.incidentDate",
                         lambda dataframe_row: str(datetime.strptime(dataframe_row['behaviorDetail.incidentDate'], "%m/%d/%Y")),
                     ],
-                    'gradeEntryDate': [
+                    'grade.entry_datetime': [
                         'grading.date',
                         lambda dataframe_row: str(datetime.strptime(dataframe_row['grading.date'], "%m/%d/%Y")),
                     ],
-                    "programName": [
+                    "program.name": [
                         "django",
                         'Expelled and At-Risk Student Services Program',
                     ],
-                    "districtName": [
+                    "district.name": [
                         "django",
                         self.School.district.name,
                     ],
-                    "districtState": [
+                    "district.state": [
                         "django",
                         self.School.district.state,
                     ],
-                    "districtCity": [
+                    "district.city": [
                         "django",
                         self.School.district.city,
                     ],
-                    "districtCode": [
+                    "district.code": [
                         "django",
                         self.School.district.code,
                     ],
-                    "schoolName": [
+                    "school.name": [
                         "django",
                         self.School.name,
                     ],
-                    "gradeCalendarYear": [
+                    "grade.calendar.year": [
                         "cal.endYear",
                         lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else None,
                     ],
-                    "gradeCalendarTerm": [
+                    "grade.calendar.term": [
                         "grading.termName",
                         lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else None,
                     ],
-                    "attendanceCalendarYear": [
+                    "attendance.calendar.year": [
                         "cal.endYear",
                         lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
-                    "attendanceCalendarTerm": [
+                    "attendance.calendar.term": [
                         "attExactDailyTermCount.termName",
                         lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
-                    "gradeTermFinalValue": [
+                    "grade.term_final_value": [
                         "django",
                         self.term_final_value,
                     ],
-                    "attendanceTermFinalValue": [
+                    "attendance.term_final_value": [
                         "django",
                         self.term_final_value,
                     ],
-                    "attendanceEntryDate": [
+                    "attendance.entry_datetime": [
                         "django",
                         str(timezone.now()),
                     ],
-                    "attendanceTotalExcusedAbsence": [
+                    "attendance.total_exabs": [
                         "attExactDailyTermCount.unexcusedAbsentDays",
                         lambda dataframe_row: round(dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'], 2)
                     ],
                 },
                 "blank": [
-                    "behaviorIncidentTypeProgram",
-                    "behaviorIncidentResultProgram",
-                    "behaviorCourseCode",
-                    "studentReasonInProgram",
-                    "attendanceAverageDailyAttendance",
-                    "behaviorPeriod",
-                    "behaviorCalendarTerm",
-                    "behaviorCalendarYear",
-                    "courseSubject",
+                    "behavior.incident_type_program",
+                    "behavior.incident_result_program",
+                    "behavior.course.code",
+                    "student.reason_in_program",
+                    "attendance.avg_daily_attendance",
+                    "behavior.period",
+                    "behavior.calendar.term",
+                    "behavior.calendar.year",
+                    "course.subject",
                 ]
             }
         }
@@ -358,12 +360,200 @@ class CSVParser():
             output[housing_field] = housing_output
         return output
 
-    def parse_json(self, json_obj):
-        return json_obj
+    def organize(self):
         """
-        - use district = District(field = value) to instantiate and check, then save.
-        - follow heirarchy through student, bring in course and calendar for grade/attendance.
-        - use get or create like hannah, but allow for blanks
-        - filter students first via HistoricalStudentID
-        - only parse grade elements with task == "Semester Grade"
+        Organizes the csv file the parser was instantiated with and turns it into a single json_object.
+        """
+        datatypes = self.get_csv_datatypes()
+        csv_df = self.get_dataframe(datatypes)
+        self.json_object = self.build_json(csv_df)
+        return self.json_object
+
+    def parse_json(self):
+        program = Program.objects.get(name = self.json_object["program.name"])
+        district = District.objects.get(
+            name = self.json_object["district.name"],
+            city = self.json_object["district.city"],
+            code = self.json_object["district.code"],
+            state = self.json_object["district.state"],
+        )
+        school = School.objects.get(
+            district = district,
+            name = self.json_object["school.name"],
+        )
+
+        """#parse student data
+        student_array = self.json_object["Student"]
+        all_school_SISIDs = [object.student_SISID for object in HistoricalStudentID.objects.filter(school = school)]
+        for student_element in student_array:
+            SISID = student_element["historicalstudentid.student_SISID"]
+
+            student_data = {}
+            for key, value in student_element.items():
+                if key.startswith("student.") and value != None:
+                    field_name = key[len("student."):]
+                    student_data[field_name] = value
+
+            if SISID in all_school_SISIDs:
+                student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                student_data_currently_in_django = ParserStudentSerializer(student).data
+                update = {}
+                for field, value in student_data.items():
+                    if value != student_data_currently_in_django[field]:
+                        update[field] = value
+                if len(update) > 0:
+                    serializer = ParserStudentSerializer(student, data = update)
+                    if serializer.is_valid():
+                        student = serializer.save()
+                    else:
+                        output = {
+                            "student": student_data_currently_in_django,
+                            "error": {
+                                "The following possible update couldn't be applied": update,
+                                "Becuase the serializer found the following errors": serializer.errors,
+                            },
+                            "how_to_fix": "Consult the errors found and check CSV document is appropriately configured."
+
+                        }
+                        self.exceptions.append(output)
+
+            elif SISID not in all_school_SISIDs:
+                if len(student_data) >= 4:
+                    duplicate_check_query = Student.objects.filter(**student_data)
+                    if duplicate_check_query.exists():
+                        if len(duplicate_check_query) == 1:
+                            student = Student.objects.get(**student_data)
+                            HistoricalStudentID.objects.create(
+                                student = student,
+                                school = school,
+                                student_SISID = SISID
+                            )
+                        else:
+                            serializer = ParserStudentSerializer(duplicate_check_query, many = True)
+                            self.exceptions.append(
+                                {
+                                    "student": student_element,
+                                    "error": {
+                                        "Their information was too similar to more than one student:": serializer.data
+                                    },
+                                    "how_to_fix": "Include more biographical student data such as birthdate or stateID in your csv document."
+                                }
+                            )
+                    elif duplicate_check_query.exists() == False:
+                        student_data["current_program"] = program.id
+                        student_data["current_school"] = school.id
+                        serializer = ParserStudentSerializer(data = student_data)
+                        if serializer.is_valid():
+                            student = serializer.save()
+                            HistoricalStudentID.objects.create(
+                                student = student,
+                                school = school,
+                                student_SISID = SISID
+                            )
+                        else:
+                            self.exceptions.append(
+                                {
+                                    "student": student_element,
+                                    "error": {
+                                        "This student was not found in the database, and a new student could not be created becuase the serializer found the following errors": serializer.errors,
+                                    },
+                                    "how_to_fix": "Consult the errors found and check CSV document is appropriately configured.",
+                                }
+                            )
+                else:
+                    self.exceptions.append(
+                        {
+                            "student": student_element,
+                            "error": "There wasn't enough data provided for the following student to find them in the database",
+                            "How_to_fix": "Include more biographical student data such as birthdate or stateID in your csv document"
+                        }
+                    )
+
+        #parse course data
+        course_array = self.json_object["Course"]
+        for course_element in course_array:
+            course_data = {"school": school.id}
+            for key, value in course_element.items():
+                if value != None:
+                    field_name = key[len("course."):]
+                    course_data[field_name] = value
+            duplicate_check_query = Course.objects.filter(**course_data)
+            if not duplicate_check_query.exists():
+                serializer = ParserCourseSerializer(data = course_data)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    self.exceptions.append(
+                        {
+                            "course": course_element,
+                            "error": {
+                                "This course was not found in the database, and a new course could not be created because the serializer found the following errors": serializer.errors,
+                            },
+                            "how_to_fix": "Consult the errors found and check CSV document is appropriately configured.",
+                        }
+                    )
+            else:
+                continue"""
+
+        #parse grade data
+        grade_array = self.json_object["Grade"]
+        for grade_element in grade_array:
+            SISID = grade_element.pop("historicalstudentid.student_SISID")
+            course_data = {
+                "name": grade_element.pop("grade.course.name"),
+                "code": grade_element.pop("grade.course.code"),
+            }
+            calendar_data = {
+                "year": grade_element.pop("grade.calendar.year"),
+                "term": grade_element.pop("grade.calendar.term"),
+            }
+            if SISID == None:
+                self.exceptions.append(
+                    {
+                        "grade": grade_element,
+                        "error": "too little information to link grade data to a student.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if the column labelled student.studentNumber is present."
+                    }
+                )
+                continue
+            if None in course_data.values():
+                self.exceptions.append(
+                    {
+                        "grade": grade_element,
+                        "error": "too little information to link grade data to a course.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if both columns labelled grading.courseNumber and grading.courseName are present."
+                    }
+                )
+                continue
+            if None in calendar_data.values():
+                self.exceptions.append(
+                    {
+                        "grade": grade_element,
+                        "error": "too little information to link grade to a year and/or term.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if both columns labelled cal.endYear and grading.termName are present."
+                    }
+                )
+                continue
+            else:
+                calendar = Calendar.objects.get_or_create(**calendar_data)[0]
+                student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                course = Course.objects.get(**course_data)
+                grade_data = {
+                    "student": student.id,
+                    "course": course.id,
+                    "calendar": calendar.id,
+                }
+            break
+
+        return {
+            "grade_data": [grade_data, grade_element]
+        }
+        """
+        - follow heirarchy of models.
+        - check for duplicate data before inputting.
+            - possible utilize get_or_creat() as Hannah did?
+            - ignore None/null fields when checking for duplicates.
+                - run get or create, if exception is multiplefound, do something
+        - rename target json fields to assist in parsing json.
+        -
         """

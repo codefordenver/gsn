@@ -845,10 +845,8 @@ class UploadCSV(APIView):
         self.has_file_already_been_uploaded()
         string_io_obj = io.StringIO(content)
         parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
-        dtypes = parser.get_csv_datatypes()
-        csv_df = parser.get_dataframe(dtypes)
-        json_object = parser.build_json(csv_df)
-        return Response(json_object)
+        parser.organize()
+        return Response(parser.parse_json())
         """
         if(self.has_file_already_uploaded):
             return Response(
