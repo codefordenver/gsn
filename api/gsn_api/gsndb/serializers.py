@@ -189,6 +189,7 @@ class GradeSerializer(serializers.ModelSerializer):
         representation["courseTerm"] = grade_obj.calendar.term + " " + str(grade_obj.calendar.year)
         representation["grade"] = grade_obj.grade
         representation["finalGradeForTerm"] = grade_obj.term_final_value
+        representation["entryDate"] = grade_obj.entry_datetime
 
 
         return representation
