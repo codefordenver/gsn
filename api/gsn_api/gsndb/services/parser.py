@@ -3,8 +3,10 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from django.utils import timezone
-from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior
-from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer, BehaviorSerializer
+from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior, StudentUserHasAccess
+from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer
+from django.contrib.auth.models import User
+
 
 class CSVParser():
 
@@ -413,7 +415,6 @@ class CSVParser():
         )
 
         #parse student data
-        students_added = []
         student_array = self.json_object["Student"]
         all_school_SISIDs = [object.student_SISID for object in HistoricalStudentID.objects.filter(school = school)]
         for student_element in student_array:
@@ -459,7 +460,6 @@ class CSVParser():
                                 school = school,
                                 student_SISID = SISID
                             )
-                            students_added.append(student)
                         else:
                             serializer = ParserStudentSerializer(duplicate_check_query, many = True)
                             self.exceptions["Student"].append(
@@ -482,7 +482,6 @@ class CSVParser():
                                 school = school,
                                 student_SISID = SISID
                             )
-                            students_added.append(student)
                         else:
                             self.exceptions["Student"].append(
                                 {
@@ -511,7 +510,9 @@ class CSVParser():
                     field_name = key[len("course."):]
                     course_data[field_name] = value
             duplicate_check_query = Course.objects.filter(**course_data)
-            if not duplicate_check_query.exists():
+            if duplicate_check_query.exists():
+                continue
+            else:
                 course_data["school"] = school.id
                 serializer = ParserCourseSerializer(data = course_data)
                 if serializer.is_valid():
@@ -526,8 +527,6 @@ class CSVParser():
                             "how_to_fix": "Consult the errors found and check CSV document is appropriately configured.",
                         }
                     )
-            else:
-                continue
 
         #parse grade data
         grade_array = self.json_object["Grade"]
@@ -690,12 +689,20 @@ class CSVParser():
                     behavior = Behavior.objects.create(**behavior_data)
 
         return self.exceptions
-        """
-        - follow heirarchy of models.
-        - check for duplicate data before inputting.
-            - possible utilize get_or_creat() as Hannah did?
-            - ignore None/null fields when checking for duplicates.
-                - run get or create, if exception is multiplefound, do something
-        - rename target json fields to assist in parsing json.
-        -
-        """
+
+    def make_added_students_accessible(self):
+        access_created = []
+        users = User.objects.all()
+        students = Student.objects.all()
+        for user in users:
+            for student in students:
+                access = StudentUserHasAccess.objects.get_or_create(student = student, user = user)
+                access_created.append(access)
+        return {
+            "access results": access_created,
+        }
+
+    def input(self):
+        self.parse_json()
+        self.make_added_students_accessible()
+        return self.exceptions
