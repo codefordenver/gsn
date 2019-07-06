@@ -152,7 +152,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class ParserCourseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course 
+        model = Course
         fields = (
             "id",
             "school",
@@ -215,6 +215,7 @@ class GradeSerializer(serializers.ModelSerializer):
         representation["courseName"] = grade_obj.course.name
         representation["courseTermId"] = grade_obj.calendar.id
         representation["courseTerm"] = grade_obj.calendar.term + " " + str(grade_obj.calendar.year)
+        representation["gradeTask"] = grade_obj.task
         representation["grade"] = grade_obj.grade
         representation["finalGradeForTerm"] = grade_obj.term_final_value
 

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from django.utils import timezone
 from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior
-from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer
+from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer, BehaviorSerializer
 
 class CSVParser():
 
@@ -505,13 +505,14 @@ class CSVParser():
         #parse course data
         course_array = self.json_object["Course"]
         for course_element in course_array:
-            course_data = {"school": school.id}
+            course_data = {"school": school}
             for key, value in course_element.items():
                 if value != None:
                     field_name = key[len("course."):]
                     course_data[field_name] = value
             duplicate_check_query = Course.objects.filter(**course_data)
             if not duplicate_check_query.exists():
+                course_data["school"] = school.id
                 serializer = ParserCourseSerializer(data = course_data)
                 if serializer.is_valid():
                     serializer.save()
@@ -572,16 +573,123 @@ class CSVParser():
                 student = HistoricalStudentID.objects.get(student_SISID = SISID).student
                 course = Course.objects.get(**course_data)
                 grade_data = {
-                    "student": student.id,
-                    "course": course.id,
-                    "calendar": calendar.id,
+                    "student": student,
+                    "program": program,
+                    "course": course,
+                    "calendar": calendar,
                 }
+                for key, value in grade_element.items():
+                    if value != None:
+                        field_name = key[len("grade."):]
+                        grade_data[field_name] = value
+                duplicate_check_query = Grade.objects.filter(**grade_data)
+                if duplicate_check_query.exists():
+                    continue
+                else:
+                    grade = Grade.objects.create(**grade_data)
 
-            break
+        #parse attendance data
+        attendance_array = self.json_object["Attendance"]
+        for attendance_element in attendance_array:
+            SISID = attendance_element.pop("historicalstudentid.student_SISID")
+            calendar_data = {
+                "year": attendance_element.pop("attendance.calendar.year"),
+                "term": attendance_element.pop("attendance.calendar.term"),
+            }
+            if SISID == None:
+                self.exceptions["Attendance"].append(
+                    {
+                        "attendance": attendance_element,
+                        "error": "too little information to link attendance data to a student.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if the column labelled student.studentNumber is present."
+                    }
+                )
+                continue
+            if None in calendar_data.values():
+                self.exceptions["Attendance"].append(
+                    {
+                        "attendance": attendance_element,
+                        "error": "too little information to link attendance to a year and/or term.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if both columns labelled cal.endYear and attExactDailyTermCount.termName are present."
+                    }
+                )
+                continue
+            else:
+                calendar = Calendar.objects.get_or_create(**calendar_data)[0]
+                student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                attendance_data = {
+                    "student": student,
+                    "program": program,
+                    "calendar": calendar,
+                }
+                for key, value in attendance_element.items():
+                    if value != None:
+                        field_name = key[len("attendance."):]
+                        attendance_data[field_name] = value
+                duplicate_check_query = Attendance.objects.filter(**attendance_data)
+                if duplicate_check_query.exists():
+                    continue
+                else:
+                    attendance = Attendance.objects.create(**attendance_data)
 
-        return {
-            "grade_data": [grade_data, grade_element]
-        }
+        #parse behavior data
+        behavior_array = self.json_object["Behavior"]
+        for behavior_element in behavior_array:
+            SISID = behavior_element.pop("historicalstudentid.student_SISID")
+            calendar_data = {
+                "year": behavior_element.pop("behavior.calendar.year"),
+                "term": behavior_element.pop("behavior.calendar.term"),
+            }
+            if SISID == None:
+                self.exceptions["Behavior"].append(
+                    {
+                        "behavior": behavior_element,
+                        "error": "too little information to link this behavior data to a student.",
+                        "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if the column labelled student.studentNumber is present."
+                    }
+                )
+                continue
+            if None in calendar_data.values():
+                student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                behavior_data = {
+                    "student": student,
+                    "program": program,
+                }
+                for key, value in behavior_element.items():
+                    if value != None:
+                        field_name = key[len("behavior."):]
+                        behavior_data[field_name] = value
+                duplicate_check_query = Behavior.objects.filter(**behavior_data)
+                if duplicate_check_query.exists():
+                    continue
+                else:
+                    self.exceptions["Behavior"].append(
+                        {
+                            "behavior": behavior_element,
+                            "error": "This behavior data was added to the database, but there was too little information to link it to a year and/or term.",
+                            "how_to_fix": "Check the CSV file you uploaded or the data extract that created it and see if the configuration can be altered to include calendar data for the behavior incident."
+                        }
+                    )
+                    behavior = Behavior.objects.create(**behavior_data)
+            else:
+                calendar = Calendar.objects.get_or_create(**calendar_data)[0]
+                student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                behavior_data = {
+                    "student": student,
+                    "program": program,
+                    "calendar": calendar,
+                }
+                for key, value in behavior_element.items():
+                    if value != None:
+                        field_name = key[len("behavior."):]
+                        behavior_data[field_name] = value
+                duplicate_check_query = Behavior.objects.filter(**behavior_data)
+                if duplicate_check_query.exists():
+                    continue
+                else:
+                    behavior = Behavior.objects.create(**behavior_data)
+
+        return self.exceptions
         """
         - follow heirarchy of models.
         - check for duplicate data before inputting.
