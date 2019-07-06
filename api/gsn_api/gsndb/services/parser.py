@@ -13,6 +13,7 @@ class CSVParser():
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value = False):
         self.school_of_csv_origin = school_of_csv_origin
         self.school = School.objects.get(name = self.school_of_csv_origin)
+        self.data_entered_for = []
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
         self.exceptions = {
@@ -428,6 +429,7 @@ class CSVParser():
 
             if SISID in all_school_SISIDs:
                 student = HistoricalStudentID.objects.get(student_SISID = SISID).student
+                self.data_entered_for.append(student)
                 student_data_currently_in_django = ParserStudentSerializer(student).data
                 update = {}
                 for field, value in student_data.items():
@@ -455,6 +457,7 @@ class CSVParser():
                     if duplicate_check_query.exists():
                         if len(duplicate_check_query) == 1:
                             student = Student.objects.get(**student_data)
+                            self.data_entered_for.append(student)
                             HistoricalStudentID.objects.create(
                                 student = student,
                                 school = school,
@@ -477,6 +480,7 @@ class CSVParser():
                         serializer = ParserStudentSerializer(data = student_data)
                         if serializer.is_valid():
                             student = serializer.save()
+                            self.data_entered_for.append(student)
                             HistoricalStudentID.objects.create(
                                 student = student,
                                 school = school,

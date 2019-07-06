@@ -863,12 +863,14 @@ class UploadCSV(APIView):
                             {
                                 "upload_successful": "The CSV was successfully uploaded, with the following exceptions.",
                                 "exceptions": parser.exceptions,
+                                "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
                             }
                         )
                         break
                 response = Response(
                     {
-                        "upload_successful": "The CSV was successfully uploaded."
+                        "upload_successful": "The CSV was successfully uploaded.",
+                        "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
                     }
                 )
             else:
