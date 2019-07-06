@@ -140,6 +140,8 @@ class BehaviorSerializer(serializers.ModelSerializer):
         representation = super().to_representation(behavior_obj)
 
         representation["behaviorId"] = representation.pop("id")
+        representation["studentId"] = behavior_obj.student.id
+        representation["studentName"] = behavior_obj.student.first_name + " " + behavior_obj.student.middle_name + " " + behavior_obj.student.last_name
         representation["date"] = behavior_obj.incident_datetime
         representation["context"] = behavior_obj.context
         representation["result"] = behavior_obj.incident_result_school
