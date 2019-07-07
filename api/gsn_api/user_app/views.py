@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserSerializer, UserSerializerWithToken, SpecialKeyLogList
 from .models import SpecialKeyLog
+from gsndb.models import StudentUserHasAccess, Student
 from uuid import uuid4
 from django.core.exceptions import PermissionDenied
 from rest_framework import generics
@@ -58,6 +59,14 @@ class UserList(APIView):
             serializer = UserSerializerWithToken(data = user_data)
             if serializer.is_valid():
                 serializer.save()
+                user = User.objects.get(username = json["username"])
+                student_list = Student.objects.all().values_list('id', flat = True)
+                for student_id in student_list:
+                    student = Student.objects.get(pk = student_id)
+                    try:
+                        StudentUserHasAccess.objects.create(user = user, student = student)
+                    except Exception as e:
+                        continue
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
