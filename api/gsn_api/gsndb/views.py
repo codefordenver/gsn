@@ -218,7 +218,9 @@ class SchoolPostList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         queryset = School.objects.all()
         serializer = SchoolSerializer(queryset, many = True)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def post(self, request, access_level, format = None):
         """
@@ -239,13 +241,15 @@ class SchoolPostList(generics.ListCreateAPIView):
         serializer = SchoolSerializer(data = school_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+            response =  HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
 
-            return Response({
+            response =  Response({
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                             })
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def put(self, request, access_level, format = None):
         """
@@ -268,13 +272,15 @@ class SchoolPostList(generics.ListCreateAPIView):
         serializer = SchoolSerializer(school_obj, data = school_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+            response =  HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
 
-            return Response({
+            response =  Response({
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                                 })
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def delete(self, request, access_level, format = None):
         """
@@ -292,13 +298,15 @@ class SchoolPostList(generics.ListCreateAPIView):
                 break
         if is_connected == False:
             current_school.delete()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
         else:
-            return Response(
+            response = Response(
                 {
                     "Sorry": "You cannot delete a student with students already connected to it.",
                 }
             )
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
 
 class DistrictPostList(generics.ListCreateAPIView):
@@ -306,7 +314,9 @@ class DistrictPostList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         queryset = District.objects.all()
         serializer = CreateDistrictSerializer(queryset, many = True)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def post(self, request, access_level, format = None):
         """
@@ -331,13 +341,16 @@ class DistrictPostList(generics.ListCreateAPIView):
         serializer = DistrictSerializer(data = district_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
 
-            return Response({
+            response = Response({
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                             })
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
+
     def put(self, request, access_level, format = None):
         """
         This method allows a user to update an existing district via a PUT request.
@@ -364,13 +377,15 @@ class DistrictPostList(generics.ListCreateAPIView):
         serializer = DistrictSerializer(district_obj, data = district_data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
 
-            return Response({
+            response = Response({
                                 "Sorry": "The serializer denied saving this note.",
                                 "The serializer raised the following errors": serializer.errors
                                 })
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def delete(self, request, access_level, format = None):
         """
@@ -388,14 +403,16 @@ class DistrictPostList(generics.ListCreateAPIView):
                 break
         if connected_schools == False:
             current_district.delete()
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
-            return Response(
+            response = Response(
                 {
                     "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
                     "schools": SchoolSerializer(current_district.school_set, many = True).data
                 }
             )
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
 
 
@@ -861,10 +878,10 @@ class UploadCSV(APIView):
                 parser.input()
                 for key, value in parser.exceptions.items():
                     if len(value) > 0:
-                        
+
                         response = Response(
                             {
-                                
+
                                 "upload_successful": "The CSV was successfully uploaded, with the following exceptions.",
                                 "exceptions": parser.exceptions,
                                 "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
@@ -873,7 +890,7 @@ class UploadCSV(APIView):
                         break
                 self.create_hash()
                 response = Response(
-                    {  
+                    {
                         "upload_successful": "The CSV was successfully uploaded.",
                         "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
                     }
@@ -885,4 +902,5 @@ class UploadCSV(APIView):
                         "exceptions": parser.exceptions,
                     }
                 )
+        response["Access-Control-Allow-Origin"] = "*"
         return response
