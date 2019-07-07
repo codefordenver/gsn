@@ -825,6 +825,8 @@ class UploadCSV(APIView):
 
     def has_file_already_been_uploaded(self):
         self.has_file_already_uploaded = FileSHA.objects.filter(hasher = self.hash).exists()
+
+    def create_hash(self):
         if(not self.has_file_already_uploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
@@ -859,16 +861,19 @@ class UploadCSV(APIView):
                 parser.input()
                 for key, value in parser.exceptions.items():
                     if len(value) > 0:
+                        
                         response = Response(
                             {
+                                
                                 "upload_successful": "The CSV was successfully uploaded, with the following exceptions.",
                                 "exceptions": parser.exceptions,
                                 "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
                             }
                         )
                         break
+                self.create_hash()
                 response = Response(
-                    {
+                    {  
                         "upload_successful": "The CSV was successfully uploaded.",
                         "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
                     }
