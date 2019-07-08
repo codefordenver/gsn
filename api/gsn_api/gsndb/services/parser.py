@@ -40,7 +40,7 @@ class CSVParser():
                     "student.gender": "M",
                     "student.birth_date": "2018-03-23",
                     "student.state_id": 542796,
-                    "student.grade_year": 9,
+                    "student.grade_year": "9",
                     "student.reason_in_program": "behavior",
                     "historicalstudentid.student_SISID": 298347928374,
                 },
@@ -141,143 +141,141 @@ class CSVParser():
 
         #a dictionary of dictionaries linking target json fields to associated
         #csv fields based on school of origin.
-        self.master_field_dict = {
-            #Keys: json fields. Values: csv fields.
-            "Trivial": {
-                #out of date.
-                'studentFirstName': 'studentFirstName',
-                'studentLastName': 'studentLastName',
-                'studentMiddleName': "studentMiddleName",
-                'studentGender': "studentGender",
-                'studentBirthday': "studentBirthday",
-                'studentStateID': "studentStateID",
-                'studentGradeYear': "studentGradeYear",
-                'courseName': "courseName",
-                'courseCode': "courseCode",
-                'courseSubject': "courseSubject",
-                'courseCalendarYear': "courseCalendarYear",
-                'courseCalendarTerm': "courseCalendarTerm",
-                'grade.period': "grade.period",
-                'grae.grade': "grade",
-                'grade.term_final_value': "grade.term_final_value",
-                'attendance.entry_datetime': "attendance.entry_datetime",
-                'attendance.total_unexabs': "attendance.total_unexabs",
-                'attendance.total_exabs': "attendance.total_exabs",
-                'attendance.total_tardies': "attendance.total_tardies",
-                'attendance.avg_daily_attendance': "attendance.avg_daily_attendance",
-                'attendance.term_final_value': "attendance.term_final_value",
-                'behavior.period': "behavior.period",
-                'behavior.incident_datetime': "behavior.incident_datetime",
-                'behavior.context': "behavior.context",
-                'behavior.incident_type_school': "behavior.incident_type_school",
-                'behavior.incident_result_school': "behavior.incident_result_school",
+
+        default_translation_dict = {
+            "direct": {
+                'student.first_name': "student.firstName",
+                'student.last_name': 'student.lastName',
+                "student.middle_name": 'student.middleName',
+                "student.gender": 'student.gender',
+                "student.state_id": 'student.stateID',
+                'historicalstudentid.student_SISID': 'student.studentNumber',
+                "course.name": 'grading.courseName',
+                "course.code": 'grading.courseNumber',
+                'grade.course.code': 'grading.courseNumber',
+                "grade.period": 'grading.periodName',
+                "grade.task":'grading.task',
+                "grade.grade": 'grading.percent',
+                "grade.course.name": "grading.courseName",
+                "attendance.total_unexabs": 'attExactDailyTermCount.unexcusedAbsentDays',
+                "attendance.total_abs": 'attExactDailyTermCount.absentDays',
+                'attendance.total_tardies': "attExactDailyTermCount.tardies",
+                'behavior.context': "behaviorDetail.contextDescription",
+                'behavior.behavior_SISID': "behaviorDetail.incidentID",
+                'behavior.incident_type_school': "behaviorDetail.eventName",
+                'behavior.incident_result_school': "behaviorDetail.resolutionName",
             },
-            "Weld Central Middle School": {
-                "direct": {
-                    'student.first_name': "student.firstName",
-                    'student.last_name': 'student.lastName',
-                    "student.middle_name": 'student.middleName',
-                    "student.gender": 'student.gender',
-                    "student.state_id": 'student.stateID',
-                    'historicalstudentid.student_SISID': 'student.studentNumber',
-                    'student.grade_year': 'student.grade',
-                    "course.name": 'grading.courseName',
-                    "course.code": 'grading.courseNumber',
-                    'grade.course.code': 'grading.courseNumber',
-                    "grade.period": 'grading.periodName',
-                    "grade.task":'grading.task',
-                    "grade.grade": 'grading.percent',
-                    "grade.course.name": "grading.courseName",
-                    "attendance.total_unexabs": 'attExactDailyTermCount.unexcusedAbsentDays',
-                    "attendance.total_abs": 'attExactDailyTermCount.absentDays',
-                    'attendance.total_tardies': "attExactDailyTermCount.tardies",
-                    'behavior.context': "behaviorDetail.contextDescription",
-                    'behavior.behavior_SISID': "behaviorDetail.incidentID",
-                    'behavior.incident_type_school': "behaviorDetail.eventName",
-                    'behavior.incident_result_school': "behaviorDetail.resolutionName",
-                },
-                "parse": {
-                    "student.birth_date": [
-                        'student.birthdate',
-                        lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y").strftime('%Y-%m-%d')),
-                    ],
-                    'behavior.incident_datetime': [
-                        "behaviorDetail.incidentDate",
-                        lambda dataframe_row: str(datetime.strptime(dataframe_row['behaviorDetail.incidentDate'], "%m/%d/%Y")),
-                    ],
-                    'grade.entry_datetime': [
-                        'grading.date',
-                        lambda dataframe_row: str(datetime.strptime(dataframe_row['grading.date'], "%m/%d/%Y")),
-                    ],
-                    "program.name": [
-                        "django",
-                        'Expelled and At-Risk Student Services Program',
-                    ],
-                    "district.name": [
-                        "django",
-                        self.school.district.name,
-                    ],
-                    "district.state": [
-                        "django",
-                        self.school.district.state,
-                    ],
-                    "district.city": [
-                        "django",
-                        self.school.district.city,
-                    ],
-                    "district.code": [
-                        "django",
-                        self.school.district.code,
-                    ],
-                    "school.name": [
-                        "django",
-                        self.school.name,
-                    ],
-                    "grade.calendar.year": [
-                        "cal.endYear",
-                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else None,
-                    ],
-                    "grade.calendar.term": [
-                        "grading.termName",
-                        lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else None,
-                    ],
-                    "attendance.calendar.year": [
-                        "cal.endYear",
-                        lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
-                    ],
-                    "attendance.calendar.term": [
-                        "attExactDailyTermCount.termName",
-                        lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
-                    ],
-                    "grade.term_final_value": [
-                        "django",
-                        self.term_final_value,
-                    ],
-                    "attendance.term_final_value": [
-                        "django",
-                        self.term_final_value,
-                    ],
-                    "attendance.entry_datetime": [
-                        "django",
-                        str(timezone.now()),
-                    ],
-                    "attendance.total_exabs": [
-                        "attExactDailyTermCount.unexcusedAbsentDays",
-                        lambda dataframe_row: round(dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'], 2)
-                    ],
-                },
-                "blank": [
-                    "behavior.incident_type_program",
-                    "behavior.incident_result_program",
-                    "behavior.course.code",
-                    "student.reason_in_program",
-                    "attendance.avg_daily_attendance",
-                    "behavior.period",
-                    "behavior.calendar.term",
-                    "behavior.calendar.year",
-                    "course.subject",
-                ]
-            }
+            "parse": {
+                "student.birth_date": [
+                    'student.birthdate',
+                    lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y").strftime('%Y-%m-%d')),
+                ],
+                'behavior.incident_datetime': [
+                    "behaviorDetail.incidentDate",
+                    lambda dataframe_row: str(datetime.strptime(dataframe_row['behaviorDetail.incidentDate'], "%m/%d/%Y").strftime('%Y-%m-%d')),
+                ],
+                'grade.entry_datetime': [
+                    'grading.date',
+                    lambda dataframe_row: str(datetime.strptime(dataframe_row['grading.date'], "%m/%d/%Y").strftime('%Y-%m-%d')),
+                ],
+                "program.name": [
+                    "django",
+                    'Expelled and At-Risk Student Services Program',
+                ],
+                "district.name": [
+                    "django",
+                    self.school.district.name,
+                ],
+                "district.state": [
+                    "django",
+                    self.school.district.state,
+                ],
+                "district.city": [
+                    "django",
+                    self.school.district.city,
+                ],
+                "district.code": [
+                    "django",
+                    self.school.district.code,
+                ],
+                "school.name": [
+                    "django",
+                    self.school.name,
+                ],
+                "grade.calendar.year": [
+                    "cal.endYear",
+                    lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else None,
+                ],
+                "grade.calendar.term": [
+                    "grading.termName",
+                    lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else None,
+                ],
+                "attendance.calendar.year": [
+                    "cal.endYear",
+                    lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
+                ],
+                "attendance.calendar.term": [
+                    "attExactDailyTermCount.termName",
+                    lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
+                ],
+                "grade.term_final_value": [
+                    "django",
+                    self.term_final_value,
+                ],
+                "attendance.term_final_value": [
+                    "django",
+                    self.term_final_value,
+                ],
+                "attendance.entry_datetime": [
+                    "django",
+                    str(timezone.now()),
+                ],
+                "attendance.total_exabs": [
+                    "attExactDailyTermCount.unexcusedAbsentDays",
+                    lambda dataframe_row: round(dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'], 2)
+                ],
+                'student.grade_year': [
+                    'student.grade',
+                    lambda dataframe_row: "K" if dataframe_row['student.grade'] == "K" else str(int(dataframe_row["student.grade"]))
+                ],
+            },
+            "blank": [
+                "behavior.incident_type_program",
+                "behavior.incident_result_program",
+                "behavior.course.code",
+                "student.reason_in_program",
+                "attendance.avg_daily_attendance",
+                "behavior.period",
+                "behavior.calendar.term",
+                "behavior.calendar.year",
+                "course.subject",
+            ]
+        }
+
+        #School json to csv translation dictionaries
+        weld_central_MS_dict = dict(default_translation_dict)
+
+        guadalupe_elem_dict = dict(default_translation_dict)
+        del guadalupe_elem_dict["parse"]["grade.calendar.term"]
+        guadalupe_elem_dict["direct"]["grade.calendar.term"] = "grading.termName"
+
+        del guadalupe_elem_dict["parse"]["attendance.calendar.term"]
+        guadalupe_elem_dict["direct"]["attendance.calendar.term"] = "attExactDailyTermCount.termName"
+
+        guadalupe_elem_dict["parse"]["grade.calendar.year"] = [
+            "cal.endYear",
+            lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "Q1" or dataframe_row['grading.termName'] == "Q2" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "Q3" or dataframe_row['grading.termName'] == "Q4" else None,
+        ]
+        guadalupe_elem_dict["parse"]["attendance.calendar.year"] = [
+            "cal.endYear",
+            lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "Q1" or dataframe_row['attExactDailyTermCount.termName'] == "Q2" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "Q3" or dataframe_row['attExactDailyTermCount.termName'] == "Q4" else None,
+        ]
+
+
+
+        self.master_field_dict = {
+            "Weld Central Middle School": weld_central_MS_dict,
+            "Guadalupe Elementary": guadalupe_elem_dict,
         }
 
     def get_csv_datatypes(self):
@@ -379,8 +377,11 @@ class CSVParser():
                         if csv_field == "django":
                             value = parse_dict[child_field][1]
                         else:
-                            lambda_parser = parse_dict[child_field][1]
-                            value = lambda_parser(row)
+                            if row[csv_field] == replacement_for_nan:
+                                value = None
+                            else:
+                                lambda_parser = parse_dict[child_field][1]
+                                value = lambda_parser(row)
                     elif child_field in blank_fields:
                         value = None
                     if value == replacement_for_nan:

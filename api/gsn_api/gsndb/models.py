@@ -149,22 +149,23 @@ class Student(models.Model):
     state_id = models.BigIntegerField(null = True)
     """Establish choices for Grade Year"""
     GRADE_YEAR_CHOICES = (
-        (0, 'Kindergarten'),
-        (1, 'First Grade'),
-        (2, 'Second Grade'),
-        (3, 'Third Grade'),
-        (4, 'Fourth Grade'),
-        (5, 'Fifth Grade'),
-        (6, 'Sixth Grade'),
-        (7, 'Seventh Grade'),
-        (8, 'Eighth Grade'),
-        (9, 'Ninth Grade'),
-        (10, 'Tenth Grade'),
-        (11, 'Eleventh Grade'),
-        (12, 'Twelfth Grade'),
+        ("K", 'Kindergarten'),
+        ("1", 'First Grade'),
+        ("2", 'Second Grade'),
+        ("3", 'Third Grade'),
+        ("4", 'Fourth Grade'),
+        ("5", 'Fifth Grade'),
+        ("6", 'Sixth Grade'),
+        ("7", 'Seventh Grade'),
+        ("8", 'Eighth Grade'),
+        ("9", 'Ninth Grade'),
+        ("10", 'Tenth Grade'),
+        ("11", 'Eleventh Grade'),
+        ("12", 'Twelfth Grade'),
     )
-    grade_year = models.SmallIntegerField(
+    grade_year = models.CharField(
         choices = GRADE_YEAR_CHOICES,
+        max_length = 3,
         null = True,
     )
     reason_in_program = models.TextField(blank=True)
@@ -214,6 +215,10 @@ class Calendar(models.Model):
         ("SPR", "Spring"),
         ("SMR", "Summer"),
         ("FLL", "Fall"),
+        ("Q1", "1st Quarter"),
+        ("Q2", "2nd Quarter"),
+        ("Q3", "3rd Quarter"),
+        ("Q4", "4th Quarter"),
     )
     term = models.CharField(
         max_length = 3,
@@ -221,6 +226,9 @@ class Calendar(models.Model):
         choices = TERM_CHOICES,
     )
     notes = GenericRelation(Note)
+
+    class Meta:
+        unique_together = ('year', 'term')
 
 class Behavior(models.Model):
     student = models.ForeignKey(
