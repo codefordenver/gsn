@@ -407,8 +407,8 @@ class DistrictPostList(generics.ListCreateAPIView):
         else:
             response = Response(
                 {
-                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
-                    "schools": SchoolSerializer(current_district.school_set, many = True).data
+                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first."
+                    #"schools": SchoolSerializer(current_district.school_set, many = True).data
                 }
             )
         response["Access-Control-Allow-Origin"] = "*"
