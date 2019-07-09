@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 def post_note(request, Model, pk, access_level):
     """
@@ -380,7 +381,7 @@ class DistrictPostList(generics.ListCreateAPIView):
         interact via: DELETE <host>/gsndb/<access_level>/district/<pk> body = {"id": 1}
         """
         pk = request.data["id"]
-        current_district = District.objects.get(pk = pk)
+        current_district = get_object_or_404(District, pk = pk)
         connected_schools = False
         all_schools = School.objects.all()
         for school in all_schools:
