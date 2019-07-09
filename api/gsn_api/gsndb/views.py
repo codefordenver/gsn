@@ -381,6 +381,7 @@ class DistrictPostList(generics.ListCreateAPIView):
         interact via: DELETE <host>/gsndb/<access_level>/district/<pk> body = {"id": 1}
         """
         pk = request.data["id"]
+        return Response(pk)
         current_district = get_object_or_404(District, pk = pk)
         connected_schools = False
         all_schools = School.objects.all()
