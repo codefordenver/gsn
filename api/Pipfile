@@ -13,7 +13,6 @@ djangorestframework-jwt = "*"
 httpie = "*"
 django-cors-headers = "*"
 djangorestframework-camel-case2 = "*"
-pandas = "*"
 
 [dev-packages]
 coverage = "*"

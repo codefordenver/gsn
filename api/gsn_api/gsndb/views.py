@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from gsndb.filter_security import FilterSecurity
-from .services.parser import CSVParser
 from django.contrib.auth.models import User
 
 def post_note(request, Model, pk, access_level):
@@ -794,97 +793,3 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
 
-class UploadCSV(APIView):
-
-    parser_classes = (
-        MultiPartParser,
-    )
-
-    def __init__(self):
-        self.file_name = ""
-        self.hash = ""
-        self.has_file_already_uploaded = False
-
-    def hash_handler(self, byte_file_obj):
-        """A hash function that identifies gives a csv file a hash that uniquely
-        identifies it against other csv files.
-
-        Note: the .read() method reads entire file to memory, so large
-        files may cause your machine to crash. Use .chunks() for larger files.
-        """
-        blocksize = 65536
-        hasher = hashlib.sha1()
-        content = ""
-        self.file_name = byte_file_obj.name
-        buf = byte_file_obj.read(blocksize)
-        while len(buf) > 0:
-            hasher.update(buf)
-            content += buf.decode('utf-8')
-            buf = byte_file_obj.read(blocksize)
-        self.hash = hasher.hexdigest()
-        return content
-
-
-    def has_file_already_been_uploaded(self):
-        self.has_file_already_uploaded = FileSHA.objects.filter(hasher = self.hash).exists()
-
-    def create_hash(self):
-        if(not self.has_file_already_uploaded):
-            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
-
-    def post(self, request, access_level):
-        """Takes a file and turns it into an instance of Django's UploadedFile
-        class. The response generated renders an html template offering some
-        meta information.
-
-        Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
-        """
-        byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
-        if request.data["term_final_value"] == "True":
-            term_final_value = True
-        else:
-            term_final_value = False
-        content = self.hash_handler(byte_file_obj)
-        self.has_file_already_been_uploaded()
-
-        if(self.has_file_already_uploaded):
-            response = Response(
-                {
-                    "error": f"{self.file_name} has already been uploaded.",
-                    "content": content,
-                }
-            )
-        else:
-            string_io_obj = io.StringIO(content)
-            parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
-            parser.organize()
-            if len(parser.exceptions["Organize"]) == 0:
-                parser.input()
-                for key, value in parser.exceptions.items():
-                    if len(value) > 0:
-                        
-                        response = Response(
-                            {
-                                
-                                "upload_successful": "The CSV was successfully uploaded, with the following exceptions.",
-                                "exceptions": parser.exceptions,
-                                "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
-                            }
-                        )
-                        break
-                self.create_hash()
-                response = Response(
-                    {  
-                        "upload_successful": "The CSV was successfully uploaded.",
-                        "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
-                    }
-                )
-            else:
-                response = Response(
-                    {
-                        "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
-                        "exceptions": parser.exceptions,
-                    }
-                )
-        return response
