@@ -306,7 +306,9 @@ class DistrictPostList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         queryset = District.objects.all()
         serializer = CreateDistrictSerializer(queryset, many = True)
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def post(self, request, access_level, format = None):
         """
@@ -392,8 +394,8 @@ class DistrictPostList(generics.ListCreateAPIView):
         else:
             return Response(
                 {
-                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
-                    "schools": SchoolSerializer(current_district.school_set, many = True).data
+                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first."
+                    #"schools": SchoolSerializer(current_district.school_set, many = True).data
                 }
             )
 
