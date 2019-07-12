@@ -395,7 +395,7 @@ class DistrictPostList(generics.ListCreateAPIView):
             current_district.delete()
 
         return Response(pk)
-            return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+        '''    return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
             return Response(
                 {
