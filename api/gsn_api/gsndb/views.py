@@ -382,10 +382,11 @@ class DistrictPostList(generics.ListCreateAPIView):
         """
         pk = request.data["id"]
         current_district = District.objects.get(pk = pk)
-        return Response(pk)
-        '''# current_district = get_object_or_404(District, pk = pk)
+        
+        # current_district = get_object_or_404(District, pk = pk)
         connected_schools = False
-        all_schools = School.objects.all()
+        return Response(pk)
+        '''all_schools = School.objects.all()
         for school in all_schools:
             if school.district.id == pk:
                 connected_schools = True
