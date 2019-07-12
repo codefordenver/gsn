@@ -385,14 +385,16 @@ class DistrictPostList(generics.ListCreateAPIView):
         
         # current_district = get_object_or_404(District, pk = pk)
         connected_schools = False
-        return Response(pk)
-        '''all_schools = School.objects.all()
+        
+        all_schools = School.objects.all()
         for school in all_schools:
             if school.district.id == pk:
                 connected_schools = True
                 break
         if connected_schools == False:
             current_district.delete()
+
+        return Response(pk)
             return HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
         else:
             return Response(
