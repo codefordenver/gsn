@@ -297,12 +297,12 @@ class SchoolPostList(generics.ListCreateAPIView):
         if is_connected == False:
             current_school.delete()
             queryset = School.objects.all()
-                serializer = SchoolSerializer(queryset, many = True)
-        return Response(serializer.data)
+            serializer = SchoolSerializer(queryset, many = True)
+            return Response(serializer.data)
         else:
-            return response = Response(
+            return Response(
                 {
-                    "Sorry": "You cannot delete a student with students already connected to it.",
+                    "Sorry": "You cannot delete a school with students already connected to it.",
                 }
             )
 
