@@ -14,6 +14,8 @@ class CSVParser():
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value= False):
         self.school_of_csv_origin = school_of_csv_origin
         self.school = School.objects.get(name = self.school_of_csv_origin)
+        self.district = self.school.district
+        self.program = Program.objects.get(name = 'Expelled and At-Risk Student Services Program')
         self.data_entered_for = []
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
@@ -189,23 +191,23 @@ class CSVParser():
                     ],
                     "program.name": [
                         "django",
-                        'Expelled and At-Risk Student Services Program',
+                        self.program.name,
                     ],
                     "district.name": [
                         "django",
-                        self.school.district.name,
+                        self.district.name,
                     ],
                     "district.state": [
                         "django",
-                        self.school.district.state,
+                        self.district.state,
                     ],
                     "district.city": [
                         "django",
-                        self.school.district.city,
+                        self.district.city,
                     ],
                     "district.code": [
                         "django",
-                        self.school.district.code,
+                        self.district.code,
                     ],
                     "school.name": [
                         "django",
@@ -423,17 +425,9 @@ class CSVParser():
         return data_element
 
     def parse_json(self):
-        program = Program.objects.get(name = self.json_object["program.name"])
-        district = District.objects.get(
-            name = self.json_object["district.name"],
-            city = self.json_object["district.city"],
-            code = self.json_object["district.code"],
-            state = self.json_object["district.state"],
-        )
-        school = School.objects.get(
-            district = district,
-            name = self.json_object["school.name"],
-        )
+        program = self.program
+        district = self.district
+        school = self.school
 
         #parse student data
         student_array = self.json_object["Student"]
