@@ -218,9 +218,7 @@ class SchoolPostList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         queryset = School.objects.all()
         serializer = SchoolSerializer(queryset, many = True)
-        response = Response(serializer.data)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
+        return Response(serializer.data)
 
     def post(self, request, access_level, format = None):
         """
@@ -298,15 +296,15 @@ class SchoolPostList(generics.ListCreateAPIView):
                 break
         if is_connected == False:
             current_school.delete()
-            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
+            queryset = School.objects.all()
+            serializer = SchoolSerializer(queryset, many = True)
+            return Response(serializer.data)
         else:
-            response = Response(
+            return Response(
                 {
-                    "Sorry": "You cannot delete a student with students already connected to it.",
+                    "Sorry": "You cannot delete a school with students already connected to it.",
                 }
             )
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
 
 
 class DistrictPostList(generics.ListCreateAPIView):
@@ -314,9 +312,7 @@ class DistrictPostList(generics.ListCreateAPIView):
     def get(self, request, access_level, format = None):
         queryset = District.objects.all()
         serializer = CreateDistrictSerializer(queryset, many = True)
-        response = Response(serializer.data)
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
+        return Response(serializer.data)
 
     def post(self, request, access_level, format = None):
         """
@@ -403,16 +399,16 @@ class DistrictPostList(generics.ListCreateAPIView):
                 break
         if connected_schools == False:
             current_district.delete()
-            response = HttpResponseRedirect(f"/gsndb/{access_level}/create-district/")
+            queryset = District.objects.all()
+            serializer = CreateDistrictSerializer(queryset, many = True)
+            return Response(serializer.data)
         else:
-            response = Response(
+            return Response(
                 {
-                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first.",
-                    "schools": SchoolSerializer(current_district.school_set, many = True).data
+                    "Sorry": "You cannot delete a district with schools already connected to it. To delete this district, delete the following schools first."
+                    #"schools": SchoolSerializer(current_district.school_set, many = True).data
                 }
             )
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
 
 
 
