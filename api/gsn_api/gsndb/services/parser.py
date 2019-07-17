@@ -414,18 +414,6 @@ class CSVParser():
 
         return self.json_object
 
-    def organize(self):
-        """
-        Organizes the csv file the parser was instantiated with and turns it into a single json_object.
-        """
-        datatypes = self.get_csv_datatypes()
-        try:
-            csv_df = self.get_dataframe(datatypes)
-            self.json_object = self.build_json(csv_df)
-            return self.json_object
-        except:
-            return self.exceptions
-
     def check_and_handle_max_length(self, data_element, TargetModel):
         for field, value in data_element.items():
             target_field = TargetModel._meta.get_field(field)
@@ -743,8 +731,3 @@ class CSVParser():
         return {
             "access results": access_created,
         }
-
-    def input(self):
-        self.parse_json()
-        self.make_added_students_accessible()
-        return self.exceptions
