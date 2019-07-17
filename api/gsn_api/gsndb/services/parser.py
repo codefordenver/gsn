@@ -6,6 +6,7 @@ from django.utils import timezone
 from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior, StudentUserHasAccess
 from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer
 from django.contrib.auth.models import User
+from django.db.models import CharField
 
 
 class CSVParser():
@@ -425,6 +426,14 @@ class CSVParser():
         except:
             return self.exceptions
 
+    def check_and_handle_max_length(self, data_element, TargetModel):
+        for field, value in data_element.items():
+            target_field = TargetModel._meta.get_field(field)
+            if target_field.__class__ == CharField:
+                new_value = value[:target_field.max_length]
+                data_element[field] = new_value
+        return data_element
+
     def parse_json(self):
         program = Program.objects.get(name = self.json_object["program.name"])
         district = District.objects.get(
@@ -449,6 +458,7 @@ class CSVParser():
                 if key.startswith("student.") and value != None:
                     field_name = key[len("student."):]
                     student_data[field_name] = value
+            self.check_and_handle_max_length(student_data, Student)
 
             if SISID in all_school_SISIDs:
                 student = HistoricalStudentID.objects.get(student_SISID = SISID).student
@@ -536,6 +546,7 @@ class CSVParser():
                 if value != None:
                     field_name = key[len("course."):]
                     course_data[field_name] = value
+            self.check_and_handle_max_length(course_data, Course)
             duplicate_check_query = Course.objects.filter(**course_data)
             if duplicate_check_query.exists():
                 continue
@@ -608,6 +619,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("grade."):]
                         grade_data[field_name] = value
+                self.check_and_handle_max_length(grade_data, Grade)
                 duplicate_check_query = Grade.objects.filter(**grade_data)
                 if duplicate_check_query.exists():
                     continue
@@ -652,6 +664,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("attendance."):]
                         attendance_data[field_name] = value
+                self.check_and_handle_max_length(attendance_data, Attendance)
                 duplicate_check_query = Attendance.objects.filter(**attendance_data)
                 if duplicate_check_query.exists():
                     continue
@@ -685,6 +698,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("behavior."):]
                         behavior_data[field_name] = value
+                self.check_and_handle_max_length(behavior_data, Behavior)
                 duplicate_check_query = Behavior.objects.filter(**behavior_data)
                 if duplicate_check_query.exists():
                     continue
@@ -709,6 +723,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("behavior."):]
                         behavior_data[field_name] = value
+                self.check_and_handle_max_length(behavior_data, Behavior)
                 duplicate_check_query = Behavior.objects.filter(**behavior_data)
                 if duplicate_check_query.exists():
                     continue
