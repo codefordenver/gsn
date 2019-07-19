@@ -34,7 +34,8 @@ class Note(models.Model):
 
 
 class District(models.Model):
-    """establish state choices"""
+    """establish state choices
+    if these change they need to change on the frontend too"""
     STATE_CHOICES = (
         ("AL", "Alabama"),
         ("AK", "Alaska"),
