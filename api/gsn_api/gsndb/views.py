@@ -216,7 +216,7 @@ class ReferralList(generics.ListCreateAPIView):
 class SchoolPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
-        queryset = School.objects.all()
+        queryset = School.objects.filter(student__isnull = True)
         serializer = SchoolSerializer(queryset, many = True)
         return Response(serializer.data)
 
@@ -310,7 +310,7 @@ class SchoolPostList(generics.ListCreateAPIView):
 class DistrictPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
-        queryset = District.objects.all()
+        queryset = District.objects.filter(school__isnull = True)
         serializer = CreateDistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
@@ -898,4 +898,5 @@ class UploadCSV(APIView):
                         "exceptions": parser.exceptions,
                     }
                 )
+        response["Access-Control-Allow-Origin"] = "*"
         return response
