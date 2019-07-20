@@ -899,4 +899,5 @@ class UploadCSV(APIView):
                     }
                 )
         response["Access-Control-Allow-Origin"] = "*"
+        response["access-control-allow-headers"] = "*"
         return response
