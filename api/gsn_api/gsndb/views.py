@@ -310,7 +310,7 @@ class SchoolPostList(generics.ListCreateAPIView):
 class DistrictPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
-        queryset = District.objects.filter(school__isnull = True)
+        queryset = District.objects.all() #filter(school__isnull = True)
         serializer = CreateDistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
