@@ -844,7 +844,7 @@ class UploadCSV(APIView):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)'''
 
     #def post(self, request, access_level):
-    def post(self, request, access_level, format = None):
+    def post(self, request, access_level):
         """
         This method allows new schools to be posted to the database.
 
