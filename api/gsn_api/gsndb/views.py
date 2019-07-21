@@ -845,43 +845,21 @@ class UploadCSV(APIView):
 
     #def post(self, request, access_level):
     def post(self, request, access_level):
-        """
-        This method allows new schools to be posted to the database.
-
-        The body of the post request this method handles should be in JSON format:
-
-        {"school_name": "new school name",
-        "district_id": "district pk"
-        }
-        """
-
-        '''json = request.data
-        school_data = {
-            "name": json["school_name"],
-            "district": json["district_id"]
-        }
-        serializer = SchoolSerializer(data = school_data)
-        if serializer.is_valid():
-            serializer.save()
-            response =  HttpResponseRedirect(f"/gsndb/{access_level}/create-school/")
-        else:
-
-            response =  Response({
-                                "Sorry": "The serializer denied saving this note.",
-                                "The serializer raised the following errors": serializer.errors
-                            })
-        response["Access-Control-Allow-Origin"] = "*"
-        '''
-        response = Response({"Hello"})
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
         """Takes a file and turns it into an instance of Django's UploadedFile
         class. The response generated renders an html template offering some
         meta information.
 
         Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
         """
+
+        byte_file_obj = request.data["csv"]
+        school_of_origin = request.data["school_of_csv_origin"]
+    
+        response = Response({"Hello"})
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
+
+        
         #byte_file_obj = request.data["csv"]
         #school_of_origin = request.data["school_of_csv_origin"]
 
