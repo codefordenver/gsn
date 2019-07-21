@@ -852,7 +852,9 @@ class UploadCSV(APIView):
         """
         byte_file_obj = request.data["csv"]
         school_of_origin = request.data["school_of_csv_origin"]
-        if request.data["term_final_value"] == "True":
+
+        response = school_of_origin
+        '''if request.data["term_final_value"] == "True":
             term_final_value = True
         else:
             term_final_value = False
@@ -897,7 +899,5 @@ class UploadCSV(APIView):
                         "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
                         "exceptions": parser.exceptions,
                     }
-                )
-        response["Access-Control-Allow-Origin"] = "*"
-        response["access-control-allow-headers"] = "*"
+                )'''
         return response
