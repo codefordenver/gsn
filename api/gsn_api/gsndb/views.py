@@ -872,7 +872,8 @@ class UploadCSV(APIView):
                             })
         response["Access-Control-Allow-Origin"] = "*"
         '''
-        response = "Hello"
+        response = Response({"Hello"})
+        response["Access-Control-Allow-Origin"] = "*"
         return response
 
         """Takes a file and turns it into an instance of Django's UploadedFile
