@@ -850,10 +850,10 @@ class UploadCSV(APIView):
 
         Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
         """
-        byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
+        #byte_file_obj = request.data["csv"]
+        #school_of_origin = request.data["school_of_csv_origin"]
 
-        response = school_of_origin
+        response = "Hello"
         '''if request.data["term_final_value"] == "True":
             term_final_value = True
         else:
