@@ -807,7 +807,7 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UploadCSV(APIView):
 
-    parser_classes = (
+    '''parser_classes = (
         MultiPartParser,
     )
 
@@ -841,7 +841,7 @@ class UploadCSV(APIView):
 
     def create_hash(self):
         if(not self.has_file_already_uploaded):
-            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
+            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)'''
 
     def post(self, request, access_level):
         """Takes a file and turns it into an instance of Django's UploadedFile
