@@ -807,11 +807,11 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UploadCSV(APIView):
 
-    '''parser_classes = (
+    parser_classes = (
         MultiPartParser,
     )
 
-    def __init__(self):
+    '''def __init__(self):
         self.file_name = ""
         self.hash = ""
         self.has_file_already_uploaded = False
