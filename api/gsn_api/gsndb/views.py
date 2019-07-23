@@ -855,7 +855,7 @@ class UploadCSV(APIView):
     
         response = Response({"Hello"})
         response["Access-Control-Allow-Origin"] = "*"
-        return Response(request.data)
+        return Response("Hello")#request.data)
 
         
         #byte_file_obj = request.data["csv"]
