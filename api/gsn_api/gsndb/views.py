@@ -851,11 +851,11 @@ class UploadCSV(APIView):
         """
 
         #byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
+        #school_of_origin = request.data["school_of_csv_origin"]
     
         response = Response({"Hello"})
         response["Access-Control-Allow-Origin"] = "*"
-        return response
+        return request
 
         
         #byte_file_obj = request.data["csv"]
