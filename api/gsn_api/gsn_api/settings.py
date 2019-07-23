@@ -68,6 +68,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PARSER_CLASSES': (
         'djangorestframework_camel_case2.parser.CamelCaseJSONParser',
+        'rest_framework.parsers.MultiPartParser',
         # Any other parsers
     ),
 }
