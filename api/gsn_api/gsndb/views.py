@@ -851,7 +851,8 @@ class UploadCSV(APIView):
         """
 
         byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
+        school_of_origin_id = request.data["school_of_csv_origin"]
+        school_of_origin = School.objects.get(pk = school_of_origin_id)
 
         if request.data["term_final_value"] == "True":
             term_final_value = True
