@@ -10,9 +10,10 @@ from django.contrib.auth.models import User
 
 class CSVParser():
 
-    def __init__(self, string_file_obj, school_of_csv_origin, term_final_value= False):
-        self.school_of_csv_origin = school_of_csv_origin
-        self.school = School.objects.get(name = self.school_of_csv_origin)
+    def __init__(self, string_file_obj, school_of_csv_origin_id, term_final_value= False):
+        self.school_of_csv_origin_id = school_of_csv_origin_id
+        self.school = School.objects.get(pk = self.school_of_csv_origin_id)
+        self.school_of_csv_origin = self.school.name
         self.data_entered_for = []
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
