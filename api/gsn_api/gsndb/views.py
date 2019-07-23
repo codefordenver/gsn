@@ -807,7 +807,7 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UploadCSV(APIView):
 
-    parser_classes = (MultiPartParser,FormParser,JSONParser)
+    parser_classes = (MultiPartParser)
 
     '''def __init__(self):
         self.file_name = ""
@@ -855,7 +855,7 @@ class UploadCSV(APIView):
     
         response = Response({"Hello"})
         response["Access-Control-Allow-Origin"] = "*"
-        return Response("Hello")#request.data)
+        return Response(request.body)
 
         
         #byte_file_obj = request.data["csv"]
