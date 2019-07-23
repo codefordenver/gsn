@@ -809,7 +809,7 @@ class UploadCSV(APIView):
 
     parser_classes = (MultiPartParser,FormParser,JSONParser)
 
-    '''def __init__(self):
+    def __init__(self):
         self.file_name = ""
         self.hash = ""
         self.has_file_already_uploaded = False
@@ -839,7 +839,7 @@ class UploadCSV(APIView):
 
     def create_hash(self):
         if(not self.has_file_already_uploaded):
-            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)'''
+            FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
     #def post(self, request, access_level):
     def post(self, request, access_level):
@@ -850,19 +850,10 @@ class UploadCSV(APIView):
         Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
         """
 
-        #byte_file_obj = request.data["csv"]
+        byte_file_obj = request.data["csv"]
         school_of_origin = request.data["school_of_csv_origin"]
-    
-        response = Response({"Hello"})
-        response["Access-Control-Allow-Origin"] = "*"
-        return Response(request.data)
 
-        
-        #byte_file_obj = request.data["csv"]
-        #school_of_origin = request.data["school_of_csv_origin"]
-
-        #response = "Hello"
-        '''if request.data["term_final_value"] == "True":
+        if request.data["term_final_value"] == "True":
             term_final_value = True
         else:
             term_final_value = False
@@ -907,5 +898,5 @@ class UploadCSV(APIView):
                         "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
                         "exceptions": parser.exceptions,
                     }
-                )'''
-        #return response
+                )
+        return response
