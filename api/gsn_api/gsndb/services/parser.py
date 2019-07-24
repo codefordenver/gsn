@@ -6,6 +6,7 @@ from django.utils import timezone
 from gsndb.models import Program, District, School, Course, Student, Calendar, HistoricalStudentID, Grade, Attendance, Behavior, StudentUserHasAccess
 from gsndb.serializers import ParserStudentSerializer, ParserCourseSerializer
 from django.contrib.auth.models import User
+from django.db.models import CharField
 
 
 class CSVParser():
@@ -13,6 +14,8 @@ class CSVParser():
     def __init__(self, string_file_obj, school_of_csv_origin, term_final_value= False):
         self.school_of_csv_origin = school_of_csv_origin
         self.school = School.objects.get(name = self.school_of_csv_origin)
+        self.district = self.school.district
+        self.program = Program.objects.get(name = 'Expelled and At-Risk Student Services Program')
         self.data_entered_for = []
         self.string_file_obj = string_file_obj
         self.term_final_value = term_final_value
@@ -121,7 +124,7 @@ class CSVParser():
         self.datatypes_dict = {
             #datatypes are NumPy dtypes, and 'object' for strings.
             #Note: django appears to want datetimes as strings, not np.datetime64
-            'int': np.int64,
+            'int': pd.Int64Dtype(),
             'str': object,
             'bool': np.bool_,
             'float': np.float64,
@@ -143,35 +146,6 @@ class CSVParser():
         #csv fields based on school of origin.
         self.master_field_dict = {
             #Keys: json fields. Values: csv fields.
-            "Trivial": {
-                #out of date.
-                'studentFirstName': 'studentFirstName',
-                'studentLastName': 'studentLastName',
-                'studentMiddleName': "studentMiddleName",
-                'studentGender': "studentGender",
-                'studentBirthday': "studentBirthday",
-                'studentStateID': "studentStateID",
-                'studentGradeYear': "studentGradeYear",
-                'courseName': "courseName",
-                'courseCode': "courseCode",
-                'courseSubject': "courseSubject",
-                'courseCalendarYear': "courseCalendarYear",
-                'courseCalendarTerm': "courseCalendarTerm",
-                'grade.period': "grade.period",
-                'grae.grade': "grade",
-                'grade.term_final_value': "grade.term_final_value",
-                'attendance.entry_datetime': "attendance.entry_datetime",
-                'attendance.total_unexabs': "attendance.total_unexabs",
-                'attendance.total_exabs': "attendance.total_exabs",
-                'attendance.total_tardies': "attendance.total_tardies",
-                'attendance.avg_daily_attendance': "attendance.avg_daily_attendance",
-                'attendance.term_final_value': "attendance.term_final_value",
-                'behavior.period': "behavior.period",
-                'behavior.incident_datetime': "behavior.incident_datetime",
-                'behavior.context': "behavior.context",
-                'behavior.incident_type_school': "behavior.incident_type_school",
-                'behavior.incident_result_school': "behavior.incident_result_school",
-            },
             "Weld Central Middle School": {
                 "direct": {
                     'student.first_name': "student.firstName",
@@ -198,55 +172,71 @@ class CSVParser():
                 },
                 "parse": {
                     "student.birth_date": [
-                        'student.birthdate',
+                        [
+                            'student.birthdate',
+                        ],
                         lambda dataframe_row: str(datetime.strptime(dataframe_row['student.birthdate'], "%m/%d/%Y").strftime('%Y-%m-%d')),
                     ],
                     'behavior.incident_datetime': [
-                        "behaviorDetail.incidentDate",
+                        [
+                            "behaviorDetail.incidentDate",
+                        ],
                         lambda dataframe_row: str(datetime.strptime(dataframe_row['behaviorDetail.incidentDate'], "%m/%d/%Y")),
                     ],
                     'grade.entry_datetime': [
-                        'grading.date',
+                        [
+                            'grading.date',
+                        ],
                         lambda dataframe_row: str(datetime.strptime(dataframe_row['grading.date'], "%m/%d/%Y")),
                     ],
                     "program.name": [
                         "django",
-                        'Expelled and At-Risk Student Services Program',
+                        self.program.name,
                     ],
                     "district.name": [
                         "django",
-                        self.school.district.name,
+                        self.district.name,
                     ],
                     "district.state": [
                         "django",
-                        self.school.district.state,
+                        self.district.state,
                     ],
                     "district.city": [
                         "django",
-                        self.school.district.city,
+                        self.district.city,
                     ],
                     "district.code": [
                         "django",
-                        self.school.district.code,
+                        self.district.code,
                     ],
                     "school.name": [
                         "django",
                         self.school.name,
                     ],
                     "grade.calendar.year": [
-                        "cal.endYear",
+                        [
+                            "cal.endYear",
+                            'grading.termName',
+                        ],
                         lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['grading.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['grading.termName'] == "S2" else None,
                     ],
                     "grade.calendar.term": [
-                        "grading.termName",
+                        [
+                            "grading.termName",
+                        ],
                         lambda dataframe_row: "FLL" if dataframe_row['grading.termName'] == "S1" else "SPR" if dataframe_row['grading.termName'] == "S2" else None,
                     ],
                     "attendance.calendar.year": [
-                        "cal.endYear",
+                        [
+                            "cal.endYear",
+                            'attExactDailyTermCount.termName',
+                        ],
                         lambda dataframe_row: dataframe_row['cal.endYear'] - 1 if dataframe_row['attExactDailyTermCount.termName'] == "S1" else dataframe_row['cal.endYear'] if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
                     "attendance.calendar.term": [
-                        "attExactDailyTermCount.termName",
+                        [
+                            "attExactDailyTermCount.termName",
+                        ],
                         lambda dataframe_row: "FLL" if dataframe_row['attExactDailyTermCount.termName'] == "S1" else "SPR" if dataframe_row['attExactDailyTermCount.termName'] == "S2" else None,
                     ],
                     "grade.term_final_value": [
@@ -262,7 +252,10 @@ class CSVParser():
                         str(timezone.now()),
                     ],
                     "attendance.total_exabs": [
-                        "attExactDailyTermCount.unexcusedAbsentDays",
+                        [
+                            "attExactDailyTermCount.unexcusedAbsentDays",
+                            'attExactDailyTermCount.absentDays',
+                        ],
                         lambda dataframe_row: round(dataframe_row['attExactDailyTermCount.absentDays'] - dataframe_row['attExactDailyTermCount.unexcusedAbsentDays'], 2)
                     ],
                 },
@@ -290,11 +283,11 @@ class CSVParser():
         for json_field, csv_field in json_to_csv_field_dict["direct"].items():
             datatype = self.target_field_datatypes[json_field]
             csv_datatypes[csv_field] = datatype
-        for json_field, parsing_pair in json_to_csv_field_dict["parse"].items():
-            csv_field = parsing_pair[0]
-            if csv_field != "django":
+        for json_field, parse_objects in json_to_csv_field_dict["parse"].items():
+            parse_source = parse_objects[0]
+            if parse_source != "django":
                 datatype = self.target_field_datatypes[json_field]
-                csv_datatypes[csv_field] = datatype
+                csv_datatypes[parse_source[0]] = datatype
         return csv_datatypes
 
     def get_dataframe(self, csv_datatypes):
@@ -306,11 +299,12 @@ class CSVParser():
 
         expected_columns = []
         json_to_csv_field_dict = self.master_field_dict[self.school_of_csv_origin]
-        for key, value in json_to_csv_field_dict["direct"].items():
-            expected_columns.append(value)
-        for key, value in json_to_csv_field_dict["parse"].items():
-            if value[0] != "django":
-                expected_columns.append(value[0])
+        for json_field, csv_field in json_to_csv_field_dict["direct"].items():
+            expected_columns.append(csv_field)
+        for json_field, parse_objects in json_to_csv_field_dict["parse"].items():
+            parse_source = parse_objects[0]
+            if parse_source != "django":
+                expected_columns.append(parse_source[0])
         expected_columns = set(expected_columns)
         csv_columns = set(list(csv_df.columns))
         if csv_columns == expected_columns:
@@ -352,11 +346,11 @@ class CSVParser():
                     csv_field = direct_dict[child_field]
                     subset_fields.append(csv_field)
                 elif child_field in parse_fields:
-                    csv_field = parse_dict[child_field][0]
-                    if csv_field == "django":
+                    parse_source = parse_dict[child_field][0]
+                    if parse_source == "django":
                         continue
                     else:
-                        subset_fields.append(csv_field)
+                        subset_fields.append(parse_source[0])
                 elif child_field in blank_fields:
                     continue
             subset_fields = set(subset_fields)
@@ -374,46 +368,66 @@ class CSVParser():
                     if child_field in direct_fields:
                         csv_field = direct_dict[child_field]
                         value = row[csv_field]
+                        if value == replacement_for_nan:
+                            value = None
                     elif child_field in parse_fields:
-                        csv_field = parse_dict[child_field][0]
-                        if csv_field == "django":
+                        parse_source = parse_dict[child_field][0]
+                        if parse_source == "django":
                             value = parse_dict[child_field][1]
                         else:
-                            lambda_parser = parse_dict[child_field][1]
-                            value = lambda_parser(row)
+                            if replacement_for_nan in [row[csv_field] for csv_field in parse_source]:
+                                value = None
+                            else:
+                                lambda_parser = parse_dict[child_field][1]
+                                value = lambda_parser(row)
                     elif child_field in blank_fields:
-                        value = None
-                    if value == replacement_for_nan:
                         value = None
                     child_output[child_field] = value
                 housing_output.append(child_output)
             output[housing_field] = housing_output
-        return output
+        self.json_object = output
 
-    def organize(self):
-        """
-        Organizes the csv file the parser was instantiated with and turns it into a single json_object.
-        """
-        datatypes = self.get_csv_datatypes()
-        try:
-            csv_df = self.get_dataframe(datatypes)
-            self.json_object = self.build_json(csv_df)
-            return self.json_object
-        except:
-            return self.exceptions
+        for housing_field in self.target_housing_fields:
+            data_array = self.json_object[housing_field]
+            possible_missing_data_copies = []
+            confirmed_missing_data_copies = []
+            for element in data_array:
+                if None in element.values():
+                    possible_missing_data_copies.append(element)
+            for possible_copy in possible_missing_data_copies:
+                copy_check_template = {}
+                for field, value in possible_copy.items():
+                    if value != None:
+                        copy_check_template[field] = value
+                copy_check_array = []
+                for element in data_array:
+                    copy_check_element = {}
+                    for field in copy_check_template.keys():
+                        copy_check_element[field] = element[field]
+                    copy_check_array.append(copy_check_element)
+                count = 0
+                for copy_check_element in copy_check_array:
+                    if copy_check_element == copy_check_template:
+                        count += 1
+                if count > 1:
+                    confirmed_missing_data_copies.append(possible_copy)
+            for confirmed_copy in confirmed_missing_data_copies:
+                data_array.remove(confirmed_copy)
+
+        return self.json_object
+
+    def check_and_handle_max_length(self, data_element, TargetModel):
+        for field, value in data_element.items():
+            target_field = TargetModel._meta.get_field(field)
+            if target_field.__class__ == CharField:
+                new_value = value[:target_field.max_length]
+                data_element[field] = new_value
+        return data_element
 
     def parse_json(self):
-        program = Program.objects.get(name = self.json_object["program.name"])
-        district = District.objects.get(
-            name = self.json_object["district.name"],
-            city = self.json_object["district.city"],
-            code = self.json_object["district.code"],
-            state = self.json_object["district.state"],
-        )
-        school = School.objects.get(
-            district = district,
-            name = self.json_object["school.name"],
-        )
+        program = self.program
+        district = self.district
+        school = self.school
 
         #parse student data
         student_array = self.json_object["Student"]
@@ -426,6 +440,7 @@ class CSVParser():
                 if key.startswith("student.") and value != None:
                     field_name = key[len("student."):]
                     student_data[field_name] = value
+            self.check_and_handle_max_length(student_data, Student)
 
             if SISID in all_school_SISIDs:
                 student = HistoricalStudentID.objects.get(student_SISID = SISID).student
@@ -513,6 +528,7 @@ class CSVParser():
                 if value != None:
                     field_name = key[len("course."):]
                     course_data[field_name] = value
+            self.check_and_handle_max_length(course_data, Course)
             duplicate_check_query = Course.objects.filter(**course_data)
             if duplicate_check_query.exists():
                 continue
@@ -585,6 +601,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("grade."):]
                         grade_data[field_name] = value
+                self.check_and_handle_max_length(grade_data, Grade)
                 duplicate_check_query = Grade.objects.filter(**grade_data)
                 if duplicate_check_query.exists():
                     continue
@@ -629,6 +646,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("attendance."):]
                         attendance_data[field_name] = value
+                self.check_and_handle_max_length(attendance_data, Attendance)
                 duplicate_check_query = Attendance.objects.filter(**attendance_data)
                 if duplicate_check_query.exists():
                     continue
@@ -662,6 +680,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("behavior."):]
                         behavior_data[field_name] = value
+                self.check_and_handle_max_length(behavior_data, Behavior)
                 duplicate_check_query = Behavior.objects.filter(**behavior_data)
                 if duplicate_check_query.exists():
                     continue
@@ -686,6 +705,7 @@ class CSVParser():
                     if value != None:
                         field_name = key[len("behavior."):]
                         behavior_data[field_name] = value
+                self.check_and_handle_max_length(behavior_data, Behavior)
                 duplicate_check_query = Behavior.objects.filter(**behavior_data)
                 if duplicate_check_query.exists():
                     continue
@@ -705,8 +725,3 @@ class CSVParser():
         return {
             "access results": access_created,
         }
-
-    def input(self):
-        self.parse_json()
-        self.make_added_students_accessible()
-        return self.exceptions
