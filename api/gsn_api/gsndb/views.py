@@ -216,7 +216,7 @@ class ReferralList(generics.ListCreateAPIView):
 class SchoolPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
-        queryset = School.objects.all()
+        queryset = School.objects.filter(student__isnull = True)
         serializer = SchoolSerializer(queryset, many = True)
         return Response(serializer.data)
 
