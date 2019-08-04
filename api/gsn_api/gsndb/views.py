@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from gsndb.models import Program, District, School, Student, Course, Calendar, Grade, Behavior, Attendance, Referral, Note, Bookmark, FileSHA, StudentUserHasAccess, MyStudents, HistoricalStudentID
 from gsndb.serializers import ProgramSerializer, ProgramDetailSerializer, CourseDetailSerializer, SchoolDetailSerializer, StudentDetailSerializer,DistrictSerializer, DistrictDetailSerializer, SchoolSerializer, StudentSerializer, CourseSerializer, CalendarSerializer, GradeSerializer, BehaviorSerializer, AttendanceSerializer, ReferralSerializer, NoteSerializer, BookmarkSerializer, NestedSchoolSerializer, NestedStudentSerializer, NestedProgramSerializer, MyStudentsSerializer, ReferralDetailSerializer, CreateDistrictSerializer
@@ -310,7 +310,7 @@ class SchoolPostList(generics.ListCreateAPIView):
 class DistrictPostList(generics.ListCreateAPIView):
 
     def get(self, request, access_level, format = None):
-        queryset = District.objects.all()
+        queryset = District.objects.all() #filter(school__isnull = True)
         serializer = CreateDistrictSerializer(queryset, many = True)
         return Response(serializer.data)
 
@@ -807,9 +807,7 @@ class BookmarkDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UploadCSV(APIView):
 
-    parser_classes = (
-        MultiPartParser,
-    )
+    parser_classes = (MultiPartParser,FormParser,JSONParser)
 
     def __init__(self):
         self.file_name = ""
@@ -843,6 +841,7 @@ class UploadCSV(APIView):
         if(not self.has_file_already_uploaded):
             FileSHA.objects.create(hasher = self.hash, filePath = self.file_name)
 
+    #def post(self, request, access_level):
     def post(self, request, access_level):
         """Takes a file and turns it into an instance of Django's UploadedFile
         class. The response generated renders an html template offering some
@@ -850,8 +849,10 @@ class UploadCSV(APIView):
 
         Interact with: POST <host>/gsndb/access_level/uploadcsv/ {"school_of_csv_origin": <school_name>, "term_final_value" = <boolean>, "csv": <csv_file>}
         """
+
         byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
+        school_of_origin_id = request.data["school_of_csv_origin_id"]
+
         if request.data["term_final_value"] == "True":
             term_final_value = True
         else:
@@ -868,7 +869,7 @@ class UploadCSV(APIView):
             )
         else:
             string_io_obj = io.StringIO(content)
-            parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
+            parser = CSVParser(string_io_obj, school_of_origin_id, term_final_value)
             dtypes = parser.get_csv_datatypes()
             csv_df = parser.get_dataframe(dtypes)
             try:

@@ -11,9 +11,10 @@ from django.db.models import CharField
 
 class CSVParser():
 
-    def __init__(self, string_file_obj, school_of_csv_origin, term_final_value= False):
-        self.school_of_csv_origin = school_of_csv_origin
-        self.school = School.objects.get(name = self.school_of_csv_origin)
+    def __init__(self, string_file_obj, school_of_csv_origin_id, term_final_value= False):
+        self.school_of_csv_origin_id = school_of_csv_origin_id
+        self.school = School.objects.get(pk = self.school_of_csv_origin_id)
+        self.school_of_csv_origin = self.school.name
         self.district = self.school.district
         self.program = Program.objects.get(name = 'Expelled and At-Risk Student Services Program')
         self.data_entered_for = []
