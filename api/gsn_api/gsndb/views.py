@@ -870,9 +870,27 @@ class UploadCSV(APIView):
         else:
             string_io_obj = io.StringIO(content)
             parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
-            parser.organize()
-            if len(parser.exceptions["Organize"]) == 0:
-                parser.input()
+            dtypes = parser.get_csv_datatypes()
+            csv_df = parser.get_dataframe(dtypes)
+            try:
+                parser.build_json(csv_df)
+            except:
+                response = Response(
+                    {
+                        "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
+                        "exceptions": parser.exceptions,
+                    }
+                )
+            else:
+                parser.parse_json()
+                parser.make_added_students_accessible()
+                self.create_hash()
+                response = Response(
+                    {
+                        "upload_successful": "The CSV was successfully uploaded.",
+                        "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
+                    }
+                )
                 for key, value in parser.exceptions.items():
                     if len(value) > 0:
 
@@ -885,18 +903,6 @@ class UploadCSV(APIView):
                             }
                         )
                         break
-                self.create_hash()
-                response = Response(
-                    {
-                        "upload_successful": "The CSV was successfully uploaded.",
-                        "data_entered_for": StudentSerializer(parser.data_entered_for, many = True).data,
-                    }
-                )
-            else:
-                response = Response(
-                    {
-                        "upload_unsuccessful": "The CSV was not uploaded successfully due to the following exceptions.",
-                        "exceptions": parser.exceptions,
-                    }
-                )
+
+        response["Access-Control-Allow-Origin"] = "*"
         return response
