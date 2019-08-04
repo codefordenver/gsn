@@ -851,7 +851,7 @@ class UploadCSV(APIView):
         """
 
         byte_file_obj = request.data["csv"]
-        school_of_origin = request.data["school_of_csv_origin"]
+        school_of_origin_id = request.data["school_of_csv_origin_id"]
 
         if request.data["term_final_value"] == "True":
             term_final_value = True
@@ -869,7 +869,7 @@ class UploadCSV(APIView):
             )
         else:
             string_io_obj = io.StringIO(content)
-            parser = CSVParser(string_io_obj, school_of_origin, term_final_value)
+            parser = CSVParser(string_io_obj, school_of_origin_id, term_final_value)
             dtypes = parser.get_csv_datatypes()
             csv_df = parser.get_dataframe(dtypes)
             try:
