@@ -1,6 +1,11 @@
 # gsn
 An application to assist social workers in monitoring k-12 student performance. 
 
+## ALERT: Domain Name expiration / HTTP Server EOL:
+The gsndev.com domain expired on 11/04/2019. The gsn-api.com domain will expire on 11/24/2019. The server that hosts the api will also be deactivated on 11/24/2019. As the code for the API is readily available on Github, it should be relatively trivial to spin up another server. I recommend DigitalOcean, or maybe just a Raspberry with a DDNS Cloudflare rig to keep costs down. Of course there's Heroku too!
+
+Hopefully someone will come along and find this project worthy of dusting off! :smiley:
+
 ## Setting up your project from GitHub:
 
 To get things going quickly, it will be easiest if your local repo is a clone of the remote repo at codefordenver/gsn. Git has an elegant command to achieve just that:
