@@ -242,6 +242,16 @@ Unfortunately, the API hasn't quite figured out middle names, so any information
 An astute reader may be wondering why we're retrieving information with a POST request. This is because it is historically frowned upon to include data in the payload of a GET request that would then be parsed by the server. In our case, the sensitivity of the information being exchanged precludes transmission of certain parameters through the request url, consigning us to the constraints of the payload. Moreover, though HTTPS ensures URL encryption, the API wouldn't pass muster if it relied soley on SSL/TLS for basic security.
 
 
+## Updating the dependencies:
+This project utilizes pipenv. Some of the libraries might be out of date. To update these, use the following command:
+
+```bash
+cd api
+pipenv --three lock
+```
+
+Be patient. Pipfile.lock is being re-generated.
+
 ## Instructions for admin users updating the server:
 
 Once you have been given access and read/write/docker permissions to the development server, you will be capable of integrating changes tht have been made into the codebase so that frontend developers can interact with the most up-to-date version of the api! 
